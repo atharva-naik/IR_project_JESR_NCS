@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
 
@@ -11,11 +13,11 @@ class ConcatSim(nn.Module):
     def forward(self, text_emb: torch.Tensor, code_emb: torch.Tensor):
         return self.relu(
             self.linear(
-                torch.cat(
+                torch.cat((
                     text_emb, 
-                    code_emb
+                    code_emb,
                 ), 
-                axis=1
+                axis=1)
             )
         )
     
