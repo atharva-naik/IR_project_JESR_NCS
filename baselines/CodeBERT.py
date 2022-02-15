@@ -46,8 +46,7 @@ class TripletAccuracy:
         neg = self.pdist(anchor, neg)
         self.count += torch.as_tensor((neg-pos)>0).sum().item()
         self.tot += len(pos)
-        print(self.count, self.tot)
-    
+
 # TripletMarginWithDistanceLoss for custom design function.
 class TriplesDataset(Dataset):
     def __init__(self, path: str, tokenizer: Union[str, None, RobertaTokenizer]=None, **tok_args):
@@ -148,7 +147,7 @@ class CodeBERTripletNet(nn.Module):
                 batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
                 val_acc.update(anchor_text_emb, pos_code_emb, neg_code_emb)
                 batch_losses.append(batch_loss.item())
-                pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
+                pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*val_acc.get():.2f}")
                 if step == 5: break # DEBUG
                 
         return val_acc.get(), np.mean(batch_losses)
@@ -217,9 +216,9 @@ class CodeBERTripletNet(nn.Module):
             val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
                                          epochs=epochs, device=device)
             if val_acc > best_val_acc:
-                print(f"saving best model till now with val_acc: {val_acc}")
+                print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
                 best_val_acc = val_acc
-                model.save(save_path)
+                torch.save(self.state_dict(), save_path)
             train_metrics["epochs"].append({
                 "train_batch_losses": batch_losses, 
                 "train_loss": np.mean(batch_losses), 
@@ -229,8 +228,8 @@ class CodeBERTripletNet(nn.Module):
             })
         
         return train_metrics
-#     def predict(self):
-#         self.tokenizer.
+
+    
 def main():
     import os
     args = get_args()
@@ -239,9 +238,13 @@ def main():
     print("creating model object")
     triplet_net = CodeBERTripletNet(tok_path=tok_path)
     print("commencing training")
-    triplet_net.fit(train_path=args.train_path, 
-                    val_path=args.val_path, 
-                    exp_name=args.exp_name)
+    metrics = triplet_net.fit(train_path=args.train_path, 
+                              val_path=args.val_path, 
+                              exp_name=args.exp_name)
+    metrics_path = os.path.join(args.exp_name, "train_metrics.json")
+    print(f"saving metrics to {metrics_path}")
+    with open(metrics_path, "w") as f:
+        json.dump(metrics, f)
     
     
 if __name__ == "__main__":
