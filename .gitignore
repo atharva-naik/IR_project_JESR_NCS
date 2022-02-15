@@ -127,6 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+# large dataset files
 triples.json
 data/
 data
+triples_train.json
+triples_val.json

@@ -33,12 +33,13 @@ class NCSPipeLine(nn.Module):
         
         return score
     
-    def train(self, train_loader: DataLoader, 
-              val_loader: DataLoader, **args):
+    def train_triplet(self, train_loader: DataLoader, 
+                      val_loader: DataLoader, **args):
+        """train the similarity module using a triplet network configuration"""
         # training args.
         lr = args.get("lr", 1e-5)
         epochs = args.get("epochs", 20)
-        device = torch.cuda(args.get("device_id"), 0)
+        device = torch.cuda(args.get("device_id", "cuda:0"))
         # move model to device
         self.to(device)
         # train metrics JSON
@@ -51,12 +52,14 @@ class NCSPipeLine(nn.Module):
             batch_losses = []
             # train step.
             for step, batch in enumerate(train_loader):
-                batch[0] = batch[0].to(device)
-                batch[1] = batch[1].to(device)
-                scores = self(batch[0], batch[1])
-                labels = batch[2]
-                scores = scores.to("cpu")
-                bath_loss = self.loss_fn(scores, labels)
+                anchors = batch[0].to(device) # anchor text
+                positives = batch[1].to(device) # positive code snippet.
+                negatives = batch[2].to(device) # negative code snippet.
+                an_scores = self(batch[0], batch[1])
+                ap_scorse = self(batch[0], batch[2])
+                ap_scores = ap_scores.to("cpu")
+                an_scores = an_scores.to("cpu")
+                bath_loss = self.loss_fn(anchors, positives, negatives)
                 # clear previous gradients.
                 self.optimizer.zero_grad()
                 # calculate gradients and optimize.

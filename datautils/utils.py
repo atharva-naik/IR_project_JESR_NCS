@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import json
 import random
-from typing import List, Dict
+from tqdm import tqdm
+from typing import List, Dict, Tuple
 
 
 def read_jsonl(path: str) -> List[dict]:
@@ -49,4 +50,31 @@ def flatten_list(l: List[list]) -> list:
         flat_list += sub_list
         
     return flat_list
-        
+
+def create_triples(posts: List[List[dict]], neg_to_pos_ratio: int=3) -> List[Tuple[str, str, str]]:
+    """
+    create triples from the list of lists post structure.
+    Each post is a list of code snippet answers accompanying the intent (post title).
+    The code snippets are actually excerpts of the code blocks that were the answers.
+    """
+    triples: List[Tuple[str, str, str]] = []
+    for i, post in tqdm(enumerate(posts), desc="creating triplets"):
+        neg_posts = get_list_complement(posts, i)
+        # get list of negative samples from ans of the remaining posts.
+        neg_samples = flatten_list(neg_posts)
+        singleton_samples = 0
+        for j, ans in enumerate(post):
+            anchor = ans["intent"]
+            # get positive sample from remaining ans of the post.
+            pos_posts = get_list_complement(post, j)
+            try:
+                pos_sample = sample_list(pos_posts, k=1)[0]["snippet"]
+            except ValueError:
+                singleton_samples += 1
+                continue
+            # number of negative samples for a given positive sample.
+            for neg_post in sample_list(neg_samples, k=neg_to_pos_ratio):
+                neg_sample = neg_post["snippet"]
+                triples.append((anchor, pos_sample, neg_sample))
+                
+    return triples
