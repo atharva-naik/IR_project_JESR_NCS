@@ -39,13 +39,14 @@ class TripletAccuracy:
         self.tot = 0
         
     def get(self):
-        return self.tot/self.count
+        return self.count/self.tot
         
     def update(self, anchor, pos, neg):
         pos = self.pdist(anchor, pos)
         neg = self.pdist(anchor, neg)
         self.count += torch.as_tensor((neg-pos)>0).sum().item()
         self.tot += len(pos)
+        print(self.count, self.tot)
     
 # TripletMarginWithDistanceLoss for custom design function.
 class TriplesDataset(Dataset):
@@ -101,21 +102,23 @@ class CodeBERTripletNet(nn.Module):
                  tok_path: str="microsoft/codebert-base", **args):
         super(CodeBERTripletNet, self).__init__()
         self.config = {}
-        self.config.update(vars(args))
         self.config["model_path"] = model_path
         self.config["tok_path"] = tok_path
         
         margin = args.get("margin", 1)
         dist_fn_deg = args.get("dist_fn_deg", 2)
+        self.config["margin"] = margin
+        self.config["dist_fn_deg"] = dist_fn_deg
         print(f"loading pretrained CodeBERT embedding model from {model_path}")
         start = time.time()
         self.embed_model = RobertaModel.from_pretrained(model_path)
-        print(f"loaded embedding model in {time.time()-start}s")
+        print(f"loaded embedding model in {(time.time()-start):.2f}s")
         print(f"loaded tokenizer files from {tok_path}")
         self.tokenizer = RobertaTokenizer.from_pretrained(tok_path)
         # optimizer and loss.
         adam_eps = 1e-8
         lr = args.get("lr", 1e-5)
+        self.config["lr"] = lr
         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
         self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
         print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
@@ -130,7 +133,7 @@ class CodeBERTripletNet(nn.Module):
         
         return anchor_text_emb, pos_code_emb, neg_code_emb
         
-    def val(self, valloader: DataLoader):
+    def val(self, valloader: DataLoader, epoch_i: int=0, epochs: int=0, device="cuda:0"):
         self.eval()
         val_acc = TripletAccuracy()
         batch_losses = []
@@ -152,16 +155,19 @@ class CodeBERTripletNet(nn.Module):
         
     def fit(self, train_path: str, val_path: str, **args):
         batch_size = args.get("batch_size", 48)
+        self.config["batch_size"] = batch_size
         epochs = args.get("epochs", 5)
+        self.config["epochs"] = epochs
         device_id = args.get("device_id", "cuda:0")
+        self.config["device_id"] = device_id
         device = torch.device(device_id)
         exp_name = args.get("exp_name", "experiment")
+        self.config["exp_name"] = exp_name
         os.makedirs(exp_name, exist_ok=True)
         save_path = os.path.join(exp_name, "model.pt")
-    
         self.config["train_path"] = train_path
         self.config["val_path"] = val_path
-        self.config.update(vars(args))
+        
         config_path = os.path.join(exp_name, "config.json")
         with open(config_path, "w") as f:
             json.dump(self.config, f)
@@ -208,7 +214,8 @@ class CodeBERTripletNet(nn.Module):
                 pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
                 if step == 5: break # DEBUG
             # validate current model
-            val_acc, val_loss = self.val(valloader)
+            val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
+                                         epochs=epochs, device=device)
             if val_acc > best_val_acc:
                 print(f"saving best model till now with val_acc: {val_acc}")
                 best_val_acc = val_acc
