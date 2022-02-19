@@ -13,3 +13,16 @@ We use different encoders for the text and code
 ### Code Encoders
 1. Code2Vec
 2. Roberta (code)
+
+### Performance Comparison
+avg canditate rank: 8.342
+avg best candidate rank: 6.115068493150685
+MRR (LRAP): 0.5192234969909357
+
+avg canditate rank: 11.016
+avg best candidate rank: 8.2986301369863
+MRR (LRAP): 0.49738491711917343
+
+avg canditate rank: 223.428
+avg best candidate rank: 204.35342465753425
+MRR (LRAP): 0.02759542885829559

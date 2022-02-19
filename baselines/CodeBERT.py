@@ -9,10 +9,11 @@ import argparse
 import numpy as np
 import torch.nn as nn
 from tqdm import tqdm
-from typing import Union
 from torch.optim import AdamW
+from typing import Union, List
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
+from sklearn.metrics import label_ranking_average_precision_score as MRR
 
 # seed shit
 random.seed(0)
@@ -23,8 +24,12 @@ def get_args():
     parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the CodeBERT in Late Fusion configuration for Neural Code Search.")
     parser.add_argument("-tp", "--train_path", type=str, default="triples_train.json")
     parser.add_argument("-vp", "--val_path", type=str, default="triples_val.json")
-    # parser.add_argument("-sp", "--save_path", type=str, default="triplet_CodeBERT.pt")
+    parser.add_argument("-p", "--predict", action="store_true")
+    parser.add_argument("-t", "--train", action="store_true")
     parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT")
+    parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT/model.pt")
+    parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
+    parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
     
     return parser.parse_args()
     
@@ -48,6 +53,67 @@ class TripletAccuracy:
         self.tot += len(pos)
 
 # TripletMarginWithDistanceLoss for custom design function.
+class CodeDataset(Dataset):
+    def __init__(self, code_snippets: str, tokenizer: Union[str, None, RobertaTokenizer]=None, **tok_args):
+        super(CodeDataset, self).__init__()
+        self.data = code_snippets
+        self.tok_args = tok_args
+        if isinstance(tokenizer, RobertaTokenizer):
+            self.tokenizer = tokenizer
+        elif isinstance(tokenizer, str):
+            self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
+        else:
+            self.tokenizer = tokenizer
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def proc_code(self, code: str):
+        code = " ".join(code.split("\n")).strip()
+        return code
+    
+    def __getitem__(self, i: int):
+        code = self.proc_code(self.data[i])
+        if self.tokenizer:
+            # special tokens are added by default.
+            code = self.tokenizer(code, **self.tok_args)            
+            return [code["input_ids"][0], 
+                    code["attention_mask"][0]]
+        else:
+            return [code]
+        
+        
+class TextDataset(Dataset):
+    def __init__(self, texts: str, tokenizer: Union[str, None, RobertaTokenizer]=None, **tok_args):
+        super(TextDataset, self).__init__()
+        self.data = texts
+        self.tok_args = tok_args
+        if isinstance(tokenizer, RobertaTokenizer):
+            self.tokenizer = tokenizer
+        elif isinstance(tokenizer, str):
+            self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
+        else:
+            self.tokenizer = tokenizer
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def proc_text(self, text: str):
+        text = " ".join(text.split("\n"))
+        text = " ".join(text.split()).strip()
+        return text
+    
+    def __getitem__(self, i: int):
+        text = self.proc_text(self.data[i])
+        if self.tokenizer:
+            # special tokens are added by default.
+            text = self.tokenizer(text, **self.tok_args)            
+            return [text["input_ids"][0], 
+                    text["attention_mask"][0]]
+        else:
+            return [text]
+    
+    
 class TriplesDataset(Dataset):
     def __init__(self, path: str, tokenizer: Union[str, None, RobertaTokenizer]=None, **tok_args):
         super(TriplesDataset, self).__init__()
@@ -148,9 +214,44 @@ class CodeBERTripletNet(nn.Module):
                 val_acc.update(anchor_text_emb, pos_code_emb, neg_code_emb)
                 batch_losses.append(batch_loss.item())
                 pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*val_acc.get():.2f}")
-                if step == 5: break # DEBUG
-                
+                # if step == 5: break # DEBUG
         return val_acc.get(), np.mean(batch_losses)
+        
+    def encode_emb(self, text_or_snippets: List[str], mode: str="text", **args):
+        """Note: our late fusion CodeBERT is a universal encoder for text and code, so the same function works for both."""
+        batch_size = args.get("batch_size", 48)
+        device_id = args.get("device_id", "cuda:0")
+        device = torch.device(device_id)
+        use_tqdm = args.get("use_tqdm", False)
+        self.to(device)
+        self.eval()
+        
+        if mode == "text":
+            dataset = TextDataset(text_or_snippets, tokenizer=self.tokenizer,
+                                  truncation=True, padding="max_length",
+                                  max_length=100, add_special_tokens=True,
+                                  return_tensors="pt")
+        elif mode == "code":
+            dataset = CodeDataset(text_or_snippets, tokenizer=self.tokenizer,
+                                  truncation=True, padding="max_length",
+                                  max_length=100, add_special_tokens=True,
+                                  return_tensors="pt")
+        else: raise TypeError("Unrecognized encoding mode")
+        
+        datalloader = DataLoader(dataset, shuffle=False, 
+                                 batch_size=batch_size)
+        pbar = tqdm(enumerate(datalloader), total=len(datalloader), 
+                    desc=f"enocding {mode}", disable=not(use_tqdm))
+        all_embeds = []
+        for step, batch in pbar:
+            with torch.no_grad():
+                enc_args = (batch[0].to(device), batch[1].to(device))
+                batch_embed = self.embed_model(*enc_args).pooler_output
+                for embed in batch_embed: all_embeds.append(embed)
+                # if step == 5: break # DEBUG
+        # print(type(all_embeds[0]), len(all_embeds))
+        return all_embeds
+        
         
     def fit(self, train_path: str, val_path: str, **args):
         batch_size = args.get("batch_size", 48)
@@ -178,7 +279,7 @@ class CodeBERTripletNet(nn.Module):
                                   truncation=True, padding="max_length",
                                   max_length=100, add_special_tokens=True,
                                   return_tensors="pt")
-        valset = TriplesDataset(train_path, tokenizer=self.tokenizer,
+        valset = TriplesDataset(val_path, tokenizer=self.tokenizer,
                                 truncation=True, padding="max_length",
                                 max_length=100, add_special_tokens=True,
                                 return_tensors="pt")
@@ -211,7 +312,7 @@ class CodeBERTripletNet(nn.Module):
                 self.zero_grad()
                 batch_losses.append(batch_loss.item())
                 pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
-                if step == 5: break # DEBUG
+                # if step == 5: break # DEBUG
             # validate current model
             val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
                                          epochs=epochs, device=device)
@@ -237,15 +338,119 @@ def main():
     tok_path = os.path.join(os.path.expanduser("~"), "codebert-base-tok")
     print("creating model object")
     triplet_net = CodeBERTripletNet(tok_path=tok_path)
-    print("commencing training")
-    metrics = triplet_net.fit(train_path=args.train_path, 
-                              val_path=args.val_path, 
-                              exp_name=args.exp_name)
-    metrics_path = os.path.join(args.exp_name, "train_metrics.json")
-    print(f"saving metrics to {metrics_path}")
-    with open(metrics_path, "w") as f:
-        json.dump(metrics, f)
+    if args.train:
+        print("commencing training")
+        metrics = triplet_net.fit(train_path=args.train_path, 
+                                  val_path=args.val_path, 
+                                  exp_name=args.exp_name)
+        metrics_path = os.path.join(args.exp_name, "train_metrics.json")
+        print(f"saving metrics to {metrics_path}")
+        with open(metrics_path, "w") as f:
+            json.dump(metrics, f)
+    if args.predict:
+        model_path = os.path.join(args.exp_name, "model.pt")
+        print(model_path)
+        
+def test_retreival_early_fusion():
+    import os
+    import json
+    args = get_args()
+    print("initializing model and tokenizer ..")
+    tok_path = os.path.join(os.path.expanduser("~"), "codebert-base-tok")
     
+    print(f"loading checkpoint (state dict) from {args.ckpt_path}")
+    state_dict = torch.load(args.ckpt_path)
     
+    print("creating model object")
+    triplet_net = CodeBERTripletNet(tok_path=tok_path)
+    
+    print(f"loading candidates from {args.candidates_path}")
+    candidates = json.load(open(args.candidates_path))
+    
+    print(f"loading queries from {args.queries_path}")
+    queries_and_cand_labels = json.load(open(args.queries_path))
+    queries = [i["query"] for i in queries_and_cand_labels]
+    labels = [i["docs"] for i in queries_and_cand_labels]
+        
+def test_retreival_late_fusion():
+    import os
+    import json
+    args = get_args()
+    print("initializing model and tokenizer ..")
+    tok_path = os.path.join(os.path.expanduser("~"), "codebert-base-tok")
+    
+    print(f"loading checkpoint (state dict) from {args.ckpt_path}")
+    state_dict = torch.load(args.ckpt_path)
+    
+    print("creating model object")
+    triplet_net = CodeBERTripletNet(tok_path=tok_path)
+    # triplet_net.load_state_dict(state_dict)
+    print(f"loading candidates from {args.candidates_path}")
+    candidates = json.load(open(args.candidates_path))
+    
+    print(f"loading queries from {args.queries_path}")
+    queries_and_cand_labels = json.load(open(args.queries_path))
+    queries = [i["query"] for i in queries_and_cand_labels]
+    labels = [i["docs"] for i in queries_and_cand_labels]
+    
+    print(f"encoding {len(queries)} queries:")
+    query_mat = triplet_net.encode_emb(queries, mode="text", use_tqdm=True)
+    query_mat = torch.stack(query_mat)
+    
+    print(f"encoding {len(candidates)} candidates:")
+    cand_mat = triplet_net.encode_emb(candidates, mode="code", use_tqdm=True)
+    cand_mat = torch.stack(cand_mat)
+    # print(query_mat.shape, cand_mat.shape)
+    mode = "l2_dist"
+    if mode == "inner_prod": scores = query_mat @ cand_mat.T
+    elif mode == "l2_dist": scores = torch.cdist(query_mat, cand_mat, p=2)
+    doc_ranks = scores.argsort(axis=1)
+    label_ranks = []
+    avg_rank = 0
+    avg_best_rank = 0 
+    N = 0
+    M = 0
+    
+    lrap_GT = np.zeros(
+        (
+            len(queries), 
+            len(candidates)
+        )
+    )
+    for i in range(len(labels)):
+        for j in labels[i]:
+            lrap_GT[i][j] = 1
+            
+    for i, rank_list in enumerate(doc_ranks):
+        if mode == "inner_prod": rank_list = rank_list.tolist()[::-1]
+        elif mode == "l2_dist": rank_list = rank_list.tolist()
+        instance_label_ranks = []
+        ranks = []
+        for cand_rank in labels[i]:
+            # print(rank_list, cand_rank)
+            rank = rank_list.index(cand_rank)
+            avg_rank += rank
+            ranks.append(rank)
+            N += 1
+            instance_label_ranks.append(rank)
+        M += 1
+        avg_best_rank += min(ranks)
+        label_ranks.append(instance_label_ranks)
+    print("avg canditate rank:", avg_rank/N)
+    print("avg best candidate rank:", avg_best_rank/M)
+    if mode == "inner_prod":
+        print(
+            "MRR (LRAP):", 
+            MRR(lrap_GT, scores.cpu().numpy()) # -scores for distance based scores, no - for innert product based scores.
+        )
+    elif mode == "l2_dist":
+        print(
+            "MRR (LRAP):", 
+            MRR(lrap_GT, -scores.cpu().numpy()) # -scores for distance based scores, no - for innert product based scores.
+        )
+#     with open("pred_cand_ranks.json", "w") as f:
+#         json.dump(label_ranks, f, indent=4)
 if __name__ == "__main__":
-    main()
+    # main()
+    # test_retreival_late_fusion()
+    test_retreival_early_fusion()
