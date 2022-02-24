@@ -134,3 +134,4 @@ data
 triples_train.json
 triples_val.json
 triplet_CodeBERT/model.pt
+triples_*.json

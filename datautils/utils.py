@@ -58,7 +58,85 @@ def create_triples(posts: List[List[dict]], neg_to_pos_ratio: int=3) -> List[Tup
     The code snippets are actually excerpts of the code blocks that were the answers.
     """
     triples: List[Tuple[str, str, str]] = []
-    for i, post in tqdm(enumerate(posts), desc="creating triplets"):
+    for i, post in tqdm(enumerate(posts), 
+                        desc="creating triplets", 
+                        total=len(posts)):
+        neg_posts = get_list_complement(posts, i)
+        # get list of negative samples from ans of the remaining posts.
+        neg_samples = flatten_list(neg_posts)
+        singleton_samples = 0
+        for j, ans in enumerate(post):
+            anchor = ans["intent"]
+            # get positive sample from remaining ans of the post.
+            pos_posts = get_list_complement(post, j)
+            try:
+                pos_sample = sample_list(pos_posts, k=1)[0]["snippet"]
+            except ValueError:
+                singleton_samples += 1
+                continue
+            # number of negative samples for a given positive sample.
+            for neg_post in sample_list(neg_samples, k=neg_to_pos_ratio):
+                neg_sample = neg_post["snippet"]
+                triples.append((anchor, pos_sample, neg_sample))
+                
+    return triples
+
+def create_relevant_triples(posts: List[List[dict]], 
+                            neg_to_pos_ratio: int=3, 
+                            pos_rel_rank_thresh: float=0.25) -> List[Tuple[str, str, str]]:
+    """
+    create relevant triples from the list of lists post structure.
+    Relevant triples are triples made by thresholding by the relevance score,
+    while pairing positive code snippet to a given anchor text.
+    Each post is a list of code snippet answers accompanying the intent (post title).
+    The code snippets are actually excerpts of the code blocks that were the answers.
+    """
+    triples: List[Tuple[str, str, str]] = []
+    for i, post in tqdm(enumerate(posts), 
+                        desc="creating triplets",
+                        total=len(posts)):
+        neg_posts = get_list_complement(posts, i)
+        # get list of negative samples from ans of the remaining posts.
+        neg_samples = flatten_list(neg_posts)
+        singleton_samples = 0
+        for j, ans in enumerate(post):
+            anchor = ans["intent"]
+            # get positive sample from remaining ans of the post.
+            pos_posts = get_list_complement(post, j)
+            N = max(int(pos_rel_rank_thresh * len(pos_posts)), 1)
+            # print(len(pos_posts), N)
+            pos_post_rel_tuples = [(rec["prob"], rec) for rec in pos_posts]
+            pos_post_rel_tuples = sorted(pos_post_rel_tuples, 
+                                         key=lambda x: x[0], 
+                                         reverse=True)
+            pos_posts = [rec for _,rec in pos_post_rel_tuples[:N]]
+            # print(len(pos_posts))
+            try:
+                pos_sample = sample_list(pos_posts, k=1)[0]["snippet"]
+            except ValueError:
+                singleton_samples += 1
+                continue
+            # number of negative samples for a given positive sample.
+            for neg_post in sample_list(neg_samples, k=neg_to_pos_ratio):
+                neg_sample = neg_post["snippet"]
+                triples.append((anchor, pos_sample, neg_sample))
+                
+    return triples
+
+def create_relevant_triples_intra_categ_neg(posts: List[List[dict]], 
+                                            neg_to_pos_ratio: int=3, 
+                                            pos_rel_rank_thresh: float=0.25) -> List[Tuple[str, str, str]]:
+    """
+    create relevant triples from the list of lists post structure.
+    Relevant triples are triples made by thresholding by the relevance score,
+    while pairing positive code snippet to a given anchor text.
+    Each post is a list of code snippet answers accompanying the intent (post title).
+    The code snippets are actually excerpts of the code blocks that were the answers.
+    """
+    triples: List[Tuple[str, str, str]] = []
+    for i, post in tqdm(enumerate(posts), 
+                        desc="creating triplets",
+                        total=len(posts)):
         neg_posts = get_list_complement(posts, i)
         # get list of negative samples from ans of the remaining posts.
         neg_samples = flatten_list(neg_posts)

@@ -1,0 +1,2327 @@
+[
+    {
+        "query": "How can I send a signal from a python program?",
+        "docs": [
+            0
+        ]
+    },
+    {
+        "query": "Decode Hex String in Python 3",
+        "docs": [
+            1
+        ]
+    },
+    {
+        "query": "check if all elements in a list are identical",
+        "docs": [
+            2
+        ]
+    },
+    {
+        "query": "Format string dynamically",
+        "docs": [
+            3
+        ]
+    },
+    {
+        "query": "How to convert a string from CP-1251 to UTF-8?",
+        "docs": [
+            4
+        ]
+    },
+    {
+        "query": "How I can get rid of None values in dictionary?",
+        "docs": [
+            5,
+            6
+        ]
+    },
+    {
+        "query": "Python: how to get the final output of multiple system commands?",
+        "docs": [
+            7
+        ]
+    },
+    {
+        "query": "splitting and concatenating a string",
+        "docs": [
+            8
+        ]
+    },
+    {
+        "query": "Finding the intersection between two series in Pandas",
+        "docs": [
+            9
+        ]
+    },
+    {
+        "query": "Sending http headers with python",
+        "docs": [
+            10
+        ]
+    },
+    {
+        "query": "Python -Remove Time from Datetime String",
+        "docs": [
+            11
+        ]
+    },
+    {
+        "query": "How do I split a multi-line string into multiple lines?",
+        "docs": [
+            12,
+            13
+        ]
+    },
+    {
+        "query": "How to join mixed list (array) (with integers in it) in Python?",
+        "docs": [
+            14
+        ]
+    },
+    {
+        "query": "Fastest way to get the first object from a queryset in django?",
+        "docs": [
+            15
+        ]
+    },
+    {
+        "query": "How to calculate the sum of all columns of a 2D numpy array (efficiently)",
+        "docs": [
+            16
+        ]
+    },
+    {
+        "query": "Python, how to enable all warnings?",
+        "docs": [
+            17
+        ]
+    },
+    {
+        "query": "Python printing without commas",
+        "docs": [
+            18
+        ]
+    },
+    {
+        "query": "OSError: [WinError 193] %1 is not a valid Win32 application",
+        "docs": [
+            19
+        ]
+    },
+    {
+        "query": "How can I parse a time string containing milliseconds in it with python?",
+        "docs": [
+            20
+        ]
+    },
+    {
+        "query": "How can I convert a string with dot and comma into a float number in Python",
+        "docs": [
+            21,
+            22
+        ]
+    },
+    {
+        "query": "In Python script, how do I set PYTHONPATH?",
+        "docs": [
+            23
+        ]
+    },
+    {
+        "query": "Determining the unmatched portion of a string using a regex in Python",
+        "docs": [
+            24
+        ]
+    },
+    {
+        "query": "How to read data from Excel and write it to text file line by line?",
+        "docs": [
+            25
+        ]
+    },
+    {
+        "query": "download a file over HTTP",
+        "docs": [
+            26,
+            27,
+            28,
+            29,
+            30
+        ]
+    },
+    {
+        "query": "Python's argparse to show program's version with prog and version string formatting",
+        "docs": [
+            31
+        ]
+    },
+    {
+        "query": "Remove key from dictionary in Python returning new dictionary",
+        "docs": [
+            32
+        ]
+    },
+    {
+        "query": "Merging two pandas dataframes",
+        "docs": [
+            33
+        ]
+    },
+    {
+        "query": "Python regular expression split() string",
+        "docs": [
+            34
+        ]
+    },
+    {
+        "query": "How to read keyboard-input?",
+        "docs": [
+            35
+        ]
+    },
+    {
+        "query": "Auto reloading python Flask app upon code changes",
+        "docs": [
+            36
+        ]
+    },
+    {
+        "query": "Python save list and read data from file",
+        "docs": [
+            37
+        ]
+    },
+    {
+        "query": "Numpy: Multiplying a matrix with a 3d tensor -- Suggestion",
+        "docs": [
+            38
+        ]
+    },
+    {
+        "query": "How to create nested lists in python?",
+        "docs": [
+            39
+        ]
+    },
+    {
+        "query": "Python: Cut off the last word of a sentence?",
+        "docs": [
+            40
+        ]
+    },
+    {
+        "query": "Numpy convert scalars to arrays",
+        "docs": [
+            41
+        ]
+    },
+    {
+        "query": "Finding the sum of a nested list of ints",
+        "docs": [
+            42
+        ]
+    },
+    {
+        "query": "Convert hex to float",
+        "docs": [
+            43
+        ]
+    },
+    {
+        "query": "Python: Perform an operation on each dictionary value",
+        "docs": [
+            44
+        ]
+    },
+    {
+        "query": "Running bash script from within python",
+        "docs": [
+            45
+        ]
+    },
+    {
+        "query": "How would you make a comma-separated string from a list?",
+        "docs": [
+            46,
+            47
+        ]
+    },
+    {
+        "query": "Print a list in reverse order with range()?",
+        "docs": [
+            48
+        ]
+    },
+    {
+        "query": "How can i subtract two strings in python?",
+        "docs": [
+            49
+        ]
+    },
+    {
+        "query": "python reverse tokens in a string",
+        "docs": [
+            50
+        ]
+    },
+    {
+        "query": "converting epoch time with milliseconds to datetime",
+        "docs": [
+            51,
+            52
+        ]
+    },
+    {
+        "query": "Getting the date of 7 days ago from current date in python",
+        "docs": [
+            53
+        ]
+    },
+    {
+        "query": "How can I sum a column of a list?",
+        "docs": [
+            54,
+            55
+        ]
+    },
+    {
+        "query": "How to encode text to base64 in python",
+        "docs": [
+            56
+        ]
+    },
+    {
+        "query": "How can I combine dictionaries with the same keys in python?",
+        "docs": [
+            57,
+            58
+        ]
+    },
+    {
+        "query": "How do I get the url parameter in a Flask view",
+        "docs": [
+            59
+        ]
+    },
+    {
+        "query": "Identify duplicate values in a list in Python",
+        "docs": [
+            60
+        ]
+    },
+    {
+        "query": "How do you modify sys.path in Google App Engine (Python)?",
+        "docs": [
+            61,
+            62
+        ]
+    },
+    {
+        "query": "Insert Null into SQLite3 in Python",
+        "docs": [
+            63
+        ]
+    },
+    {
+        "query": "Flattening a shallow list in Python",
+        "docs": [
+            64
+        ]
+    },
+    {
+        "query": "Append elements of a set to a list in Python",
+        "docs": [
+            65,
+            66
+        ]
+    },
+    {
+        "query": "Python, Pandas : write content of DataFrame into text File",
+        "docs": [
+            67,
+            68
+        ]
+    },
+    {
+        "query": "how to get the last part of a string before a certain character?",
+        "docs": [
+            69,
+            70
+        ]
+    },
+    {
+        "query": "FTP upload files Python",
+        "docs": [
+            71
+        ]
+    },
+    {
+        "query": "Write value to hidden element with selenium python script",
+        "docs": [
+            72
+        ]
+    },
+    {
+        "query": "Combining two numpy arrays to form an array with the largest value from each array",
+        "docs": [
+            73
+        ]
+    },
+    {
+        "query": "How to print an entire list while not starting by the first item",
+        "docs": [
+            74
+        ]
+    },
+    {
+        "query": "loop over files",
+        "docs": [
+            75,
+            76
+        ]
+    },
+    {
+        "query": "Create random list of integers in Python",
+        "docs": [
+            77
+        ]
+    },
+    {
+        "query": "Using %f with strftime() in Python to get microseconds",
+        "docs": [
+            78
+        ]
+    },
+    {
+        "query": "Build a GQL query (for Google App Engine) that has a condition on ReferenceProperty",
+        "docs": [
+            79
+        ]
+    },
+    {
+        "query": "How to filter rows in pandas by regex",
+        "docs": [
+            80
+        ]
+    },
+    {
+        "query": "What is the best way to print a table with delimiters in Python",
+        "docs": [
+            81
+        ]
+    },
+    {
+        "query": "Pandas: Delete rows based on multiple columns values",
+        "docs": [
+            82
+        ]
+    },
+    {
+        "query": "String Formatting in Python 3",
+        "docs": [
+            83,
+            84,
+            85
+        ]
+    },
+    {
+        "query": "Convert list of lists to list of integers",
+        "docs": [
+            86,
+            87,
+            88
+        ]
+    },
+    {
+        "query": "How to write a list to a file with newlines in Python3",
+        "docs": [
+            89
+        ]
+    },
+    {
+        "query": "Removing an element from a list based on a predicate",
+        "docs": [
+            90
+        ]
+    },
+    {
+        "query": "python regular expression to remove repeated words",
+        "docs": [
+            91
+        ]
+    },
+    {
+        "query": "Counting non zero values in each column of a dataframe in python",
+        "docs": [
+            92
+        ]
+    },
+    {
+        "query": "Python match string if it does not start with X",
+        "docs": [
+            93
+        ]
+    },
+    {
+        "query": "String to list in Python",
+        "docs": [
+            94
+        ]
+    },
+    {
+        "query": "Parsing XML in Python with regex",
+        "docs": [
+            95
+        ]
+    },
+    {
+        "query": "How to empty a file using Python",
+        "docs": [
+            96
+        ]
+    },
+    {
+        "query": "how to convert a string date into datetime format in python?",
+        "docs": [
+            97
+        ]
+    },
+    {
+        "query": "What's the fastest way to locate a list element within a list in python?",
+        "docs": [
+            98
+        ]
+    },
+    {
+        "query": "Python: trying to lower a string and remove non-alphanumeric characters aside from space",
+        "docs": [
+            99,
+            100
+        ]
+    },
+    {
+        "query": "Subscripting text in matplotlib labels",
+        "docs": [
+            101,
+            102
+        ]
+    },
+    {
+        "query": "Looping over a list in Python",
+        "docs": [
+            103
+        ]
+    },
+    {
+        "query": "Initialize a list of objects in Python",
+        "docs": [
+            104,
+            105
+        ]
+    },
+    {
+        "query": "selenium how to get the content of href within some targeted class",
+        "docs": [
+            106
+        ]
+    },
+    {
+        "query": "Joining Table/DataFrames with common Column in Python",
+        "docs": [
+            107
+        ]
+    },
+    {
+        "query": "insert variable values into a string in python",
+        "docs": [
+            108
+        ]
+    },
+    {
+        "query": "Split a string by a delimiter in python",
+        "docs": [
+            109
+        ]
+    },
+    {
+        "query": "check if a directory exists and create it if necessary",
+        "docs": [
+            110,
+            111,
+            112,
+            113
+        ]
+    },
+    {
+        "query": "Replace a substring when it is a separate word",
+        "docs": [
+            114
+        ]
+    },
+    {
+        "query": "Python: removing characters except digits from string",
+        "docs": [
+            115,
+            116
+        ]
+    },
+    {
+        "query": "How to access a tag called \"name\" in BeautifulSoup",
+        "docs": [
+            117
+        ]
+    },
+    {
+        "query": "Iterate through PyMongo Cursor as key-value pair",
+        "docs": [
+            118
+        ]
+    },
+    {
+        "query": "Python how to combine two matrices in numpy",
+        "docs": [
+            119,
+            120
+        ]
+    },
+    {
+        "query": "how to check the character count of a file in python",
+        "docs": [
+            121
+        ]
+    },
+    {
+        "query": "count the occurrences of a list item",
+        "docs": [
+            122,
+            123,
+            124,
+            125,
+            126
+        ]
+    },
+    {
+        "query": "How to copy a file using python?",
+        "docs": [
+            127
+        ]
+    },
+    {
+        "query": "Efficient way to find the largest key in a dictionary with non-zero value",
+        "docs": [
+            128,
+            129,
+            128
+        ]
+    },
+    {
+        "query": "Re-read an open file Python",
+        "docs": [
+            130
+        ]
+    },
+    {
+        "query": "Coalesce values from 2 columns into a single column in a pandas dataframe",
+        "docs": [
+            131
+        ]
+    },
+    {
+        "query": "python: Is this a wrong way to remove an element from a dict?",
+        "docs": [
+            132
+        ]
+    },
+    {
+        "query": "How can I subtract or add 100 years to a datetime field in the database in Django?",
+        "docs": [
+            133
+        ]
+    },
+    {
+        "query": "How to merge multiple lists into one list in python?",
+        "docs": [
+            134
+        ]
+    },
+    {
+        "query": "How to increment a value with leading zeroes?",
+        "docs": [
+            135
+        ]
+    },
+    {
+        "query": "How can I check if a Pandas dataframe's index is sorted",
+        "docs": [
+            136
+        ]
+    },
+    {
+        "query": "Convert tuple to list",
+        "docs": [
+            137,
+            138
+        ]
+    },
+    {
+        "query": "Convert tuple to list and back",
+        "docs": [
+            139
+        ]
+    },
+    {
+        "query": "how to send the output of pprint module to a log file",
+        "docs": [
+            140
+        ]
+    },
+    {
+        "query": "Python Pandas: Get index of rows which column matches certain value",
+        "docs": [
+            141,
+            142,
+            143,
+            144
+        ]
+    },
+    {
+        "query": "How do I change directory back to my original working directory with Python?",
+        "docs": [
+            145
+        ]
+    },
+    {
+        "query": "How to insert strings with quotes and newlines into sqlite db with Python?",
+        "docs": [
+            146
+        ]
+    },
+    {
+        "query": "Python - how to convert a \"raw\" string into a normal string",
+        "docs": [
+            147,
+            148,
+            149
+        ]
+    },
+    {
+        "query": "Splitting a string with repeated characters into a list using regex",
+        "docs": [
+            150
+        ]
+    },
+    {
+        "query": "How to do a scatter plot with empty circles in Python?",
+        "docs": [
+            151,
+            152
+        ]
+    },
+    {
+        "query": "Deleting a div with a particlular class using BeautifulSoup",
+        "docs": [
+            153
+        ]
+    },
+    {
+        "query": "How to filter rows containing a string pattern from a Pandas dataframe",
+        "docs": [
+            154
+        ]
+    },
+    {
+        "query": "How to convert pandas index in a dataframe to a column?",
+        "docs": [
+            155,
+            156,
+            157
+        ]
+    },
+    {
+        "query": "Generic reverse of list items in Python",
+        "docs": [
+            158
+        ]
+    },
+    {
+        "query": "in Numpy, how to zip two 2-D arrays?",
+        "docs": [
+            159,
+            160
+        ]
+    },
+    {
+        "query": "How to convert a list of longs into a comma separated string in python",
+        "docs": [
+            161
+        ]
+    },
+    {
+        "query": "Posting raw data with Python",
+        "docs": [
+            162
+        ]
+    },
+    {
+        "query": "Find last occurrence of character",
+        "docs": [
+            163
+        ]
+    },
+    {
+        "query": "Ending with a for loop in python",
+        "docs": [
+            164
+        ]
+    },
+    {
+        "query": "transpose dictionary (extract all the values for one key from a list of dictionaries)",
+        "docs": [
+            165
+        ]
+    },
+    {
+        "query": "How to get the filename without the extension from a path in Python?",
+        "docs": [
+            166
+        ]
+    },
+    {
+        "query": "Make dictionary from list with python",
+        "docs": [
+            167
+        ]
+    },
+    {
+        "query": "Merging a list of lists",
+        "docs": [
+            168
+        ]
+    },
+    {
+        "query": "How to select rows in a DataFrame between two values, in Python Pandas?",
+        "docs": [
+            169
+        ]
+    },
+    {
+        "query": "Replace all occurrences of a string in a pandas dataframe (Python)",
+        "docs": [
+            170,
+            170
+        ]
+    },
+    {
+        "query": "Mapping a string into a list of pairs",
+        "docs": [
+            171,
+            172
+        ]
+    },
+    {
+        "query": "How do you extract a url from a string using python?",
+        "docs": [
+            173,
+            174
+        ]
+    },
+    {
+        "query": "Remove all special characters, punctuation and spaces from string",
+        "docs": [
+            175
+        ]
+    },
+    {
+        "query": "How to get a daterange of the 2nd Fridays of each month?",
+        "docs": [
+            176
+        ]
+    },
+    {
+        "query": "Multidimensional array in Python",
+        "docs": [
+            177
+        ]
+    },
+    {
+        "query": "How do I replace whitespaces with underscore and vice versa?",
+        "docs": [
+            178
+        ]
+    },
+    {
+        "query": "How to get an absolute file path in Python",
+        "docs": [
+            179
+        ]
+    },
+    {
+        "query": "Is there a string-collapse library function in python?",
+        "docs": [
+            180
+        ]
+    },
+    {
+        "query": "Get Filename Without Extension in Python",
+        "docs": [
+            181
+        ]
+    },
+    {
+        "query": "How to sum elements in functional way",
+        "docs": [
+            182
+        ]
+    },
+    {
+        "query": "Python Regex Split Keeps Split Pattern Characters",
+        "docs": [
+            183
+        ]
+    },
+    {
+        "query": "Shuffle columns of an array with Numpy",
+        "docs": [
+            184
+        ]
+    },
+    {
+        "query": "Copy all values in a column to a new column in a pandas dataframe",
+        "docs": [
+            185
+        ]
+    },
+    {
+        "query": "Find a value within nested json dictionary in python",
+        "docs": [
+            186
+        ]
+    },
+    {
+        "query": "True for all characters of a string",
+        "docs": [
+            187
+        ]
+    },
+    {
+        "query": "How to determine number of files on a drive with Python?",
+        "docs": [
+            188
+        ]
+    },
+    {
+        "query": "how to get a single result from a SQLite query in python?",
+        "docs": [
+            189
+        ]
+    },
+    {
+        "query": "How to convert a string list into an integer in python",
+        "docs": [
+            190,
+            191
+        ]
+    },
+    {
+        "query": "Sorting a Python list by two criteria",
+        "docs": [
+            192
+        ]
+    },
+    {
+        "query": "How to sort a list of objects , based on an attribute of the objects?",
+        "docs": [
+            193,
+            194,
+            194
+        ]
+    },
+    {
+        "query": "Click a href button with selenium and python?",
+        "docs": [
+            195,
+            196,
+            197
+        ]
+    },
+    {
+        "query": "Casting an int to a string in Python",
+        "docs": [
+            198
+        ]
+    },
+    {
+        "query": "Sorting data in DataFrame Pandas",
+        "docs": [
+            199
+        ]
+    },
+    {
+        "query": "Prepend a line to an existing file in Python",
+        "docs": [
+            200
+        ]
+    },
+    {
+        "query": "Python sort a List by length of value in tuple",
+        "docs": [
+            201
+        ]
+    },
+    {
+        "query": "Split by suffix with Python regular expression",
+        "docs": [
+            202
+        ]
+    },
+    {
+        "query": "python's re: return True if regex contains in the string",
+        "docs": [
+            203
+        ]
+    },
+    {
+        "query": "Removing duplicates in lists",
+        "docs": [
+            204,
+            205,
+            206
+        ]
+    },
+    {
+        "query": "How to make List from Numpy Matrix in Python",
+        "docs": [
+            207,
+            208
+        ]
+    },
+    {
+        "query": "Beautifulsoup - nextSibling",
+        "docs": [
+            209
+        ]
+    },
+    {
+        "query": "Converting lists of tuples to strings Python",
+        "docs": [
+            210,
+            211
+        ]
+    },
+    {
+        "query": "Splinter or Selenium: Can we get current html page after clicking a button?",
+        "docs": [
+            212
+        ]
+    },
+    {
+        "query": "Find a specific pattern (regular expression) in a list of strings (Python)",
+        "docs": [
+            213
+        ]
+    },
+    {
+        "query": "Selecting with complex criteria from pandas.DataFrame",
+        "docs": [
+            214
+        ]
+    },
+    {
+        "query": "How to sort dictionaries by keys in Python",
+        "docs": [
+            215,
+            216,
+            217
+        ]
+    },
+    {
+        "query": "convert strings into integers",
+        "docs": [
+            218,
+            219,
+            220
+        ]
+    },
+    {
+        "query": "How to call a shell script from python code?",
+        "docs": [
+            221,
+            222
+        ]
+    },
+    {
+        "query": "Interleaving two lists in Python",
+        "docs": [
+            223
+        ]
+    },
+    {
+        "query": "Base64 encoding in Python 3",
+        "docs": [
+            224,
+            225
+        ]
+    },
+    {
+        "query": "Parsing CSV / tab-delimited txt file with Python",
+        "docs": [
+            226
+        ]
+    },
+    {
+        "query": "Python - Access object attributes as in a dictionary",
+        "docs": [
+            227
+        ]
+    },
+    {
+        "query": "list of dicts to/from dict of lists",
+        "docs": [
+            228
+        ]
+    },
+    {
+        "query": "How do I sum the first value in each tuple in a list of tuples in Python?",
+        "docs": [
+            229
+        ]
+    },
+    {
+        "query": "Convert unicode string dictionary into dictionary in python",
+        "docs": [
+            230
+        ]
+    },
+    {
+        "query": "Find all words in a string that start with the $ sign in Python",
+        "docs": [
+            231
+        ]
+    },
+    {
+        "query": "How to remove any URL within a string in Python",
+        "docs": [
+            232
+        ]
+    },
+    {
+        "query": "How to find all elements in a numpy 2-dimensional array that match a certain list?",
+        "docs": [
+            233
+        ]
+    },
+    {
+        "query": "Calculate mean across dimension in a 2D array",
+        "docs": [
+            234
+        ]
+    },
+    {
+        "query": "Running R script from python",
+        "docs": [
+            235,
+            236
+        ]
+    },
+    {
+        "query": "How to add a header to a csv file in Python?",
+        "docs": [
+            237
+        ]
+    },
+    {
+        "query": "Pandas Dataframe: Replacing NaN with row average",
+        "docs": [
+            238
+        ]
+    },
+    {
+        "query": "Python: Converting Epoch time into the datetime",
+        "docs": [
+            239
+        ]
+    },
+    {
+        "query": "Calling a base class's classmethod in Python",
+        "docs": [
+            240
+        ]
+    },
+    {
+        "query": "selecting rows in numpy ndarray based on the value of two columns",
+        "docs": [
+            241
+        ]
+    },
+    {
+        "query": "Python regex separate space-delimited words into a list",
+        "docs": [
+            242
+        ]
+    },
+    {
+        "query": "Length of longest word in a list",
+        "docs": [
+            243
+        ]
+    },
+    {
+        "query": "accessing python dictionary",
+        "docs": [
+            244
+        ]
+    },
+    {
+        "query": "Save line in file to list",
+        "docs": [
+            245
+        ]
+    },
+    {
+        "query": "Python: Best Way to Exchange Keys with Values in a Dictionary?",
+        "docs": [
+            246
+        ]
+    },
+    {
+        "query": "creating a tmp file in python",
+        "docs": [
+            247
+        ]
+    },
+    {
+        "query": "How to count distinct values in a column of a pandas group by object?",
+        "docs": [
+            248
+        ]
+    },
+    {
+        "query": "Check for a key pattern in a dictionary in python",
+        "docs": [
+            249,
+            250
+        ]
+    },
+    {
+        "query": "python, best way to convert a pandas series into a pandas dataframe",
+        "docs": [
+            251
+        ]
+    },
+    {
+        "query": "printing tab-separated values of a list",
+        "docs": [
+            252
+        ]
+    },
+    {
+        "query": "Python unicode string with UTF-8?",
+        "docs": [
+            253,
+            254
+        ]
+    },
+    {
+        "query": "How to adjust the quality of a resized image in Python Imaging Library?",
+        "docs": [
+            255
+        ]
+    },
+    {
+        "query": "Regex, find pattern only in middle of string",
+        "docs": [
+            256
+        ]
+    },
+    {
+        "query": "how to show Percentage in python",
+        "docs": [
+            257
+        ]
+    },
+    {
+        "query": "Sort a list of dicts by dict values",
+        "docs": [
+            258,
+            259,
+            260
+        ]
+    },
+    {
+        "query": "finding n largest differences between two lists",
+        "docs": [
+            261
+        ]
+    },
+    {
+        "query": "Finding multiple attributes within the span tag in Python",
+        "docs": [
+            262
+        ]
+    },
+    {
+        "query": "Pandas writing dataframe to other postgresql schema",
+        "docs": [
+            263
+        ]
+    },
+    {
+        "query": "Regular Expression to find brackets in a string",
+        "docs": [
+            264
+        ]
+    },
+    {
+        "query": "Removing duplicates from list of lists in Python",
+        "docs": [
+            265
+        ]
+    },
+    {
+        "query": "Reading a file without newlines",
+        "docs": [
+            266
+        ]
+    },
+    {
+        "query": "get item's position in a list",
+        "docs": [
+            267,
+            267,
+            268,
+            269,
+            270,
+            271,
+            272
+        ]
+    },
+    {
+        "query": "Find the maximum value in a list of tuples in Python",
+        "docs": [
+            273,
+            274
+        ]
+    },
+    {
+        "query": "How do I simulate a progress counter in a command line application in Python?",
+        "docs": [
+            275
+        ]
+    },
+    {
+        "query": "Tuple conversion to a string",
+        "docs": [
+            276
+        ]
+    },
+    {
+        "query": "Default value for field in Django model",
+        "docs": [
+            277
+        ]
+    },
+    {
+        "query": "How do I perform secondary sorting in python?",
+        "docs": [
+            278,
+            279
+        ]
+    },
+    {
+        "query": "Python: convert list to generator",
+        "docs": [
+            280
+        ]
+    },
+    {
+        "query": "Remove multiple items from list in Python",
+        "docs": [
+            281
+        ]
+    },
+    {
+        "query": "Deleting a specific line in a file (python)",
+        "docs": [
+            282
+        ]
+    },
+    {
+        "query": "Attribute getters in python",
+        "docs": [
+            283
+        ]
+    },
+    {
+        "query": "How do I convert tuple of tuples to list in one line (pythonic)?",
+        "docs": [
+            284,
+            285
+        ]
+    },
+    {
+        "query": "Python Pandas: How to replace a characters in a column of a dataframe?",
+        "docs": [
+            286
+        ]
+    },
+    {
+        "query": "inverse of zip",
+        "docs": [
+            287,
+            287,
+            288,
+            289,
+            290,
+            291
+        ]
+    },
+    {
+        "query": "Python JSON serialize a Decimal object",
+        "docs": [
+            292
+        ]
+    },
+    {
+        "query": "Add key to a dictionary",
+        "docs": [
+            293,
+            294,
+            295,
+            296
+        ]
+    },
+    {
+        "query": "Is there a one line code to find maximal value in a matrix?",
+        "docs": [
+            297
+        ]
+    },
+    {
+        "query": "Python - how to round down to 2 decimals",
+        "docs": [
+            298
+        ]
+    },
+    {
+        "query": "Extract IP address from an html string (python)",
+        "docs": [
+            299
+        ]
+    },
+    {
+        "query": "How do I filter a pandas DataFrame based on value counts?",
+        "docs": [
+            300
+        ]
+    },
+    {
+        "query": "Converting a string into a list in Python",
+        "docs": [
+            301,
+            302
+        ]
+    },
+    {
+        "query": "Adding Colorbar to a Spectrogram",
+        "docs": [
+            303
+        ]
+    },
+    {
+        "query": "Count most frequent 100 words from sentences in Dataframe Pandas",
+        "docs": [
+            304
+        ]
+    },
+    {
+        "query": "Python split a string using regex",
+        "docs": [
+            305
+        ]
+    },
+    {
+        "query": "Generate all subsets of size k (containing k elements) in Python",
+        "docs": [
+            306
+        ]
+    },
+    {
+        "query": "Python: How to get a value of datetime.today() that is \"timezone aware\"?",
+        "docs": [
+            307
+        ]
+    },
+    {
+        "query": "Python: How to remove empty lists from a list?",
+        "docs": [
+            308,
+            309
+        ]
+    },
+    {
+        "query": "Django view returning json without using template",
+        "docs": [
+            310
+        ]
+    },
+    {
+        "query": "regex to get all text outside of brackets",
+        "docs": [
+            311,
+            312
+        ]
+    },
+    {
+        "query": "Matching multiple regex patterns with the alternation operator?",
+        "docs": [
+            313,
+            314,
+            315
+        ]
+    },
+    {
+        "query": "Perform a string operation for every element in a Python list",
+        "docs": [
+            316
+        ]
+    },
+    {
+        "query": "start python script as background process from within a python script",
+        "docs": [
+            317
+        ]
+    },
+    {
+        "query": "Python dictionary: Get list of values for list of keys",
+        "docs": [
+            318
+        ]
+    },
+    {
+        "query": "Create dictionary from lists of keys and multiple values",
+        "docs": [
+            319
+        ]
+    },
+    {
+        "query": "Numpy - Averaging multiple columns of a 2D array",
+        "docs": [
+            320
+        ]
+    },
+    {
+        "query": "Replace all quotes in a string with escaped quotes?",
+        "docs": [
+            321
+        ]
+    },
+    {
+        "query": "Partitioning a string in Python by a regular expression",
+        "docs": [
+            322
+        ]
+    },
+    {
+        "query": "plotting stacked barplots on a panda data frame",
+        "docs": [
+            323
+        ]
+    },
+    {
+        "query": "How to reverse a dictionary in Python?",
+        "docs": [
+            324
+        ]
+    },
+    {
+        "query": "finding index of multiple items in a list",
+        "docs": [
+            325
+        ]
+    },
+    {
+        "query": "find out if a Python object is a string",
+        "docs": [
+            326,
+            327,
+            328,
+            327,
+            329
+        ]
+    },
+    {
+        "query": "take the content of a list and append it to another list",
+        "docs": [
+            330,
+            331,
+            332,
+            333
+        ]
+    },
+    {
+        "query": "Appending tuples to lists",
+        "docs": [
+            334
+        ]
+    },
+    {
+        "query": "Where do I get a SECRET_KEY for Flask?",
+        "docs": [
+            335
+        ]
+    },
+    {
+        "query": "How to unpack a Series of tuples in Pandas?",
+        "docs": [
+            336
+        ]
+    },
+    {
+        "query": "How to find the position of an element in a list , in Python?",
+        "docs": [
+            337
+        ]
+    },
+    {
+        "query": "Is it possible to wrap the text of xticks in matplotlib in python?",
+        "docs": [
+            338
+        ]
+    },
+    {
+        "query": "How to remove symbols from a string with Python?",
+        "docs": [
+            339
+        ]
+    },
+    {
+        "query": "get current directory - Python",
+        "docs": [
+            340
+        ]
+    },
+    {
+        "query": "Regex and Octal Characters",
+        "docs": [
+            341
+        ]
+    },
+    {
+        "query": "Python split string based on regex",
+        "docs": [
+            342,
+            343
+        ]
+    },
+    {
+        "query": "Using Python Requests to send file and JSON in single request",
+        "docs": [
+            344
+        ]
+    },
+    {
+        "query": "How to write bytes to a file in Python 3 without knowing the encoding?",
+        "docs": [
+            345
+        ]
+    },
+    {
+        "query": "Mapping dictionary value to list",
+        "docs": [
+            346
+        ]
+    },
+    {
+        "query": "How to find duplicate names using pandas?",
+        "docs": [
+            347
+        ]
+    },
+    {
+        "query": "Truncating floats in Python",
+        "docs": [
+            348
+        ]
+    },
+    {
+        "query": "Order list by date (String and datetime)",
+        "docs": [
+            349
+        ]
+    },
+    {
+        "query": "Move radial tick labels on a polar plot in matplotlib",
+        "docs": [
+            350
+        ]
+    },
+    {
+        "query": "How to check if a path is absolute path or relative path in cross platform way with Python?",
+        "docs": [
+            351
+        ]
+    },
+    {
+        "query": "Counting the Number of keywords in a dictionary in python",
+        "docs": [
+            352,
+            353
+        ]
+    },
+    {
+        "query": "Pandas dataframe get first row of each group",
+        "docs": [
+            354
+        ]
+    },
+    {
+        "query": "Splitting a list in a Pandas cell into multiple columns",
+        "docs": [
+            355
+        ]
+    },
+    {
+        "query": "Extracting specific src attributes from script tags",
+        "docs": [
+            356
+        ]
+    },
+    {
+        "query": "Most efficient way to convert items of a list to int and sum them up",
+        "docs": [
+            357
+        ]
+    },
+    {
+        "query": "How to use subprocess when multiple arguments contain spaces?",
+        "docs": [
+            358
+        ]
+    },
+    {
+        "query": "how to reverse a priority queue in Python without using classes?",
+        "docs": [
+            359
+        ]
+    },
+    {
+        "query": "pandas plot dataframe barplot with colors by category",
+        "docs": [
+            360
+        ]
+    },
+    {
+        "query": "Python regex for MD5 hash",
+        "docs": [
+            361
+        ]
+    },
+    {
+        "query": "Getting the length of an array",
+        "docs": [
+            362,
+            363,
+            364,
+            365,
+            366
+        ]
+    },
+    {
+        "query": "remove escape character from string",
+        "docs": [
+            367
+        ]
+    },
+    {
+        "query": "Python string replace two things at once?",
+        "docs": [
+            368
+        ]
+    },
+    {
+        "query": "How do I remove/delete a folder that is not empty with Python?",
+        "docs": [
+            369
+        ]
+    },
+    {
+        "query": "in pandas how can I groupby weekday() for a datetime column?",
+        "docs": [
+            370
+        ]
+    },
+    {
+        "query": "How to sort Counter by value? - python",
+        "docs": [
+            371,
+            372
+        ]
+    },
+    {
+        "query": "Append a NumPy array to a NumPy array",
+        "docs": [
+            373
+        ]
+    },
+    {
+        "query": "numpy concatenate two arrays vertically",
+        "docs": [
+            374,
+            375,
+            376,
+            377
+        ]
+    },
+    {
+        "query": "How can I do DNS lookups in Python, including referring to /etc/hosts?",
+        "docs": [
+            378
+        ]
+    },
+    {
+        "query": "How to update a subset of a MultiIndexed pandas DataFrame",
+        "docs": [
+            379
+        ]
+    },
+    {
+        "query": "How do I return a 401 Unauthorized in Django?",
+        "docs": [
+            380
+        ]
+    },
+    {
+        "query": "How to dynamically select template directory to be used in flask?",
+        "docs": [
+            381
+        ]
+    },
+    {
+        "query": "How do I INSERT INTO t1 (SELECT * FROM t2) in SQLAlchemy?",
+        "docs": [
+            382
+        ]
+    },
+    {
+        "query": "Sorting a list of lists in Python",
+        "docs": [
+            383,
+            384,
+            385
+        ]
+    },
+    {
+        "query": "Non-ASCII characters in Matplotlib",
+        "docs": [
+            386
+        ]
+    },
+    {
+        "query": "Pandas datetime column to ordinal",
+        "docs": [
+            387
+        ]
+    },
+    {
+        "query": "Get HTML Source of WebElement in Selenium WebDriver using Python",
+        "docs": [
+            388
+        ]
+    },
+    {
+        "query": "Most efficient way to get the integer index of a key in pandas",
+        "docs": [
+            389
+        ]
+    },
+    {
+        "query": "open a terminal from python",
+        "docs": [
+            390
+        ]
+    },
+    {
+        "query": "Python - How to declare and add items to an array?",
+        "docs": [
+            391,
+            392,
+            393
+        ]
+    },
+    {
+        "query": "Add entry to list and remove first one in Python",
+        "docs": [
+            394
+        ]
+    },
+    {
+        "query": "Converting a hex-string representation to actual bytes in Python",
+        "docs": [
+            395
+        ]
+    },
+    {
+        "query": "How to select the last column of dataframe",
+        "docs": [
+            396
+        ]
+    },
+    {
+        "query": "How to get a value from a Pandas DataFrame and not the index and object type",
+        "docs": [
+            397
+        ]
+    },
+    {
+        "query": "Converting two lists into a matrix",
+        "docs": [
+            398
+        ]
+    },
+    {
+        "query": "determine the variable type",
+        "docs": [
+            399,
+            400,
+            400,
+            400,
+            400,
+            401
+        ]
+    },
+    {
+        "query": "Get the nth item of a generator in Python",
+        "docs": [
+            402
+        ]
+    },
+    {
+        "query": "printing double quotes around a variable",
+        "docs": [
+            403
+        ]
+    },
+    {
+        "query": "Python concat string with list",
+        "docs": [
+            404
+        ]
+    },
+    {
+        "query": "Extending a list of lists in Python?",
+        "docs": [
+            405
+        ]
+    },
+    {
+        "query": "How do you read a file into a list in Python?",
+        "docs": [
+            406
+        ]
+    },
+    {
+        "query": "How to delete all instances of a character in a string in python?",
+        "docs": [
+            407,
+            408,
+            409,
+            407
+        ]
+    },
+    {
+        "query": "How to drop rows of Pandas DataFrame whose value in certain columns is NaN",
+        "docs": [
+            410
+        ]
+    },
+    {
+        "query": "Searching a list of objects in Python",
+        "docs": [
+            411
+        ]
+    },
+    {
+        "query": "converting list of string to list of integer",
+        "docs": [
+            412,
+            413
+        ]
+    },
+    {
+        "query": "print in Python without newline or space",
+        "docs": [
+            414
+        ]
+    },
+    {
+        "query": "Python float to int conversion",
+        "docs": [
+            415
+        ]
+    },
+    {
+        "query": "Find all files in directory with extension .txt",
+        "docs": [
+            416,
+            417,
+            418
+        ]
+    },
+    {
+        "query": "Pandas (python) plot() without a legend",
+        "docs": [
+            419
+        ]
+    },
+    {
+        "query": "loop through an IP address range",
+        "docs": [
+            420,
+            421,
+            422
+        ]
+    },
+    {
+        "query": "Python/Numpy: Convert list of bools to unsigned int",
+        "docs": [
+            423
+        ]
+    },
+    {
+        "query": "Python: How to write multiple strings in one line?",
+        "docs": [
+            424
+        ]
+    },
+    {
+        "query": "How to flatten a hetrogenous list of list into a single list in python?",
+        "docs": [
+            425
+        ]
+    },
+    {
+        "query": "In Python, is it possible to escape newline characters when printing a string?",
+        "docs": [
+            426
+        ]
+    },
+    {
+        "query": "String Slicing Python",
+        "docs": [
+            427
+        ]
+    },
+    {
+        "query": "Middle point of each pair of an numpy.array",
+        "docs": [
+            428,
+            429
+        ]
+    },
+    {
+        "query": "Reading unicode elements into numpy array",
+        "docs": [
+            430
+        ]
+    },
+    {
+        "query": "How to sort this list in Python?",
+        "docs": [
+            431,
+            432
+        ]
+    },
+    {
+        "query": "pandas DataFrame filter regex",
+        "docs": [
+            433
+        ]
+    },
+    {
+        "query": "How do I find the string between two special characters?",
+        "docs": [
+            434
+        ]
+    },
+    {
+        "query": "How to create a list of date string in 'yyyymmdd' format with Python Pandas?",
+        "docs": [
+            435
+        ]
+    },
+    {
+        "query": "How to count the number of times something occurs inside a certain string?",
+        "docs": [
+            436
+        ]
+    },
+    {
+        "query": "Sending post data from angularjs to django as JSON and not as raw content",
+        "docs": [
+            437
+        ]
+    },
+    {
+        "query": "Download file from web in Python 3",
+        "docs": [
+            438
+        ]
+    },
+    {
+        "query": "Split string into a list",
+        "docs": [
+            439,
+            440,
+            441
+        ]
+    },
+    {
+        "query": "Replacing characters in a regex",
+        "docs": [
+            442
+        ]
+    },
+    {
+        "query": "Sort A list of Strings Based on certain field",
+        "docs": [
+            443
+        ]
+    },
+    {
+        "query": "how to call multiple bash functions using | in python",
+        "docs": [
+            444
+        ]
+    },
+    {
+        "query": "How to eliminate all strings from a list",
+        "docs": [
+            445,
+            446
+        ]
+    },
+    {
+        "query": "How do I sort a list of dictionaries by values of the dictionary in Python?",
+        "docs": [
+            447,
+            448,
+            449,
+            450
+        ]
+    },
+    {
+        "query": "How to sort a Dataframe by the ocurrences in a column in Python (pandas)",
+        "docs": [
+            451
+        ]
+    },
+    {
+        "query": "How can I access elements inside a list within a dictionary python?",
+        "docs": [
+            452
+        ]
+    },
+    {
+        "query": "Variants of string concatenation?",
+        "docs": [
+            453
+        ]
+    },
+    {
+        "query": "How do I get JSON data from RESTful service using Python?",
+        "docs": [
+            454
+        ]
+    },
+    {
+        "query": "Removing an item from list matching a substring - Python",
+        "docs": [
+            455
+        ]
+    },
+    {
+        "query": "Django filter by hour",
+        "docs": [
+            456
+        ]
+    },
+    {
+        "query": "sort a list of dicts by x then by y",
+        "docs": [
+            457
+        ]
+    },
+    {
+        "query": "How to convert a Python datetime object to seconds",
+        "docs": [
+            458
+        ]
+    },
+    {
+        "query": "How to replace only part of the match with python re.sub",
+        "docs": [
+            459
+        ]
+    },
+    {
+        "query": "How can I reload objects in my namespace in ipython",
+        "docs": [
+            460
+        ]
+    },
+    {
+        "query": "How to get a 16bit Unsigned integer in python",
+        "docs": [
+            461
+        ]
+    },
+    {
+        "query": "How can I use sum() function for a list in Python?",
+        "docs": [
+            462
+        ]
+    },
+    {
+        "query": "Removing index column in pandas",
+        "docs": [
+            463
+        ]
+    },
+    {
+        "query": "How to convert a string data to a JSON object in python?",
+        "docs": [
+            464
+        ]
+    },
+    {
+        "query": "Is there a Python Library that contains a list of all the ascii characters?",
+        "docs": [
+            465
+        ]
+    },
+    {
+        "query": "Python how to write to a binary file?",
+        "docs": [
+            466
+        ]
+    },
+    {
+        "query": "Python Regex - checking for a capital letter with a lowercase after",
+        "docs": [
+            467
+        ]
+    },
+    {
+        "query": "Last Key in Python Dictionary",
+        "docs": [
+            468
+        ]
+    },
+    {
+        "query": "write line to file",
+        "docs": [
+            469,
+            470,
+            471
+        ]
+    },
+    {
+        "query": "Python - Unicode to ASCII conversion",
+        "docs": [
+            472
+        ]
+    },
+    {
+        "query": "How to get max value in django ORM",
+        "docs": [
+            473
+        ]
+    },
+    {
+        "query": "Python regex findall numbers and dots",
+        "docs": [
+            474,
+            475
+        ]
+    },
+    {
+        "query": "Is there a way to run powershell code in python",
+        "docs": [
+            476
+        ]
+    },
+    {
+        "query": "Sorting a dictionary of tuples in Python",
+        "docs": [
+            477
+        ]
+    },
+    {
+        "query": "How do I get all the keys that are stored in the Cassandra column family with pycassa?",
+        "docs": [
+            478
+        ]
+    },
+    {
+        "query": "how to create a file name with the current date & time in python?",
+        "docs": [
+            479
+        ]
+    },
+    {
+        "query": "How to get the index of an integer from a list if the list contains a boolean?",
+        "docs": [
+            480
+        ]
+    },
+    {
+        "query": "Subtract a value from every number in a list in Python?",
+        "docs": [
+            481
+        ]
+    },
+    {
+        "query": "Best way to choose a random file from a directory",
+        "docs": [
+            482
+        ]
+    },
+    {
+        "query": "How to get the highest element in absolute value in a numpy matrix?",
+        "docs": [
+            483
+        ]
+    },
+    {
+        "query": "Using Regular Expressions to extract specific urls in python",
+        "docs": [
+            484,
+            485
+        ]
+    },
+    {
+        "query": "Is there a function in Python to split a string without ignoring the spaces?",
+        "docs": [
+            486
+        ]
+    },
+    {
+        "query": "Open file in Python",
+        "docs": [
+            487
+        ]
+    },
+    {
+        "query": "Sum of multiple list of lists index wise",
+        "docs": [
+            488
+        ]
+    },
+    {
+        "query": "numpy: syntax/idiom to cast (n,) array to a (n, 1) array?",
+        "docs": [
+            489
+        ]
+    }
+]

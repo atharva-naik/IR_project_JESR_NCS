@@ -8,13 +8,27 @@ from datautils.utils import *
 # from datautils import TextCodeTriplets
 
 random.seed(2022)
-def main(data_path: str, triples_path: str):
+# valid modes: ['default', 'rel_thresh']
+def main(data_path: str, triples_path: str, mode: str="default"):
     data: List[dict] = read_jsonl(data_path)
     posts: List[List[dict]] = list(get_posts(data).values())
+    singleton_samples = 0
     if os.path.exists(triples_path):
         triples = json.load(open(triples_path))
         return triples
-    triples = create_triples(posts)
+    if mode == "default":
+        triples = create_triples(posts, neg_to_pos_ratio=3)
+    elif mode == "rel_thresh":
+        triples = create_relevant_triples(
+            posts, neg_to_pos_ratio=3,
+            pos_rel_rank_thresh=0.25
+        )
+    elif mode == "rel_thresh_intra_categ_neg":
+        triples = create_relevant_triples_intra_categ_neg(
+            posts, neg_to_pos_ratio=3,
+            pos_rel_rank_thresh=0.25,
+            intra_categ_thresh=0.5,
+        )
         # if i == 10: break # DEBUG.
     print(f"caching data at {triples_path}")
     with open(triples_path, "w") as f:
@@ -25,20 +39,20 @@ def main(data_path: str, triples_path: str):
 
     
 if __name__ == "__main__":
-    triples_path="triples.json"
+    mode = "rel_thresh" # "default"
+    if mode == "default": triples_path: str = "triples.json"
+    else: triples_path = f"triples_{mode}.json"
     triples = main(data_path="data/conala-mined.jsonl", 
-                   triples_path=triples_path)
+                   triples_path=triples_path, mode=mode)
     val_ratio: int=0.2
     val_size = int(len(triples)*val_ratio)
     stem, ext = os.path.splitext(triples_path)
-    
     random.shuffle(triples)
     train_path = stem + "_train" + ext
     val_path = stem + "_val" + ext
     
     train_data = triples[val_size:]
     val_data = triples[:val_size]
-    
     with open(train_path, "w") as f:
         json.dump(train_data, f, indent=4)
     with open(val_path, "w") as f:

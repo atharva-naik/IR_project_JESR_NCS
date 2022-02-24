@@ -22,12 +22,12 @@ torch.manual_seed(0)
 # get arguments
 def get_args():
     parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the CodeBERT in Late Fusion configuration for Neural Code Search.")
-    parser.add_argument("-tp", "--train_path", type=str, default="triples_train.json")
-    parser.add_argument("-vp", "--val_path", type=str, default="triples_val.json")
+    parser.add_argument("-tp", "--train_path", type=str, default="triples_rel_thresh_train.json")
+    parser.add_argument("-vp", "--val_path", type=str, default="triples_rel_thresh_val.json")
     parser.add_argument("-p", "--predict", action="store_true")
     parser.add_argument("-t", "--train", action="store_true")
-    parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT")
-    parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT/model.pt")
+    parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_rel_thresh")
+    parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
     parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
     
@@ -252,6 +252,8 @@ class CodeBERTripletNet(nn.Module):
         # print(type(all_embeds[0]), len(all_embeds))
         return all_embeds
         
+    def joint_classify(self, ):
+        return ex
         
     def fit(self, train_path: str, val_path: str, **args):
         batch_size = args.get("batch_size", 48)
@@ -351,28 +353,7 @@ def main():
         model_path = os.path.join(args.exp_name, "model.pt")
         print(model_path)
         
-def test_retreival_early_fusion():
-    import os
-    import json
-    args = get_args()
-    print("initializing model and tokenizer ..")
-    tok_path = os.path.join(os.path.expanduser("~"), "codebert-base-tok")
-    
-    print(f"loading checkpoint (state dict) from {args.ckpt_path}")
-    state_dict = torch.load(args.ckpt_path)
-    
-    print("creating model object")
-    triplet_net = CodeBERTripletNet(tok_path=tok_path)
-    
-    print(f"loading candidates from {args.candidates_path}")
-    candidates = json.load(open(args.candidates_path))
-    
-    print(f"loading queries from {args.queries_path}")
-    queries_and_cand_labels = json.load(open(args.queries_path))
-    queries = [i["query"] for i in queries_and_cand_labels]
-    labels = [i["docs"] for i in queries_and_cand_labels]
-        
-def test_retreival_late_fusion():
+def test_retreival():
     import os
     import json
     args = get_args()
@@ -393,17 +374,19 @@ def test_retreival_late_fusion():
     queries = [i["query"] for i in queries_and_cand_labels]
     labels = [i["docs"] for i in queries_and_cand_labels]
     
-    print(f"encoding {len(queries)} queries:")
-    query_mat = triplet_net.encode_emb(queries, mode="text", use_tqdm=True)
-    query_mat = torch.stack(query_mat)
-    
-    print(f"encoding {len(candidates)} candidates:")
-    cand_mat = triplet_net.encode_emb(candidates, mode="code", use_tqdm=True)
-    cand_mat = torch.stack(cand_mat)
-    # print(query_mat.shape, cand_mat.shape)
     mode = "l2_dist"
+    if mode in ["l2_dist", "inner_prod"]:
+        print(f"encoding {len(queries)} queries:")
+        query_mat = triplet_net.encode_emb(queries, mode="text", use_tqdm=True)
+        query_mat = torch.stack(query_mat)
+
+        print(f"encoding {len(candidates)} candidates:")
+        cand_mat = triplet_net.encode_emb(candidates, mode="code", use_tqdm=True)
+        cand_mat = torch.stack(cand_mat)
+    # print(query_mat.shape, cand_mat.shape)
     if mode == "inner_prod": scores = query_mat @ cand_mat.T
     elif mode == "l2_dist": scores = torch.cdist(query_mat, cand_mat, p=2)
+    elif mode == "joint_cls": scores = triplet_net.joint_classify(queries, candidates)
     doc_ranks = scores.argsort(axis=1)
     label_ranks = []
     avg_rank = 0
@@ -451,6 +434,4 @@ def test_retreival_late_fusion():
 #     with open("pred_cand_ranks.json", "w") as f:
 #         json.dump(label_ranks, f, indent=4)
 if __name__ == "__main__":
-    # main()
-    # test_retreival_late_fusion()
-    test_retreival_early_fusion()
+    main() # test_retreival()
