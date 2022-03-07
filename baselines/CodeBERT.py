@@ -26,7 +26,7 @@ def get_args():
     parser.add_argument("-vp", "--val_path", type=str, default="triples_rel_thresh_val.json")
     parser.add_argument("-p", "--predict", action="store_true")
     parser.add_argument("-t", "--train", action="store_true")
-    parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_rel_thresh")
+    parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_re_thresh")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
     parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
@@ -436,11 +436,13 @@ def test_retreival():
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     metrics_path = os.path.join(args.exp_name, "test_metrics.json")
     print(f"loading checkpoint (state dict) from {ckpt_path}")
-    state_dict = torch.load(ckpt_path)
+    try: state_dict = torch.load(ckpt_path)
+    except Exception as e: 
+        state_dict = None; print(e)
     
     print("creating model object")
     triplet_net = CodeBERTripletNet(tok_path=tok_path)
-    triplet_net.load_state_dict(state_dict)
+    if state_dict: triplet_net.load_state_dict(state_dict)
     print(f"loading candidates from {args.candidates_path}")
     candidates = json.load(open(args.candidates_path))
     
@@ -522,6 +524,13 @@ def test_retreival():
         mrr = MRR(lrap_GT, -scores.cpu().numpy())
     metrics["mrr"] = mrr
     print("MRR (LRAP):", mrr)
+    if not os.path.exists(args.exp_name):
+        print("missing experiment folder: assuming zero-shot setting")
+        metrics_path = os.path.join(
+            "CodeBERT_zero_shot", 
+            "test_metrics.json"
+        )
+        os.makedirs("CodeBERT_zero_shot", exist_ok=True)
     with open(metrics_path, "w") as f:
         json.dump(metrics, f)
 #     with open("pred_cand_ranks.json", "w") as f:

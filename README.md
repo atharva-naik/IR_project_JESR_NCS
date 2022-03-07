@@ -26,3 +26,11 @@ MRR (LRAP): 0.49738491711917343
 avg canditate rank: 223.428
 avg best candidate rank: 204.35342465753425
 MRR (LRAP): 0.02759542885829559
+
+|model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
+|---|---|---|---|---|---|
+|CodeBERT_zero_shot|0.030|0.050|223.428|204.353|0.028|
+|triplet_CodeBERT|0.622|0.780|8.342|6.115|0.519|
+|triplet_CodeBERT_intra_categ_neg|0.644|0.780|7.726|5.564|0.544|
+|triplet_CodeBERT_rel_thresh|0.642|0.766|9.208|7.049|0.553|
+|triplet_CodeBERT_rel_thresh_intra_categ_neg|0.572|0.734|10.050|6.910|0.475|
