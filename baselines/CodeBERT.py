@@ -26,7 +26,7 @@ def get_args():
     parser.add_argument("-vp", "--val_path", type=str, default="triples_rel_thresh_val.json")
     parser.add_argument("-p", "--predict", action="store_true")
     parser.add_argument("-t", "--train", action="store_true")
-    parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_re_thresh")
+    parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_intra_categ_neg")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
     parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
