@@ -23,11 +23,16 @@ def main(data_path: str, triples_path: str, mode: str="default"):
             posts, neg_to_pos_ratio=3,
             pos_rel_rank_thresh=0.25
         )
+    elif mode == "intra_categ_neg":
+        triples = create_triples_intra_categ_neg(
+            posts, neg_to_pos_ratio=3,
+            intra_categ_thresh=0.3,
+        )
     elif mode == "rel_thresh_intra_categ_neg":
         triples = create_relevant_triples_intra_categ_neg(
             posts, neg_to_pos_ratio=3,
             pos_rel_rank_thresh=0.25,
-            intra_categ_thresh=0.5,
+            intra_categ_thresh=0.2,
         )
         # if i == 10: break # DEBUG.
     print(f"caching data at {triples_path}")
@@ -39,7 +44,8 @@ def main(data_path: str, triples_path: str, mode: str="default"):
 
     
 if __name__ == "__main__":
-    mode = "rel_thresh" # "default"
+    mode = "rel_thresh_intra_categ_neg" # "intra_categ_neg"
+    # "rel_thresh_intra_categ_neg" # "default" # "rel_thresh"
     if mode == "default": triples_path: str = "triples.json"
     else: triples_path = f"triples_{mode}.json"
     triples = main(data_path="data/conala-mined.jsonl", 

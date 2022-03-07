@@ -27,7 +27,7 @@ def get_args():
     parser.add_argument("-p", "--predict", action="store_true")
     parser.add_argument("-t", "--train", action="store_true")
     parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_rel_thresh")
-    parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
+    # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
     parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
     
@@ -51,6 +51,16 @@ class TripletAccuracy:
         neg = self.pdist(anchor, neg)
         self.count += torch.as_tensor((neg-pos)>0).sum().item()
         self.tot += len(pos)
+# test metrics.
+def recall_at_k(actual, predicted, k: int=10):
+    rel = 0
+    tot = 0
+    for act_list, pred_list in zip(actual, predicted):
+        for i in act_list:
+            tot += 1
+            if i in pred_list[:k]: rel += 1
+                
+    return rel/tot
 
 # TripletMarginWithDistanceLoss for custom design function.
 class CodeDataset(Dataset):
@@ -112,6 +122,44 @@ class TextDataset(Dataset):
                     text["attention_mask"][0]]
         else:
             return [text]
+        
+        
+class TextCodePairDataset(Dataset):
+    def __init__(self, texts: str, codes: str, 
+                 tokenizer: Union[str, None, RobertaTokenizer]=None, 
+                 **tok_args):
+        super(TextCodePairDataset, self).__init__()
+        self.data = [(text, code) for text, code in zip(texts, codes)]
+        self.tok_args = tok_args
+        if isinstance(tokenizer, RobertaTokenizer):
+            self.tokenizer = tokenizer
+        elif isinstance(tokenizer, str):
+            self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
+        else:
+            self.tokenizer = tokenizer
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def proc_code(self, code: str):
+        code = " ".join(code.split("\n")).strip()
+        return code
+    
+    def proc_text(self, text: str):
+        text = " ".join(text.split("\n"))
+        text = " ".join(text.split()).strip()
+        return text
+    
+    def __getitem__(self, i: int):
+        text = self.proc_text(self.data[i][0])
+        code = self.proc_code(self.data[i][1])
+        if self.tokenizer:
+            # special tokens are added by default.
+            text_n_code = self.tokenizer(text, code, **self.tok_args)
+            return [text_n_code["input_ids"][0], 
+                    text_n_code["attention_mask"][0]]
+        else:
+            return [text_n_code]
     
     
 class TriplesDataset(Dataset):
@@ -156,7 +204,7 @@ class TriplesDataset(Dataset):
         else:
             return [anchor, pos, neg]
 
-
+    
 class CodeBERTripletNet(nn.Module):
     """ Class to 
     1) finetune CodeBERT in a late fusion setting using triplet margin loss.
@@ -252,8 +300,33 @@ class CodeBERTripletNet(nn.Module):
         # print(type(all_embeds[0]), len(all_embeds))
         return all_embeds
         
-    def joint_classify(self, ):
-        return ex
+    def joint_classify(self, text_snippets: List[str], 
+                       code_snippets: List[str], **args):
+        """The usual joint encoding setup of CodeBERT (similar to NLI)"""
+        batch_size = args.get("batch_size", 48)
+        device_id = args.get("device_id", "cuda:0")
+        device = torch.device(device_id)
+        use_tqdm = args.get("use_tqdm", False)
+        self.to(device)
+        self.eval()
+        
+        dataset = TextCodePairDataset(text_snippets, code_snippets, 
+                                      tokenizer=self.tokenizer, truncation=True, 
+                                      padding="max_length", max_length=100, 
+                                      add_special_tokens=True, return_tensors="pt")
+        datalloader = DataLoader(dataset, shuffle=False, 
+                                 batch_size=batch_size)
+        pbar = tqdm(enumerate(datalloader), total=len(datalloader), 
+                    desc=f"enocding {mode}", disable=not(use_tqdm))
+        all_embeds = []
+        for step, batch in pbar:
+            with torch.no_grad():
+                enc_args = (batch[0].to(device), batch[1].to(device))
+                batch_embed = self.embed_model(*enc_args).pooler_output
+                for embed in batch_embed: all_embeds.append(embed)
+                # if step == 5: break # DEBUG
+        # print(type(all_embeds[0]), len(all_embeds))
+        return all_embeds
         
     def fit(self, train_path: str, val_path: str, **args):
         batch_size = args.get("batch_size", 48)
@@ -360,12 +433,14 @@ def test_retreival():
     print("initializing model and tokenizer ..")
     tok_path = os.path.join(os.path.expanduser("~"), "codebert-base-tok")
     
-    print(f"loading checkpoint (state dict) from {args.ckpt_path}")
-    state_dict = torch.load(args.ckpt_path)
+    ckpt_path = os.path.join(args.exp_name, "model.pt")
+    metrics_path = os.path.join(args.exp_name, "test_metrics.json")
+    print(f"loading checkpoint (state dict) from {ckpt_path}")
+    state_dict = torch.load(ckpt_path)
     
     print("creating model object")
     triplet_net = CodeBERTripletNet(tok_path=tok_path)
-    # triplet_net.load_state_dict(state_dict)
+    triplet_net.load_state_dict(state_dict)
     print(f"loading candidates from {args.candidates_path}")
     candidates = json.load(open(args.candidates_path))
     
@@ -400,6 +475,15 @@ def test_retreival():
             len(candidates)
         )
     )
+    recall_at_ = []
+    for i in range(1,10+1):
+        recall_at_.append(
+            recall_at_k(
+                labels, 
+                doc_ranks.tolist(), 
+                k=5*i
+            )
+        )
     for i in range(len(labels)):
         for j in labels[i]:
             lrap_GT[i][j] = 1
@@ -419,19 +503,29 @@ def test_retreival():
         M += 1
         avg_best_rank += min(ranks)
         label_ranks.append(instance_label_ranks)
+    metrics = {
+        "avg_candidate_rank": avg_rank/N,
+        "avg_best_candidate_rank": avg_best_rank/M,
+        "recall": {
+            f"@{5*i}": recall_at_[i-1] for i in range(1,10+1) 
+        },
+    }
     print("avg canditate rank:", avg_rank/N)
     print("avg best candidate rank:", avg_best_rank/M)
+    for i in range(1,10+1):
+        print(f"recall@{5*i} = {recall_at_[i-1]}")
     if mode == "inner_prod":
-        print(
-            "MRR (LRAP):", 
-            MRR(lrap_GT, scores.cpu().numpy()) # -scores for distance based scores, no - for innert product based scores.
-        )
+        # -scores for distance based scores, no - for innert product based scores.
+        mrr = MRR(lrap_GT, scores.cpu().numpy())
     elif mode == "l2_dist":
-        print(
-            "MRR (LRAP):", 
-            MRR(lrap_GT, -scores.cpu().numpy()) # -scores for distance based scores, no - for innert product based scores.
-        )
+        # -scores for distance based scores, no - for innert product based scores.
+        mrr = MRR(lrap_GT, -scores.cpu().numpy())
+    metrics["mrr"] = mrr
+    print("MRR (LRAP):", mrr)
+    with open(metrics_path, "w") as f:
+        json.dump(metrics, f)
 #     with open("pred_cand_ranks.json", "w") as f:
 #         json.dump(label_ranks, f, indent=4)
 if __name__ == "__main__":
-    main() # test_retreival()
+    # main() 
+    test_retreival()
