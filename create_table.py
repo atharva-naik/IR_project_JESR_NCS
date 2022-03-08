@@ -8,7 +8,7 @@ for x in ["", "_rel_thresh"]:
     for y in ["", "_intra_categ_neg"]:
         triplet_CodeBERT.append("triplet_CodeBERT"+x+y)
 # print(triplet_CodeBERT)
-metrics = ["avg_candidate_rank", "avg_best_candidate_rank", "mrr"]
+metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank"]
 column_names = ["model name", "recall@5", "recall@10"] + metrics
 table_rows = []
 for folder in ["CodeBERT_zero_shot"] + triplet_CodeBERT:
