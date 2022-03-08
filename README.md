@@ -35,7 +35,7 @@ MRR (LRAP): 0.02759542885829559
 |triplet_CodeBERT_rel_thresh|**0.642**|0.766|**0.553**|9.208|7.049|
 |triplet_CodeBERT_rel_thresh_intra_categ_neg|0.606|0.718|0.498|11.196|7.707|
 
-|model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
+<!-- |model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
 |---|---|---|---|---|---|
 |CodeBERT_zero_shot|0.030|0.050|223.428|204.353|0.028|
 |triplet_CodeBERT|0.622|0.780|8.342|6.115|0.519|
@@ -43,21 +43,23 @@ MRR (LRAP): 0.02759542885829559
 |triplet_CodeBERT_rel_thresh|**0.642**|0.766|9.208|7.049|**0.553**|
 |triplet_CodeBERT_rel_thresh_intra_categ_neg|0.606|0.718|11.196|7.707|0.498|
 
-<!-- |model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
+|model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
 |---|---|---|---|---|---|
 |CodeBERT_zero_shot|0.030|0.050|223.428|204.353|0.028|
 |triplet_CodeBERT|0.622|0.780|8.342|6.115|0.519|
 |triplet_CodeBERT_intra_categ_neg|0.632|0.792|7.612|5.501|0.535|
 |triplet_CodeBERT_rel_thresh|0.642|0.766|9.208|7.049|0.553|
-|triplet_CodeBERT_rel_thresh_intra_categ_neg|0.592|0.736|10.400|7.036|0.492| -->
-<!-- |model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
+|triplet_CodeBERT_rel_thresh_intra_categ_neg|0.592|0.736|10.400|7.036|0.492|
+
+|model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
 |---|---|---|---|---|---|
 |CodeBERT_zero_shot|0.030|0.050|223.428|204.353|0.028|
 |triplet_CodeBERT|0.622|0.780|8.342|6.115|0.519|
 |triplet_CodeBERT_intra_categ_neg|0.622|**0.788**|**7.558**|**5.162**|0.542|
 |triplet_CodeBERT_rel_thresh|**0.642**|0.766|9.208|7.049|**0.553**|
-|triplet_CodeBERT_rel_thresh_intra_categ_neg|0.592|0.736|10.400|7.036|0.492| -->
-<!--  |model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
+|triplet_CodeBERT_rel_thresh_intra_categ_neg|0.592|0.736|10.400|7.036|0.492|
+
+|model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
 |---|---|---|---|---|---|
 |CodeBERT_zero_shot|0.030|0.050|223.428|204.353|0.028|
 |triplet_CodeBERT|0.622|0.780|8.342|6.115|0.519|
