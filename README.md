@@ -15,25 +15,26 @@ We use different encoders for the text and code
 2. Roberta (code)
 
 ### Performance Comparison
-avg canditate rank: 8.342
-avg best candidate rank: 6.115068493150685
-MRR (LRAP): 0.5192234969909357
 
-avg canditate rank: 11.016
-avg best candidate rank: 8.2986301369863
-MRR (LRAP): 0.49738491711917343
+**triplet contrastive pretraining (TCP):** <br>
+Create triplet instances from the conala_mixed.jsonl using the following method: <br>
+```for each post title``` <br>
+1) sample positive examples (code snippets) from a given post. <br>
+2) for each postive sample, sample (k=3) "negative" code snippets from other posts (post titles). <br>
 
-avg canditate rank: 223.428
-avg best candidate rank: 204.35342465753425
-MRR (LRAP): 0.02759542885829559
+**intra-category negative sampling (ICNS):** 
+for each
+
+**relevance thresholding for positive samples (RTPS):** 
+
 
 |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|
 |---|---|---|---|---|---|
-|CodeBERT_zero_shot|0.030|0.050|0.028|223.428|204.353|
-|triplet_CodeBERT|0.622|0.780|0.519|8.342|6.115|
-|triplet_CodeBERT_intra_categ_neg|0.632|**0.792**|0.535|**7.612**|**5.501**|
-|triplet_CodeBERT_rel_thresh|**0.642**|0.766|**0.553**|9.208|7.049|
-|triplet_CodeBERT_rel_thresh_intra_categ_neg|0.606|0.718|0.498|11.196|7.707|
+|CodeBERT (zero shot)|0.030|0.050|0.028|223.428|204.353|
+|CodeBERT (TCP)|0.622|0.780|0.519|8.342|6.115|
+|CodeBERT (ICNS)|0.632|**0.792**|0.535|**7.612**|**5.501**|
+|CodeBERT (RTPS)|**0.642**|0.766|**0.553**|9.208|7.049|
+|CodeBERT (ICNS + RTPS)|0.606|0.718|0.498|11.196|7.707|
 
 <!-- |model name|recall@5|recall@10|avg_candidate_rank|avg_best_candidate_rank|mrr|
 |---|---|---|---|---|---|
