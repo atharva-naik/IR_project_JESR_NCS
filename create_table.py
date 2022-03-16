@@ -8,6 +8,13 @@ for x in ["", "_rel_thresh"]:
     for y in ["", "_intra_categ_neg"]:
         triplet_CodeBERT.append("triplet_CodeBERT"+x+y)
 # print(triplet_CodeBERT)
+def get_model_name(folder: str, dist_fn: str="", setting: str=""):
+    model_name = folder.replace("triplet_", "").replace('CodeBERT_', "")
+    if model_name == "": model_name = "-"
+    model_name += f" ({dist_fn}) ({setting})"
+    
+    return model_name
+    
 metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank"]
 column_names = ["model name", "recall@5", "recall@10"] + metrics
 table_rows = []
@@ -16,7 +23,7 @@ for folder in ["CodeBERT_zero_shot"] + triplet_CodeBERT:
         for setting in ["code", "annot", "code+annot"]:
             path = os.path.join(folder, f"test_metrics_{dist_fn}_{setting}.json")
             with open(path) as f: metric_data = json.load(f)
-            table_row = [folder]
+            table_row = [get_model_name(folder, dist_fn, setting)]
             table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
             table_row.append(f'{metric_data["recall"]["@10"]:.3f}')
             for metric in metrics:
