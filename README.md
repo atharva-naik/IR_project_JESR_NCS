@@ -27,38 +27,38 @@ for each
 
 **relevance thresholding for positive samples (RTPS):** 
 
-|model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|
-|---|---|---|---|---|---|
-|zero_shot (inner_prod) (code)|0.018|0.022|0.015|242.406|229.819|
-|zero_shot (inner_prod) (annot)|0.012|0.022|0.018|232.462|217.389|
-|zero_shot (inner_prod) (code+annot)|0.016|0.026|0.017|237.924|225.027|
-|zero_shot (l2_dist) (code)|0.030|0.050|0.028|223.428|204.353|
-|zero_shot (l2_dist) (annot)|0.194|0.244|0.165|149.210|141.545|
-|zero_shot (l2_dist) (code+annot)|0.086|0.124|0.076|183.616|168.751|
-|CodeBERT (inner_prod) (code)|0.590|0.732|0.497|11.016|8.299|
-|CodeBERT (inner_prod) (annot)|0.764|0.850|0.676|15.336|13.932|
-|CodeBERT (inner_prod) (code+annot)|0.746|0.846|0.642|6.548|5.238|
-|CodeBERT (l2_dist) (code)|0.622|0.780|0.519|8.342|6.115|
-|CodeBERT (l2_dist) (annot)|0.792|0.876|0.706|6.696|5.756|
-|CodeBERT (l2_dist) (code+annot)|0.800|0.882|0.685|4.454|3.584|
-|intra_categ_neg (inner_prod) (code)|0.586|0.730|0.505|9.570|7.068|
-|intra_categ_neg (inner_prod) (annot)|0.774|0.852|0.675|16.452|14.279|
-|intra_categ_neg (inner_prod) (code+annot)|0.726|0.834|0.625|6.602|4.775|
-|intra_categ_neg (l2_dist) (code)|0.632|0.792|0.535|7.612|5.501|
-|intra_categ_neg (l2_dist) (annot)|0.772|0.860|0.690|7.540|6.184|
-|intra_categ_neg (l2_dist) (code+annot)|0.768|0.878|0.670|4.836|3.529|
-|rel_thresh (inner_prod) (code)|0.602|0.740|0.511|10.478|8.499|
-|rel_thresh (inner_prod) (annot)|0.786|0.858|0.685|18.990|16.107|
-|rel_thresh (inner_prod) (code+annot)|0.754|0.858|0.644|7.078|5.647|
-|rel_thresh (l2_dist) (code)|0.642|0.766|0.553|9.208|7.049|
-|rel_thresh (l2_dist) (annot)|0.796|0.866|0.705|12.092|9.605|
-|rel_thresh (l2_dist) (code+annot)|0.760|0.866|0.691|5.130|4.071|
-|rel_thresh_intra_categ_neg (inner_prod) (code)|0.562|0.690|0.475|13.548|9.586|
-|rel_thresh_intra_categ_neg (inner_prod) (annot)|0.782|0.854|0.662|19.726|17.310|
-|rel_thresh_intra_categ_neg (inner_prod) (code+annot)|0.722|0.820|0.614|8.638|6.671|
-|rel_thresh_intra_categ_neg (l2_dist) (code)|0.606|0.718|0.498|11.196|7.707|
-|rel_thresh_intra_categ_neg (l2_dist) (annot)|0.808|0.862|0.679|11.744|10.173|
-|rel_thresh_intra_categ_neg (l2_dist) (code+annot)|0.770|0.870|0.668|5.868|4.425|
+|model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
+|---|---|---|---|---|---|---|
+|zero_shot (inner_prod) (code)|0.018|0.022|0.015|242.406|229.819|0.152|
+|zero_shot (inner_prod) (annot)|0.012|0.022|0.018|232.462|217.389|0.156|
+|zero_shot (inner_prod) (code+annot)|0.016|0.026|0.017|237.924|225.027|0.155|
+|zero_shot (l2_dist) (code)|0.030|0.050|0.028|223.428|204.353|0.167|
+|zero_shot (l2_dist) (annot)|0.194|0.244|0.165|149.210|141.545|0.299|
+|zero_shot (l2_dist) (code+annot)|0.086|0.124|0.076|183.616|168.751|0.218|
+|CodeBERT (inner_prod) (code)|0.590|0.732|0.497|11.016|8.299|0.615|
+|CodeBERT (inner_prod) (annot)|0.764|0.850|0.676|15.336|13.932|0.749|
+|CodeBERT (inner_prod) (code+annot)|0.746|0.846|0.642|6.548|5.238|0.726|
+|CodeBERT (l2_dist) (code)|0.622|0.780|0.519|8.342|6.115|0.634|
+|CodeBERT (l2_dist) (annot)|0.792|0.876|0.706|6.696|5.756|0.774|
+|CodeBERT (l2_dist) (code+annot)|0.800|0.882|0.685|4.454|3.584|0.762|
+|intra_categ_neg (inner_prod) (code)|0.586|0.730|0.505|9.570|7.068|0.621|
+|intra_categ_neg (inner_prod) (annot)|0.774|0.852|0.675|16.452|14.279|0.751|
+|intra_categ_neg (inner_prod) (code+annot)|0.726|0.834|0.625|6.602|4.775|0.714|
+|intra_categ_neg (l2_dist) (code)|0.632|0.792|0.535|7.612|5.501|0.646|
+|intra_categ_neg (l2_dist) (annot)|0.772|0.860|0.690|7.540|6.184|0.764|
+|intra_categ_neg (l2_dist) (code+annot)|0.768|0.878|0.670|4.836|3.529|0.751|
+|rel_thresh (inner_prod) (code)|0.602|0.740|0.511|10.478|8.499|0.625|
+|rel_thresh (inner_prod) (annot)|0.786|0.858|0.685|18.990|16.107|0.757|
+|rel_thresh (inner_prod) (code+annot)|0.754|0.858|0.644|7.078|5.647|0.729|
+|rel_thresh (l2_dist) (code)|0.642|0.766|0.553|9.208|7.049|0.658|
+|rel_thresh (l2_dist) (annot)|0.796|0.866|0.705|12.092|9.605|0.773|
+|rel_thresh (l2_dist) (code+annot)|0.760|0.866|0.691|5.130|4.071|0.766|
+|rel_thresh_intra_categ_neg (inner_prod) (code)|0.562|0.690|0.475|13.548|9.586|0.595|
+|rel_thresh_intra_categ_neg (inner_prod) (annot)|0.782|0.854|0.662|19.726|17.310|0.739|
+|rel_thresh_intra_categ_neg (inner_prod) (code+annot)|0.722|0.820|0.614|8.638|6.671|0.706|
+|rel_thresh_intra_categ_neg (l2_dist) (code)|0.606|0.718|0.498|11.196|7.707|0.615|
+|rel_thresh_intra_categ_neg (l2_dist) (annot)|0.808|0.862|0.679|11.744|10.173|0.753|
+|rel_thresh_intra_categ_neg (l2_dist) (code+annot)|0.770|0.870|0.668|5.868|4.425|0.747|
 
 <!-- |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|
 |---|---|---|---|---|---|

@@ -15,10 +15,11 @@ def get_model_name(folder: str, dist_fn: str="", setting: str=""):
     
     return model_name
     
-metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank"]
+metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank", "ndcg"]
 column_names = ["model name", "recall@5", "recall@10"] + metrics
 table_rows = []
 for folder in ["CodeBERT_zero_shot"] + triplet_CodeBERT:
+    print(folder)
     for dist_fn in ["inner_prod", "l2_dist"]:
         for setting in ["code", "annot", "code+annot"]:
             path = os.path.join(folder, f"test_metrics_{dist_fn}_{setting}.json")

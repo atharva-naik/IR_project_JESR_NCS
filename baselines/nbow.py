@@ -69,18 +69,21 @@ class NBowEncoder(nn.Module):
     
         return pooler_output
     
-def init_nbow_from_codebert():
+def init_codebert_embed():
+    import time
+    s = time.time()
     model = RobertaModel.from_pretrained("microsoft/codebert-base")
-    nbow_encoder = NBowEncoder(model.embeddings.word_embeddings)
-    
-    return nbow_encoder
+    print(f"initialized CodeBERT embedding layer in {time.time()-s}s")
+    # nbow_encoder = NBowEncoder(model.embeddings.word_embeddings)
+    return model.embeddings.word_embeddings
 
 
 class SiameseWrapperNet(nn.Module):
     def __init__(self):
         super(SiameseWrapperNet, self).__init__()
-        self.code_encoder = init_nbow_from_codebert()
-        self.text_encoder = init_nbow_from_codebert()
+        codebert_embed = init_codebert_embed()
+        self.code_encoder = NBowEncoder(codebert_embed)
+        self.text_encoder = NBowEncoder(codebert_embed)
         self.sigmoid = nn.Sigmoid()
         
     def forward(self, text: torch.Tensor, code: torch.Tensor):
@@ -112,14 +115,14 @@ def val(model, valloader, epoch_i=0, epochs=0, device="cpu"):
     val_acc = 0
     val_tot = 0
     batch_losses = []
-    loss_fn = nn.BCELoss
+    loss_fn = nn.BCELoss()
     pbar = tqdm(enumerate(valloader), total=len(valloader), 
                 desc=f"val: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
     for step, batch in pbar:
         with torch.no_grad():
             text = batch[0].to(device)
             code = batch[1].to(device)
-            trues = batch[2].to(device)
+            trues = batch[2].to(device).float()
             
             probs = model(text, code)
             batch_loss = loss_fn(probs, trues)
@@ -127,7 +130,7 @@ def val(model, valloader, epoch_i=0, epochs=0, device="cpu"):
             val_tot += len(trues)
             
             batch_losses.append(batch_loss.item())
-            pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*val_acc.get():.2f}")
+            pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*(val_acc/val_tot):.2f}")
             if step == 5: break # DEBUG
                 
     return val_acc/val_tot, np.mean(batch_losses)
@@ -138,7 +141,7 @@ def finetune(args):
     lr = args.get("lr", 1e-5)
     device = torch.device(args.get("device_id", "cuda:0"))
     loss_fn = nn.BCELoss()
-    config["loss_fn"] = str(loss_fn)
+    config["loss_fn"] = repr(loss_fn)
     config["lr"] = lr
     
     exp_name = args.get("exp_name", "experiment")
@@ -151,7 +154,7 @@ def finetune(args):
     print("instantiated network")
     # create AdamW optimizer.
     optimizer = AdamW(model.parameters(), eps=1e-8, lr=lr)
-    config["optimizer"] = str(optimizer)
+    config["optimizer"] = repr(optimizer)
     # batch size, num epochs.
     batch_size = args.get("batch_size", 32)
     config["batch_size"] = batch_size
@@ -215,7 +218,7 @@ def finetune(args):
             # scheduler.step()  # Update learning rate schedule
             optimizer.zero_grad()
             batch_losses.append(batch_loss.item())
-            pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
+            pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*(train_acc/train_tot):.2f}")
             if step == 5: break # DEBUG
         # validate current model
         val_acc, val_loss = val(model, valloader, epoch_i=epoch_i, 

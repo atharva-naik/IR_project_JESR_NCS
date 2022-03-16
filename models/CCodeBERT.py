@@ -13,6 +13,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import AdamW
 from typing import Union, List
+from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
 from sklearn.metrics import label_ranking_average_precision_score as MRR
@@ -559,11 +560,15 @@ def test_retreival(device="cuda:0"):
             if dist_func == "inner_prod":
                 # -scores for distance based scores, no - for innert product based scores.
                 mrr = MRR(lrap_GT, scores.cpu().numpy())
+                ndcg = NDCG(lrap_GT, scores.cpu().numpy())
             elif dist_func == "l2_dist":
                 # -scores for distance based scores, no - for innert product based scores.
                 mrr = MRR(lrap_GT, -scores.cpu().numpy())
-
+                ndcg = NDCG(lrap_GT, -scores.cpu().numpy())
+                
             metrics["mrr"] = mrr
+            metrics["ndcg"] = ndcg
+            print("NDCG:", ndcg)
             print("MRR (LRAP):", mrr)
             if not os.path.exists(args.exp_name):
                 print("missing experiment folder: assuming zero-shot setting")
@@ -579,4 +584,4 @@ def test_retreival(device="cuda:0"):
 if __name__ == "__main__":
     # main() 
     # setting in ['code', 'annot', 'code+annot']
-    test_retreival(device="cuda:0")
+    test_retreival(device="cuda:1")
