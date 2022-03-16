@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+# Author: Atharva Naik (18CS10067)
 import json
 import random
 from tqdm import tqdm
@@ -81,6 +83,44 @@ def create_triples(posts: List[List[dict]], neg_to_pos_ratio: int=3) -> List[Tup
                 
     return triples
 
+def create_triples_fixed(posts: List[List[dict]], neg_to_pos_ratio: int=3) -> List[Tuple[str, str, str]]:
+    triples: List[Tuple[str, str, str]] = []
+    for i, post in tqdm(enumerate(posts), 
+                        desc="creating triplets", 
+                        total=len(posts)):
+        neg_posts = get_list_complement(posts, i)
+        # get list of negative samples from ans of the remaining posts.
+        neg_samples = flatten_list(neg_posts)
+        singleton_samples = 0
+        for j, ans in enumerate(post):
+            anchor = ans["intent"]
+            pos_sample = ans["snippet"]
+            # number of negative samples for a given positive sample.
+            for neg_post in sample_list(neg_samples, k=neg_to_pos_ratio):
+                neg_sample = neg_post["snippet"]
+                triples.append((anchor, pos_sample, neg_sample))
+                
+    return triples
+
+def create_pairs(posts: List[List[dict]], neg_to_pos_ratio: int=1) -> List[Tuple[str, str, int]]:
+    pairs: List[Tuple[str, str, int]] = []
+    for i, post in tqdm(enumerate(posts), 
+                        desc="creating pairs", 
+                        total=len(posts)):
+        neg_posts = get_list_complement(posts, i)
+        # get list of negative samples from ans of the remaining posts.
+        neg_samples = flatten_list(neg_posts)
+        for j, ans in enumerate(post):
+            anchor = ans["intent"]
+            pos_sample = ans["snippet"]
+            pairs.append((anchor, pos_sample, 1))
+            # number of negative samples for a given positive sample.
+            for neg_post in sample_list(neg_samples, k=neg_to_pos_ratio):
+                neg_sample = neg_post["snippet"]
+                pairs.append((anchor, neg_sample, 0))
+        # if i == 10: break      
+    return pairs
+
 def create_relevant_triples(posts: List[List[dict]], 
                             neg_to_pos_ratio: int=3, 
                             pos_rel_rank_thresh: float=0.25) -> List[Tuple[str, str, str]]:
@@ -123,6 +163,36 @@ def create_relevant_triples(posts: List[List[dict]],
                 
     return triples
 
+def create_relevant_triples_fixed(posts: List[List[dict]], 
+                                  neg_to_pos_ratio: int=3, 
+                                  pos_rel_rank_thresh: float=0.25) -> List[Tuple[str, str, str]]:
+    """
+    create relevant triples from the list of lists post structure.
+    Relevant triples are triples made by thresholding by the relevance score,
+    while pairing positive code snippet to a given anchor text.
+    Each post is a list of code snippet answers accompanying the intent (post title).
+    The code snippets are actually excerpts of the code blocks that were the answers.
+    """
+    triples: List[Tuple[str, str, str]] = []
+    for i, post in tqdm(enumerate(posts), 
+                        desc="creating triplets",
+                        total=len(posts)):
+        neg_posts = get_list_complement(posts, i)
+        # get list of negative samples from ans of the remaining posts.
+        neg_samples = flatten_list(neg_posts)
+        singleton_samples = 0
+        # NOTE: the posts are in decreasing order of probability (relevance) by default.
+        for j, ans in enumerate(post):
+            anchor = ans["intent"]
+            pos_sample = ans["snippet"]
+            # get positive sample from remaining ans of the post.
+            if j >= (len(post)*pos_rel_rank_thresh): continue
+            # number of negative samples for a given positive sample.
+            for neg_post in sample_list(neg_samples, k=neg_to_pos_ratio):
+                neg_sample = neg_post["snippet"]
+                triples.append((anchor, pos_sample, neg_sample))
+                
+    return triples
 # TOT = 0
 # TOT_NEG_SAMPLES = 0
 def get_intra_categ_neg(posts, init: float, 
@@ -170,6 +240,34 @@ def create_triples_intra_categ_neg(posts: List[List[dict]],
                 pos_posts, thresh=intra_categ_thresh, 
                 init=sampled_pos_post["prob"],
                 limit=int(0.5*len(post)),
+            )
+            # number of negative samples for a given positive sample.
+            for neg_post in inter_categ_samples+intra_categ_samples:
+                neg_sample = neg_post["snippet"]
+                triples.append((anchor, pos_sample, neg_sample))
+                
+    return triples
+
+def create_triples_intra_categ_neg_fixed(posts: List[List[dict]], 
+                                         neg_to_pos_ratio: int=3,
+                                         intra_categ_thresh: float=0.2) -> List[Tuple[str, str, str]]:
+    triples: List[Tuple[str, str, str]] = []
+    for i, post in tqdm(enumerate(posts), 
+                        desc="creating triplets", 
+                        total=len(posts)):
+        neg_posts = get_list_complement(posts, i)
+        # get list of negative samples from ans of the remaining posts.
+        neg_samples = flatten_list(neg_posts)
+        singleton_samples = 0
+        for j, ans in enumerate(post):
+            anchor = ans["intent"]
+            # get positive sample from remaining ans of the post.
+            pos_sample = ans["snippet"]
+            inter_categ_samples = sample_list(neg_samples, k=neg_to_pos_ratio)
+            intra_categ_samples = get_intra_categ_neg(
+                post, thresh=intra_categ_thresh, 
+                limit=int(0.5*len(post)),
+                init=ans["prob"],
             )
             # number of negative samples for a given positive sample.
             for neg_post in inter_categ_samples+intra_categ_samples:

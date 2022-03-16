@@ -1,0 +1,1 @@
+python -m baselines.nbow --train_path triples/nl_code_pairs_train.json --val_path triples/nl_code_pairs_val.json --exp_name nbow_siamese --do_train --device_id "cuda:0" --batch_size 32 --epochs 20

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import sys
 import random
 from tqdm import tqdm
 from typing import List
@@ -18,13 +19,25 @@ def main(data_path: str, triples_path: str, mode: str="default"):
         return triples
     if mode == "default":
         triples = create_triples(posts, neg_to_pos_ratio=3)
+    elif mode == "fixed":
+        triples = create_triples_fixed(posts, neg_to_pos_ratio=3)
     elif mode == "rel_thresh":
         triples = create_relevant_triples(
             posts, neg_to_pos_ratio=3,
             pos_rel_rank_thresh=0.25
         )
+    elif mode == "rel_thresh_fixed":
+        triples = create_relevant_triples_fixed(
+            posts, neg_to_pos_ratio=3,
+            pos_rel_rank_thresh=0.25
+        )
     elif mode == "intra_categ_neg":
         triples = create_triples_intra_categ_neg(
+            posts, neg_to_pos_ratio=3,
+            intra_categ_thresh=0.3,
+        )
+    elif mode == "intra_categ_neg_fixed":
+        triples = create_triples_intra_categ_neg_fixed(
             posts, neg_to_pos_ratio=3,
             intra_categ_thresh=0.3,
         )
@@ -44,21 +57,25 @@ def main(data_path: str, triples_path: str, mode: str="default"):
 
     
 if __name__ == "__main__":
-    mode = "rel_thresh_intra_categ_neg" # "intra_categ_neg"
+    # mode = "rel_thresh_intra_categ_neg" # "intra_categ_neg"
+    os.makedirs("triples", exist_ok=True)
+    try: mode = sys.argv[1]
+    except IndexError: mode = "default"
     # "rel_thresh_intra_categ_neg" # "default" # "rel_thresh"
     if mode == "default": triples_path: str = "triples.json"
-    else: triples_path = f"triples_{mode}.json"
+    else: triples_path = os.path.join("triples", f"triples_{mode}.json")
     triples = main(data_path="data/conala-mined.jsonl", 
                    triples_path=triples_path, mode=mode)
     val_ratio: int=0.2
     val_size = int(len(triples)*val_ratio)
     stem, ext = os.path.splitext(triples_path)
     random.shuffle(triples)
-    train_path = stem + "_train" + ext
-    val_path = stem + "_val" + ext
     
+    train_path = os.path.join("triples", stem + "_train" + ext)
+    val_path = os.path.join("triples", stem + "_val" + ext) 
     train_data = triples[val_size:]
     val_data = triples[:val_size]
+    
     with open(train_path, "w") as f:
         json.dump(train_data, f, indent=4)
     with open(val_path, "w") as f:

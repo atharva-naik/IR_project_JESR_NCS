@@ -131,7 +131,6 @@ dmypy.json
 triples.json
 data/
 data
-triples_train.json
-triples_val.json
+triples/
 *model.pt
 triples_*.json
