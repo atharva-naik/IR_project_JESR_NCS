@@ -1,0 +1,1 @@
+python -m models.CCodeBERT -t -tp triples/triples_rel_thresh_fixed_train.json -vp triples/triples_rel_thresh_fixed_val.json -en triplet_CodeBERT_rel_thresh_fixed

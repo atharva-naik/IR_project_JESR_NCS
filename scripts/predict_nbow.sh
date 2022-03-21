@@ -1,0 +1,1 @@
+python -m baselines.siamese_net --enc_type nbow --exp_name nbow_siamese --do_predict --device_id "cuda:0" --batch_size 32 --epochs 20 -c candidate_snippets.json -q query_and_candidates.json

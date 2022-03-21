@@ -1,0 +1,1 @@
+python -m models.CCodeBERT -ter -tcp data/conala-mined.jsonl -en rel_regressor_CodeBERT -d "cuda:1"

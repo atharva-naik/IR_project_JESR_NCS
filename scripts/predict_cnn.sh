@@ -1,0 +1,1 @@
+python -m baselines.siamese_net --enc_type CNN --exp_name cnn_siamese --do_predict --device_id "cuda:0" --batch_size 128 -c candidate_snippets.json -q query_and_candidates.json

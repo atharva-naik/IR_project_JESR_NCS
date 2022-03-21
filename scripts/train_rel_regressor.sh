@@ -1,0 +1,1 @@
+python -m models.CCodeBERT -tr -tp triples/rel_pairs_train.json -vp triples/rel_pairs_test.json -en rel_regressor_CodeBERT -d "cuda:1"
