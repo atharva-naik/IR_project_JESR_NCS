@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Atharva Naik - finetuning and model code.
+# Soumitra Das - changes to Dataset classes for GraphCodeBERT
 import os
 import json
 import time
@@ -13,6 +15,7 @@ from torch.optim import AdamW
 from typing import Union, List
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
+from models.metrics import recall_at_k, TripletAccuracy
 from sklearn.metrics import label_ranking_average_precision_score as MRR
 from tree_sitter import Language, Parser
 from datautils.parser import DFG_python
@@ -20,7 +23,6 @@ from datautils.parser import (remove_comments_and_docstrings,
                               tree_to_token_index,
                               index_to_code_token,
                               tree_to_variable_index)
-
 # seed shit
 random.seed(0)
 np.random.seed(0)
@@ -33,39 +35,31 @@ def get_args():
     parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
     parser.add_argument("-en", "--exp_name", type=str, default="GraphCodeBERT_rel_thresh")
+    parser.add_argument("-d", "--device_id", type=str, default="cuda:0")
     parser.add_argument("-p", "--predict", action="store_true")
     parser.add_argument("-t", "--train", action="store_true")
 
     return parser.parse_args()
     
-# triplet accuracy model.
-class TripletAccuracy:
-    def __init__(self):
-        self.pdist = nn.PairwiseDistance()
-        self.reset()
+
+class GraphCodeBERTWrapperModel(nn.Module):   
+    def __init__(self, encoder):
+        super(GraphCodeBERTWrapperModel, self).__init__()
+        self.encoder = encoder
         
-    def reset(self):
-        self.count = 0
-        self.tot = 0
-        
-    def get(self):
-        return self.count/self.tot
-        
-    def update(self, anchor, pos, neg):
-        pos = self.pdist(anchor, pos)
-        neg = self.pdist(anchor, neg)
-        self.count += torch.as_tensor((neg-pos)>0).sum().item()
-        self.tot += len(pos)
-# test metrics.
-def recall_at_k(actual, predicted, k: int=10):
-    rel = 0
-    tot = 0
-    for act_list, pred_list in zip(actual, predicted):
-        for i in act_list:
-            tot += 1
-            if i in pred_list[:k]: rel += 1
-                
-    return rel/tot
+    def forward(self, code_inputs=None, attn_mask=None, position_idx=None, nl_inputs=None): 
+        if code_inputs is not None:
+            # uses position_idx.
+            nodes_mask=position_idx.eq(0)
+            token_mask=position_idx.ge(2)        
+            inputs_embeddings=self.encoder.embeddings.word_embeddings(code_inputs)
+            nodes_to_token_mask=nodes_mask[:,:,None]&token_mask[:,None,:]&attn_mask
+            nodes_to_token_mask=nodes_to_token_mask/(nodes_to_token_mask.sum(-1)+1e-10)[:,:,None]
+            avg_embeddings=torch.einsum("abc,acd->abd",nodes_to_token_mask,inputs_embeddings)
+            inputs_embeddings=inputs_embeddings*(~nodes_mask)[:,:,None]+avg_embeddings*nodes_mask[:,:,None]    
+            return self.encoder(inputs_embeds=inputs_embeddings, attention_mask=attn_mask, position_ids=position_idx)[1]
+        else:
+            return self.encoder(nl_inputs, attention_mask=nl_inputs.ne(1))[1]
 
 
 class CodeDataset(Dataset):
@@ -104,7 +98,7 @@ class CodeDataset(Dataset):
         try:
             DFG,_=self.parser[1](root_node,index_to_code,{}) 
         except Exception as e:
-            print(e)
+            print("Ln 101:", e)
             DFG=[]
         DFG=sorted(DFG,key=lambda x:x[1])
         indexs=set()
@@ -237,7 +231,7 @@ class TextCodePairDataset(Dataset):
             code = remove_comments_and_docstrings(code, 'python')
         except:
             pass
-        print(type(code))
+        # print(type(code))
         tree = self.parser[0].parse(bytes(code,'utf8'))    
         root_node = tree.root_node  
         tokens_index=tree_to_token_index(root_node)     
@@ -249,7 +243,7 @@ class TextCodePairDataset(Dataset):
         try:
             DFG,_=self.parser[1](root_node,index_to_code,{}) 
         except Exception as e:
-            print(e)
+            print("Ln 246:", e)
             DFG=[]
         DFG=sorted(DFG,key=lambda x:x[1])
         indexs=set()
@@ -383,7 +377,7 @@ class TriplesDataset(Dataset):
         try:
             DFG,_ = self.parser[1](root_node,index_to_code,{}) 
         except Exception as e:
-            print(e)
+            print("Ln 380:", e)
             DFG=[]
         DFG=sorted(DFG,key=lambda x:x[1])
         indexs=set()
@@ -553,7 +547,9 @@ class GraphCodeBERTripletNet(nn.Module):
         self.config["dist_fn_deg"] = dist_fn_deg
         print(f"loading pretrained GraphCodeBERT embedding model from {model_path}")
         start = time.time()
-        self.embed_model = RobertaModel.from_pretrained(model_path)
+        self.embed_model = GraphCodeBERTWrapperModel(
+            RobertaModel.from_pretrained(model_path)
+        )
         print(f"loaded embedding model in {(time.time()-start):.2f}s")
         print(f"loaded tokenizer files from {tok_path}")
         self.tokenizer = RobertaTokenizer.from_pretrained(tok_path)
@@ -569,11 +565,12 @@ class GraphCodeBERTripletNet(nn.Module):
         self.config["loss_fn"] = f"{self.loss_fn}"
         
     def forward(self, anchor_title, pos_snippet, neg_snippet):
-        # print(anchor_title)
-        # print(len(anchor_title), type(anchor_title))
-        anchor_text_emb = self.embed_model(anchor_title).pooler_output # get [CLS] token (batch, emb_size)
-        pos_code_emb = self.embed_model(*pos_snippet).pooler_output # get [CLS] token (batch, emb_size)
-        neg_code_emb = self.embed_model(*neg_snippet).pooler_output # get [CLS] token (batch, emb_size)
+        anchor_text_emb = self.embed_model(nl_inputs=anchor_title)
+        anchor_text_emb = self.embed_model(nl_inputs=anchor_title)
+        x = pos_snippet
+        pos_code_emb = self.embed_model(code_inputs=x[0], attn_mask=x[1], position_idx=x[2])
+        x = neg_snippet
+        neg_code_emb = self.embed_model(code_inputs=x[0], attn_mask=x[1], position_idx=x[2])
         
         return anchor_text_emb, pos_code_emb, neg_code_emb
         
@@ -716,7 +713,7 @@ class GraphCodeBERTripletNet(nn.Module):
                 anchor_title = batch[-1].to(device)
                 pos_snippet = (batch[0].to(device), batch[1].to(device), batch[2].to(device))
                 neg_snippet = (batch[3].to(device), batch[4].to(device), batch[5].to(device))
-                print(neg_snippet[0].shape, neg_snippet[1].shape, neg_snippet[2].shape)
+                # print(neg_snippet[0].shape, neg_snippet[1].shape, neg_snippet[2].shape)
                 anchor_text_emb, pos_code_emb, neg_code_emb = self(anchor_title, pos_snippet, neg_snippet)
                 batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
                 batch_loss.backward()
@@ -757,7 +754,7 @@ def main():
         metrics = triplet_net.fit(train_path=args.train_path, 
                                   val_path=args.val_path, 
                                   exp_name=args.exp_name,
-                                  device_id="cpu",
+                                  device_id=args.device_id,
                                   epochs=5)
         metrics_path = os.path.join(args.exp_name, "train_metrics.json")
         print(f"saving metrics to {metrics_path}")

@@ -31,6 +31,10 @@ class CNNEncoder(nn.Module):
         kernel_sizes = args.get("kernel_sizes", [16, 16, 16])
         vocab_size = args.get("vocab_size", 50265)
         embed_size = args.get("embed_size", 128)
+        self.num_filters = num_filters
+        # weighted linear layer and it's activation.
+        self.weighted_sum_linear = nn.Linear(num_filters[-1], 1)
+        self.softmax = nn.Softmax(dim=-1)
         # dropout layer.
         self.dropout = nn.Dropout(dropout)
         # create the embedding layer.
@@ -98,8 +102,17 @@ class CNNEncoder(nn.Module):
             sequence_token_masks = tf.expand_dims(sequence_token_masks, axis=-1)  # B x T x 1
             return tf.reduce_max(sequence_token_embeddings + sequence_token_masks, axis=1)
         elif pool_mode == 'weighted_mean':
-            token_weights = seq_token_embeds * self.weighted_sum_linear(seq_token_embeds)
-            return (seq_token_embeds * token_weights).sum(1) / (token_weights.sum(1) + 1e-8)      
+            # weighted_sum_linear gives you batch_size x seq_len x 1
+            # softmax just normalizes the token weights
+            # if you don't squeeze the output will not properly sum to 1.
+            token_weights = self.softmax(
+                self.weighted_sum_linear(seq_token_embeds).squeeze()
+            )
+            # reshape the token_weights for multiplication purposes.
+            token_weights = token_weights.unsqueeze(dim=-1).repeat(1, 1, self.num_filters[-1])
+            # apply the masks.
+            token_weights *= seq_token_masks
+            return (seq_token_embeds * token_weights).sum(1) / token_weights.sum(1) 
     #         token_weights = tf.layers.dense(sequence_token_embeddings,
     #                                         units=1,
     #                                         activation=tf.sigmoid,
@@ -132,7 +145,7 @@ class CNNEncoder(nn.Module):
         curr_enc = curr_enc.transpose(-2,-1)
         
         return self.pool_sequence_embedding(
-            "mean", curr_enc, 
+            "weighted_mean", curr_enc, 
             attention_masks
         )
 

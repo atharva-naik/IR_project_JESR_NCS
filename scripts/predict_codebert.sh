@@ -1,0 +1,1 @@
+python -m models.CCodeBERT -c candidate_snippets.json -q query_and_candidates.json -en triplet_CodeBERT_rel_thresh_fixed
