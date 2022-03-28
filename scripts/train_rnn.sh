@@ -1,0 +1,1 @@
+python -m baselines.siamese_net --enc_type RNN --train_path triples/nl_code_pairs_train.json --val_path triples/nl_code_pairs_val.json --exp_name rnn_siamese --do_train --device_id "cuda:0" --batch_size 128 --epochs 20 --init_codebert

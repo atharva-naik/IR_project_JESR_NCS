@@ -13,6 +13,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import AdamW
 from typing import Union, List
+from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
 from models.metrics import recall_at_k, TripletAccuracy
@@ -67,7 +68,7 @@ class CodeDataset(Dataset):
         super(CodeDataset, self).__init__()
         self.data = code_snippets
         self.args = args
-        LANGUAGE = Language('parser/my-languages.so', 'python')
+        LANGUAGE = Language('datautils/py_parser.so', 'python')
         PARSER =  Parser()
         PARSER.set_language(LANGUAGE)
         self.parser = [PARSER, DFG_python]
@@ -85,8 +86,8 @@ class CodeDataset(Dataset):
         try:
             code = remove_comments_and_docstrings(code, 'python')
         except:
-            pass
-        print(type(code))
+            print(f"error in {code}")
+        # print(type(code))
         tree = self.parser[0].parse(bytes(code,'utf8'))    
         root_node = tree.root_node  
         tokens_index=tree_to_token_index(root_node)     
@@ -622,13 +623,22 @@ class GraphCodeBERTripletNet(nn.Module):
         datalloader = DataLoader(dataset, shuffle=False, 
                                  batch_size=batch_size)
         pbar = tqdm(enumerate(datalloader), total=len(datalloader), 
-                    desc=f"enocding {mode}", disable=not(use_tqdm))
+                    desc=f"encoding {mode}", disable=not(use_tqdm))
         all_embeds = []
         for step, batch in pbar:
             with torch.no_grad():
-                enc_args = (batch[0].to(device), batch[1].to(device))
-                batch_embed = self.embed_model(*enc_args).pooler_output
-                for embed in batch_embed: all_embeds.append(embed)
+                if mode == "text":
+                    nl_inputs = batch[0].to(device)
+                    batch_embed = self.embed_model(nl_inputs=nl_inputs)
+                elif mode == "code":
+                    code_inputs = batch[0].to(device)
+                    attn_masks = batch[1].to(device)
+                    position_idx = batch[2].to(device)
+                    batch_embed = self.embed_model(code_inputs=code_inputs, 
+                                                   attn_mask=attn_masks, 
+                                                   position_idx=position_idx)
+                for embed in batch_embed: 
+                    all_embeds.append(embed)
                 # if step == 5: break # DEBUG
         # print(type(all_embeds[0]), len(all_embeds))
         return all_embeds
@@ -722,7 +732,7 @@ class GraphCodeBERTripletNet(nn.Module):
                 # scheduler.step()  # Update learning rate schedule
                 self.zero_grad()
                 batch_losses.append(batch_loss.item())
-                pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
+                pbar.set_description(f"{exp_name}: train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
                 # if step == 5: break # DEBUG
             # validate current model
             val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
@@ -792,115 +802,132 @@ def test_retreival(device="cuda:0"):
             code_candidates = code_and_annotations["snippets"]
             annot_candidates = code_and_annotations["annotations"]
             candidates = code_candidates
-        metrics_path = os.path.join(args.exp_name, f"test_metrics_{setting}.json")
 
         print(f"loading queries from {args.queries_path}")
         queries_and_cand_labels = json.load(open(args.queries_path))
         queries = [i["query"] for i in queries_and_cand_labels]
         labels = [i["docs"] for i in queries_and_cand_labels]
-
-        mode = "l2_dist"
-        if mode in ["l2_dist", "inner_prod"]:
+        # dist_func = "l2_dist"
+        for dist_func in ["l2_dist", "inner_prod"]:
+            metrics_path = os.path.join(args.exp_name, f"test_metrics_{dist_func}_{setting}.json")
+            # if dist_func in ["l2_dist", "inner_prod"]:
             print(f"encoding {len(queries)} queries:")
-            query_mat = triplet_net.encode_emb(queries, mode="text", use_tqdm=True, device_id=device)
+            query_mat = triplet_net.encode_emb(queries, mode="text", 
+                                               use_tqdm=True, device_id=device)
             query_mat = torch.stack(query_mat)
 
             print(f"encoding {len(candidates)} candidates:")
             if setting == "code":
-                cand_mat = triplet_net.encode_emb(candidates, mode="code", use_tqdm=True, device_id=device)
+                cand_mat = triplet_net.encode_emb(candidates, mode="code", 
+                                                  use_tqdm=True, device_id=device)
                 cand_mat = torch.stack(cand_mat)
             elif setting == "annot":
-                cand_mat = triplet_net.encode_emb(candidates, mode="text", use_tqdm=True, device_id=device)
+                cand_mat = triplet_net.encode_emb(candidates, mode="text", 
+                                                  use_tqdm=True, device_id=device)
                 cand_mat = torch.stack(cand_mat)
             else:
                 cand_mat_code = triplet_net.encode_emb(code_candidates, mode="code", use_tqdm=True, device_id=device)
                 cand_mat_annot = triplet_net.encode_emb(annot_candidates, mode="text", use_tqdm=True, device_id=device)
                 cand_mat_code = torch.stack(cand_mat_code)
                 cand_mat_annot = torch.stack(cand_mat_annot)
-                # cand_mat = (cand_mat_code + cand_mat_annot)/2
-        # print(query_mat.shape, cand_mat.shape)
-        if mode == "inner_prod": 
-            scores = query_mat @ cand_mat.T
-        elif mode == "l2_dist": 
-            if setting == "code+annot":
-                scores_code = torch.cdist(query_mat, cand_mat_code, p=2)
-                scores_annot = torch.cdist(query_mat, cand_mat_annot, p=2)
-                scores = scores_code + scores_annot
-            else:
-                scores = torch.cdist(query_mat, cand_mat, p=2)
-        # elif mode == "joint_cls": scores = triplet_net.joint_classify(queries, candidates)
-        doc_ranks = scores.argsort(axis=1)
-        label_ranks = []
-        avg_rank = 0
-        avg_best_rank = 0 
-        N = 0
-        M = 0
+                    # cand_mat = (cand_mat_code + cand_mat_annot)/2
+            # print(query_mat.shape, cand_mat.shape)
+            if dist_func == "inner_prod": 
+                if setting == "code+annot":
+                    scores_code = query_mat @ cand_mat_code.T
+                    scores_annot = query_mat @ cand_mat_annot.T
+                    scores = scores_code + scores_annot
+                else:
+                    scores = query_mat @ cand_mat.T
+                # print(scores.shape)
+            elif dist_func == "l2_dist": 
+                if setting == "code+annot":
+                    scores_code = torch.cdist(query_mat, cand_mat_code, p=2)
+                    scores_annot = torch.cdist(query_mat, cand_mat_annot, p=2)
+                    scores = scores_code + scores_annot
+                else:
+                    scores = torch.cdist(query_mat, cand_mat, p=2)
+            # elif mode == "joint_cls": scores = triplet_net.joint_classify(queries, candidates)
+            doc_ranks = scores.argsort(axis=1)
+            if dist_func == "inner_prod":
+                doc_ranks = doc_ranks.flip(dims=[1])
+            label_ranks = []
+            avg_rank = 0
+            avg_best_rank = 0 
+            N = 0
+            M = 0
 
-        lrap_GT = np.zeros(
-            (
-                len(queries), 
-                len(candidates)
-            )
-        )
-        recall_at_ = []
-        for i in range(1,10+1):
-            recall_at_.append(
-                recall_at_k(
-                    labels, 
-                    doc_ranks.tolist(), 
-                    k=5*i
+            lrap_GT = np.zeros(
+                (
+                    len(queries), 
+                    len(candidates)
                 )
             )
-        for i in range(len(labels)):
-            for j in labels[i]:
-                lrap_GT[i][j] = 1
+            recall_at_ = []
+            for i in range(1,10+1):
+                recall_at_.append(
+                    recall_at_k(
+                        labels, 
+                        doc_ranks.tolist(), 
+                        k=5*i
+                    )
+                )
+            for i in range(len(labels)):
+                for j in labels[i]:
+                    lrap_GT[i][j] = 1
 
-        for i, rank_list in enumerate(doc_ranks):
-            if mode == "inner_prod": rank_list = rank_list.tolist()[::-1]
-            elif mode == "l2_dist": rank_list = rank_list.tolist()
-            instance_label_ranks = []
-            ranks = []
-            for cand_rank in labels[i]:
-                # print(rank_list, cand_rank)
-                rank = rank_list.index(cand_rank)
-                avg_rank += rank
-                ranks.append(rank)
-                N += 1
-                instance_label_ranks.append(rank)
-            M += 1
-            avg_best_rank += min(ranks)
-            label_ranks.append(instance_label_ranks)
-        metrics = {
-            "avg_candidate_rank": avg_rank/N,
-            "avg_best_candidate_rank": avg_best_rank/M,
-            "recall": {
-                f"@{5*i}": recall_at_[i-1] for i in range(1,10+1) 
-            },
-        }
-        print("avg canditate rank:", avg_rank/N)
-        print("avg best candidate rank:", avg_best_rank/M)
-        for i in range(1,10+1):
-            print(f"recall@{5*i} = {recall_at_[i-1]}")
-        if mode == "inner_prod":
-            # -scores for distance based scores, no - for innert product based scores.
-            mrr = MRR(lrap_GT, scores.cpu().numpy())
-        elif mode == "l2_dist":
-            # -scores for distance based scores, no - for innert product based scores.
-            mrr = MRR(lrap_GT, -scores.cpu().numpy())
-        metrics["mrr"] = mrr
-        print("MRR (LRAP):", mrr)
-        if not os.path.exists(args.exp_name):
-            print("missing experiment folder: assuming zero-shot setting")
-            metrics_path = os.path.join(
-                "GraphCodeBERT_zero_shot", 
-                "test_metrics.json"
-            )
-            os.makedirs("GraphCodeBERT_zero_shot", exist_ok=True)
-        with open(metrics_path, "w") as f:
-            json.dump(metrics, f)
+            for i, rank_list in enumerate(doc_ranks):
+                rank_list = rank_list.tolist()
+                # if dist_func == "inner_prod": rank_list = rank_list.tolist()[::-1]
+                # elif dist_func == "l2_dist": rank_list = rank_list.tolist()
+                instance_label_ranks = []
+                ranks = []
+                for cand_rank in labels[i]:
+                    # print(rank_list, cand_rank)
+                    rank = rank_list.index(cand_rank)
+                    avg_rank += rank
+                    ranks.append(rank)
+                    N += 1
+                    instance_label_ranks.append(rank)
+                M += 1
+                avg_best_rank += min(ranks)
+                label_ranks.append(instance_label_ranks)
+            metrics = {
+                "avg_candidate_rank": avg_rank/N,
+                "avg_best_candidate_rank": avg_best_rank/M,
+                "recall": {
+                    f"@{5*i}": recall_at_[i-1] for i in range(1,10+1) 
+                },
+            }
+            print("avg canditate rank:", avg_rank/N)
+            print("avg best candidate rank:", avg_best_rank/M)
+            for i in range(1,10+1):
+                print(f"recall@{5*i} = {recall_at_[i-1]}")
+            if dist_func == "inner_prod":
+                # -scores for distance based scores, no - for innert product based scores.
+                mrr = MRR(lrap_GT, scores.cpu().numpy())
+                ndcg = NDCG(lrap_GT, scores.cpu().numpy())
+            elif dist_func == "l2_dist":
+                # -scores for distance based scores, no - for innert product based scores.
+                mrr = MRR(lrap_GT, -scores.cpu().numpy())
+                ndcg = NDCG(lrap_GT, -scores.cpu().numpy())
+                
+            metrics["mrr"] = mrr
+            metrics["ndcg"] = ndcg
+            print("NDCG:", ndcg)
+            print("MRR (LRAP):", mrr)
+            if not os.path.exists(args.exp_name):
+                print("missing experiment folder: assuming zero-shot setting")
+                metrics_path = os.path.join(
+                    "GraphCodeBERT_zero_shot", 
+                    f"test_metrics_{dist_func}_{setting}.json"
+                )
+                os.makedirs("GraphCodeBERT_zero_shot", exist_ok=True)
+            with open(metrics_path, "w") as f:
+                json.dump(metrics, f)
 #     with open("pred_cand_ranks.json", "w") as f:
 #         json.dump(label_ranks, f, indent=4)
 if __name__ == "__main__":
-    main() 
+    # main() 
     # setting in ['code', 'annot', 'code+annot']
-    # test_retreival(device="cuda:1")
+    test_retreival(device="cuda:0")

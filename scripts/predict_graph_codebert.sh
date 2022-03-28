@@ -1,0 +1,1 @@
+python -m models.GraphCodeBERT -c candidate_snippets.json -q query_and_candidates.json -en GraphCodeBERT_zero_shot

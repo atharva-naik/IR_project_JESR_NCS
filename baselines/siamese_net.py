@@ -143,14 +143,13 @@ def init_codebert_embed():
 
 
 class SiameseWrapperNet(nn.Module):
-    def __init__(self, enc_type="nbow", init_codebert=False):
+    def __init__(self, enc_type="nbow", init_codebert=False, device="cpu"):
         super(SiameseWrapperNet, self).__init__()
         self.enc_type = enc_type
         if enc_type == "nbow":
             codebert_embed = init_codebert_embed()
             self.code_encoder = NBowEncoder(codebert_embed)
             self.text_encoder = NBowEncoder(codebert_embed)
-            self.loss_fn = nn.BCELoss()
         elif enc_type == "CNN":
             if init_codebert:
                 embeddings = init_codebert_embed()
@@ -158,13 +157,17 @@ class SiameseWrapperNet(nn.Module):
                 embeddings = None
             self.code_encoder = CNNEncoder(embeddings)
             self.text_encoder = CNNEncoder(embeddings)
-            self.loss_fn = nn.BCELoss() # nn.CrossEntropyLoss()
+            # self.loss_fn = nn.BCELoss() # nn.CrossEntropyLoss()
         elif enc_type == "RNN":
-            codebert_embed = init_codebert_embed()
-            self.code_encoder = RNNEncoder(codebert_embed)
-            self.text_encoder = RNNEncoder(codebert_embed)
+            if init_codebert:
+                embeddings = init_codebert_embed()
+            else:
+                embeddings = None
+            self.code_encoder = RNNEncoder(embeddings, device=device)
+            self.text_encoder = RNNEncoder(embeddings, device=device)
         else:
             raise TypeError(f"no implementation found for encoder of type '{enc_type}'")
+        self.loss_fn = nn.BCELoss()
         self.sigmoid = nn.Sigmoid()
         
     def forward(self, text: torch.Tensor, code: torch.Tensor, 
@@ -448,6 +451,7 @@ def finetune(args):
     model = SiameseWrapperNet(
         enc_type=enc_type, 
         init_codebert=init_codebert,
+        device=device,
     )
     config["loss_fn"] = repr(model.loss_fn)
     print(model)
