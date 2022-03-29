@@ -305,6 +305,7 @@ def test_retreival(args):
     
     print("creating model object")
     model = SiameseWrapperNet(
+        device=device,
         enc_type=args.enc_type,
         init_codebert=args.init_codebert,
     )

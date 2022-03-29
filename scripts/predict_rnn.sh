@@ -1,0 +1,1 @@
+python -m baselines.siamese_net --enc_type RNN --exp_name rnn_siamese --do_predict --device_id "cuda:1" --batch_size 128 -c candidate_snippets.json -q query_and_candidates.json --init_codebert

@@ -3,10 +3,12 @@
 import os
 import json
 
+GraphCodeBERT = []
 triplet_CodeBERT = []
 for x in ["", "_rel_thresh"]:
     for y in ["", "_intra_categ_neg"]:
         triplet_CodeBERT.append("triplet_CodeBERT"+x+y)
+        GraphCodeBERT.append("GraphCodeBERT"+x+y)
 # print(triplet_CodeBERT)
 def get_model_name(folder: str, dist_fn: str="", setting: str=""):
     model_name = folder.replace("triplet_", "").replace('CodeBERT_', "")
@@ -18,7 +20,8 @@ def get_model_name(folder: str, dist_fn: str="", setting: str=""):
 metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank", "ndcg"]
 column_names = ["model name", "recall@5", "recall@10"] + metrics
 table_rows = []
-for folder in ["CodeBERT_zero_shot"] + triplet_CodeBERT:
+model_list = ["CodeBERT_zero_shot"] + triplet_CodeBERT + ["GraphCodeBERT_zero_shot"] + GraphCodeBERT + ["nbow_siamese", "cnn_siamese", "rnn_siamese"]
+for folder in model_list:
     print(folder)
     for dist_fn in ["inner_prod", "l2_dist"]:
         for setting in ["code", "annot", "code+annot"]:
