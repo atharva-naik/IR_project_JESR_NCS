@@ -24,22 +24,25 @@ from datautils.parser import (remove_comments_and_docstrings,
                               tree_to_token_index,
                               index_to_code_token,
                               tree_to_variable_index)
-# seed shit
+# seed
 random.seed(0)
 np.random.seed(0)
 torch.manual_seed(0)
 # get arguments
 def get_args():
-    parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the GraphCodeBERT in Late Fusion configuration for Neural Code Search.")
-    parser.add_argument("-tp", "--train_path", type=str, default="triples/triples_rel_thresh_train.json")
-    parser.add_argument("-vp", "--val_path", type=str, default="triples/triples_rel_thresh_val.json")
-    parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
-    parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
-    parser.add_argument("-en", "--exp_name", type=str, default="GraphCodeBERT_rel_thresh")
-    parser.add_argument("-d", "--device_id", type=str, default="cuda:0")
-    parser.add_argument("-p", "--predict", action="store_true")
-    parser.add_argument("-t", "--train", action="store_true")
-
+    parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the GraphCodeBERT in Late Fusion configuration for Neural Code Search.")    
+    parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_rel_thresh", help="experiment name (will be used as folder name)")
+    parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json", help="path to candidates (to test retrieval)")
+    parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json", help="path to queries (to test retrieval)")
+    parser.add_argument("-tp", "--train_path", type=str, default="triples/triples_train_fixed.json", help="path to training triplet data")
+    parser.add_argument("-vp", "--val_path", type=str, default="triples/triples_test_fixed.json", help="path to validation triplet data")
+    parser.add_argument("-d", "--device_id", type=str, default="cpu", help="device string (GPU) for doing training/testing")
+    parser.add_argument("-lr", "--lr", type=float, default=1e-5, help="learning rate for training (defaults to 1e-5)")
+    parser.add_argument("-p", "--predict", action="store_true", help="flag to do prediction/testing")
+    parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
+    parser.add_argument("-bs", "--batch_size", type=int, default=32, help="batch size")
+    parser.add_argument("-e", "--epochs", type=int, default=20, help="no. of epochs")
+    
     return parser.parse_args()
     
 
@@ -542,10 +545,6 @@ class GraphCodeBERTripletNet(nn.Module):
         self.config["model_path"] = model_path
         self.config["tok_path"] = tok_path
         
-        margin = args.get("margin", 1)
-        dist_fn_deg = args.get("dist_fn_deg", 2)
-        self.config["margin"] = margin
-        self.config["dist_fn_deg"] = dist_fn_deg
         print(f"loading pretrained GraphCodeBERT embedding model from {model_path}")
         start = time.time()
         self.embed_model = GraphCodeBERTWrapperModel(
@@ -553,17 +552,31 @@ class GraphCodeBERTripletNet(nn.Module):
         )
         print(f"loaded embedding model in {(time.time()-start):.2f}s")
         print(f"loaded tokenizer files from {tok_path}")
+        # create tokenizer.
         self.tokenizer = RobertaTokenizer.from_pretrained(tok_path)
         # optimizer and loss.
         adam_eps = 1e-8
         lr = args.get("lr", 1e-5)
-        self.config["lr"] = lr
+        margin = args.get("margin", 1)
+        dist_fn_deg = args.get("dist_fn_deg", 2)
+        # print optimizer and loss function.
         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
-        self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
         print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
-        self.loss_fn = nn.TripletMarginLoss(margin=margin, p=dist_fn_deg)
+        # create optimizer object and loss function.
+        self.optimizer = AdamW(
+            self.parameters(), 
+            eps=adam_eps, lr=lr
+        )
+        self.loss_fn = nn.TripletMarginLoss(
+            margin=margin, 
+            p=dist_fn_deg
+        )
+        # store config info.
+        self.config["dist_fn_deg"] = dist_fn_deg
         self.config["optimizer"] = f"{self.optimizer}"
         self.config["loss_fn"] = f"{self.loss_fn}"
+        self.config["margin"] = margin
+        self.config["lr"] = lr
         
     def forward(self, anchor_title, pos_snippet, neg_snippet):
         anchor_text_emb = self.embed_model(nl_inputs=anchor_title)
@@ -598,7 +611,7 @@ class GraphCodeBERTripletNet(nn.Module):
         """Note: our late fusion GraphCodeBERT is a universal encoder for text and code, so the same function works for both."""
         batch_size = args.get("batch_size", 32)
         device_id = args.get("device_id", "cuda:0")
-        device = torch.device(device_id)
+        device = torch.device(device_id if torch.cuda.is_available() else "cpu")
         use_tqdm = args.get("use_tqdm", False)
         self.to(device)
         self.eval()
@@ -752,20 +765,14 @@ class GraphCodeBERTripletNet(nn.Module):
         return train_metrics
 
     
-def main():
-    import os
-    args = get_args()
+def main(args):    
     print("initializing model and tokenizer ..")
     tok_path = os.path.join(os.path.expanduser("~"), "graphcodebert-base-tok")
     print("creating model object")
     triplet_net = GraphCodeBERTripletNet(tok_path=tok_path)
     if args.train:
         print("commencing training")
-        metrics = triplet_net.fit(train_path=args.train_path, 
-                                  val_path=args.val_path, 
-                                  exp_name=args.exp_name,
-                                  device_id=args.device_id,
-                                  epochs=5)
+        metrics = triplet_net.fit(**vars(args))
         metrics_path = os.path.join(args.exp_name, "train_metrics.json")
         print(f"saving metrics to {metrics_path}")
         with open(metrics_path, "w") as f:
@@ -774,12 +781,10 @@ def main():
         model_path = os.path.join(args.exp_name, "model.pt")
         print(model_path)
         
-def test_retreival(device="cuda:0"):
-    import os
-    import json
-    args = get_args()
+def test_retreival(args):
     print("initializing model and tokenizer ..")
     tok_path = os.path.join(os.path.expanduser("~"), "graphcodebert-base-tok")
+    device = args.device_id if torch.cuda.is_available() else "cpu"
     
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     print(f"loading checkpoint (state dict) from {ckpt_path}")
@@ -813,21 +818,23 @@ def test_retreival(device="cuda:0"):
             # if dist_func in ["l2_dist", "inner_prod"]:
             print(f"encoding {len(queries)} queries:")
             query_mat = triplet_net.encode_emb(queries, mode="text", 
-                                               use_tqdm=True, device_id=device)
+                                               use_tqdm=True, **vars(args))
             query_mat = torch.stack(query_mat)
 
             print(f"encoding {len(candidates)} candidates:")
             if setting == "code":
                 cand_mat = triplet_net.encode_emb(candidates, mode="code", 
-                                                  use_tqdm=True, device_id=device)
+                                                  use_tqdm=True, **vars(args))
                 cand_mat = torch.stack(cand_mat)
             elif setting == "annot":
                 cand_mat = triplet_net.encode_emb(candidates, mode="text", 
-                                                  use_tqdm=True, device_id=device)
+                                                  use_tqdm=True, **vars(args))
                 cand_mat = torch.stack(cand_mat)
             else:
-                cand_mat_code = triplet_net.encode_emb(code_candidates, mode="code", use_tqdm=True, device_id=device)
-                cand_mat_annot = triplet_net.encode_emb(annot_candidates, mode="text", use_tqdm=True, device_id=device)
+                cand_mat_code = triplet_net.encode_emb(code_candidates, mode="code", 
+                                                       use_tqdm=True, **vars(args))
+                cand_mat_annot = triplet_net.encode_emb(annot_candidates, mode="text", 
+                                                        use_tqdm=True, **vars(args))
                 cand_mat_code = torch.stack(cand_mat_code)
                 cand_mat_annot = torch.stack(cand_mat_annot)
                     # cand_mat = (cand_mat_code + cand_mat_annot)/2
@@ -928,6 +935,8 @@ def test_retreival(device="cuda:0"):
 #     with open("pred_cand_ranks.json", "w") as f:
 #         json.dump(label_ranks, f, indent=4)
 if __name__ == "__main__":
-    # main() 
-    # setting in ['code', 'annot', 'code+annot']
-    test_retreival(device="cuda:0")
+    args = get_args()
+    if args.train:
+        main(args=args) 
+    elif args.predict:
+        test_retreival(args=args)

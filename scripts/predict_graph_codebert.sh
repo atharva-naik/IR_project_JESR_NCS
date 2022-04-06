@@ -1,1 +1,1 @@
-python -m models.GraphCodeBERT -c candidate_snippets.json -q query_and_candidates.json -en GraphCodeBERT_intra_categ_neg
+python -m models.GraphCodeBERT -p -c candidate_snippets.json -q query_and_candidates.json -en GraphCodeBERT_intra_categ_neg -d "cuda:0" -bs 48

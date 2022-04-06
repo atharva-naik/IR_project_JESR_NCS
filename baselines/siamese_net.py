@@ -257,7 +257,7 @@ def get_args():
     parser.add_argument("-dp", "--do_predict", action="store_true")
     parser.add_argument("-dt", "--do_train", action="store_true")
     parser.add_argument("-e", "--epochs", default=20, type=int)
-    # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
+
     return parser.parse_args()
     
 def val(model, valloader, epoch_i=0, 

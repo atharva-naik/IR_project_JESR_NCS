@@ -1,1 +1,1 @@
-python -m models.CCodeBERT -t -tp triples/triples_rel_thresh_train.json -vp triples/triples_rel_thresh_val.json -en triplet_CodeBERT_rel_thresh
+python -m models.CCodeBERT -t -tp triples/triples_rel_thresh_train.json -vp triples/triples_rel_thresh_val.json -en CodeBERT_experiment -d "cuda:0" -bs 48
