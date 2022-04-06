@@ -171,7 +171,8 @@ class SiameseWrapperNet(nn.Module):
         self.sigmoid = nn.Sigmoid()
         
     def forward(self, text: torch.Tensor, code: torch.Tensor, 
-                text_masks: torch.Tensor, code_masks: torch.Tensor):
+                text_masks: Union[torch.Tensor, None]=None, 
+                code_masks: Union[torch.Tensor, None]=None):
         if self.enc_type == "nbow":
             code_enc = self.code_encoder(code)
             text_enc = self.text_encoder(text)
