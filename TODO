@@ -9,10 +9,10 @@
    -> train_codebert.sh (done)
    -> predict_nbow.sh
    -> predict_cnn.sh (done)
-   -> predict_rnn.sh
+   -> predict_rnn.sh (done)
    -> train_nbow.sh
    -> train_cnn.sh (done)
-   -> train_rnn.sh
+   -> train_rnn.sh (done)
 3. choose the best model.
 4. finish the demo.py script
 5. record and edit demo.

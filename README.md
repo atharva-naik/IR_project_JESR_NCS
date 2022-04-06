@@ -1,21 +1,9 @@
 # IR_project_JESR_NCS
 Implementation of Joint Embedding Space Retrieval (JESR) for Neural Code Search (NCS) for IR term project.
-
 Our model is composed of the following components (1) encoders (2) distance function
-## Available Encoders
-We use different encoders for the text and code
 
-### Text Encoders
-1. BERT
-2. RoBERTa
-3. Sentence-BERT
 
-### Code Encoders
-1. Code2Vec
-2. Roberta (code)
-
-### Performance Comparison
-
+## Triplet Generation Process
 **triplet contrastive pretraining (TCP):** <br>
 Create triplet instances from the conala_mixed.jsonl using the following method: <br>
 ```for each post title``` <br>
@@ -25,6 +13,48 @@ Create triplet instances from the conala_mixed.jsonl using the following method:
 **intra-category negative sampling (ICNS):** 
 for each
 
+## Baselines
+**NOTE: Please grant execution permissions to all bash scripts (chmod +x)**
+
+We train our baselines on **natural language** (nl) and **code snippet** (pl or programming language) pair classification task. 
+We create a balanced training and validation set by sampling positive and negative instances from the CoNaLa mined pairs dataset.
+We utilize a separate encoder for both text and code, and train the models in a siamese configuration, with Binary Cross Entropy as loss.
+We encode code, text and annotations separately durin test time and score them using functions like inner product and euclidean distance (l2_loss)
+
+### n-BOW: Neural Bag of words
+1. Treat **nl** & **pl** as bag of words and represent them as mean pool of token level embeddings.
+2. Utilize tokenizer of CodeBERT to get token sequence and initialize embedding layer with CodeBERT embeddings (768 dim).
+
+To train model from scratch:
+``` scripts/train_nbow.sh ```
+
+To test saved model:
+``` scripts/predict_nbow.sh ```
+
+### CNN: Convolutional Neural Network
+1. Perform 1-D convolutions with 3 filters of kernel width of 16 each and residual connections.
+2. Use self-attention like weighted sum layer to pool the sequence output (across sequence lenght dim.)
+3. Utilize tokenizer of CodeBERT to get token sequence but initialize embedding layer from scratch (128 dim.). We initialize from scratch unlike other baselines because we had performance issues on initializing with CodeBERT embeddings. 
+
+To train model from scratch:
+``` scripts/train_cnn.sh ```
+
+To test saved model:
+``` scripts/predict_cnn.sh ```
+
+### RNN: Recurrent Neural Network (LSTM)
+1. Treat **nl** & **pl** 
+2. Utilize tokenizer of CodeBERT to get token sequence and initialize embedding layer with CodeBERT embeddings (768 dim).
+
+To train model from scratch:
+``` scripts/train_rnn.sh ```
+
+To test saved model:
+``` scripts/predict_rnn.sh ```
+
+## Models
+
+### Performance Comparison
 **relevance thresholding for positive samples (RTPS):** 
 |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
 |---|---|---|---|---|---|---|
