@@ -104,9 +104,12 @@ def show_best_worst_examples(model: GraphCodeBERTripletNet, queries: List[str], 
     # final results (best & worst examples).
     best_results = {}
     worst_results = {}
+    best_result_GTs = []
+    worst_result_GTs = []
     # hard coded: show top-5 results for the query.
     for i in best_query_ids:
         best_results[queries[i]] = []
+        best_result_GTs.append(labels[i])
         for j in ranked_docs[i][:5]:
             is_true = int(j in labels[i])
             best_results[queries[i]].append((
@@ -116,6 +119,7 @@ def show_best_worst_examples(model: GraphCodeBERTripletNet, queries: List[str], 
     # hard coded: show top-5 results for the query.
     for i in worst_query_ids:
         worst_results[queries[i]] = []
+        worst_result_GTs.append(labels[i])
         for j in ranked_docs[i][:5]:
             is_true = int(j in labels[i])
             worst_results[queries[i]].append((
@@ -123,7 +127,7 @@ def show_best_worst_examples(model: GraphCodeBERTripletNet, queries: List[str], 
                 is_true
             ))
     
-    return best_results, worst_results
+    return best_results, best_result_GTs, worst_results, worst_result_GTs
         
 def demo_annotated_code_search(args):
     print("initializing model and tokenizer ..")
@@ -177,10 +181,10 @@ def demo_annotated_code_search(args):
     # interactive mode.
     if args.interactive_mode:
         while True:
+            query = input("Enter a natural language query: ").strip()
             if query == ":exit" or query == ":quit":
                 print("\x1b[31;1mshutting down!\x1b[0m")
                 exit()
-            query = input("Enter a natural language query: ").strip()
             results = get_top_k_results(model=triplet_net, queries=[query],  
                                         cand_mat_annot=cand_mat_annot, 
                                         cand_mat_code=cand_mat_code,
@@ -192,28 +196,37 @@ def demo_annotated_code_search(args):
                 print(f"{i}) \x1b[34;1m{annot}\x1b[0m\n{code}")    
     # show k of the best and worst examples
     else:
-        best_eg, worst_eg = show_best_worst_examples(model=triplet_net, queries=queries,  
-                                                     cand_mat_annot=cand_mat_annot, 
-                                                     cand_mat_code=cand_mat_code,
-                                                     labels=labels, args=args)
-        print(best_eg)
-        print(worst_eg)
+        best_eg, best_GTs, worst_eg, worst_GTs = show_best_worst_examples(model=triplet_net, queries=queries,  
+                                                                          cand_mat_annot=cand_mat_annot, 
+                                                                          cand_mat_code=cand_mat_code,
+                                                                          labels=labels, args=args)
+        k = 0
         print("\x1b[32;1mcorrectly\x1b[0m classified examples:")
         for eg, id_list in best_eg.items():
-            print(f"\x1b[34;1m{eg}\x1b[0m")
-            for i, is_true in id_list:
-                code = code_candidates[i]
-                annot = annot_candidates[i]
-                if is_true: print(f"{i}) \x1b[32;1mannot: {annot}\ncode:{code}\x1b[0m")
-                else: print(f"{i}) {annot}\n{code}")
-        print("\x1b[31;1mincorrectly\x1b[0m classified examples:")
-        for eg, id_list in worst_eg.items():
-            print(f"\x1b[34;1m{eg}\x1b[0m")
+            print(f"\n\x1b[34;1m{eg}\x1b[0m")
+            print("\nGround Truths: ")
+            print([code_candidates[t] for t in best_GTs[k]])
+            print()
             for i, is_true in id_list:
                 code = code_candidates[i]
                 annot = annot_candidates[i]
                 if is_true: print(f"{i}) \x1b[32;1mannot: {annot}\ncode: {code}\x1b[0m")
                 else: print(f"{i}) {annot}\n{code}")
+            k += 1
+        
+        k = 0
+        print("\x1b[31;1mincorrectly\x1b[0m classified examples:")
+        for eg, id_list in worst_eg.items():
+            print(f"\n\x1b[34;1m{eg}\x1b[0m")
+            print("\nGround Truths: ")
+            print([code_candidates[t] for t in worst_GTs[k]])
+            print()
+            for i, is_true in id_list:
+                code = code_candidates[i]
+                annot = annot_candidates[i]
+                if is_true: print(f"{i}) \x1b[32;1mannot: {annot}\ncode: {code}\x1b[0m")
+                else: print(f"{i}) {annot}\n{code}")
+            k += 1
         
         
 if __name__ == "__main__":
