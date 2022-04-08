@@ -291,12 +291,26 @@ def val(model, valloader, epoch_i=0,
             # if step == 5: break # DEBUG  
     return val_acc/val_tot, np.mean(batch_losses)
     
+def get_tok_path(model_name: str) -> str:
+    assert model_name in ["codebert", "graphcodebert"]
+    if model_name == "codebert":
+        tok_path = os.path.expanduser("~/codebert-base-tok")
+        if not os.path.exists(tok_path):
+            tok_path = "microsoft/codebert-base"
+    elif model_name == "graphcodebert":
+        tok_path = os.path.expanduser("~/graphcodebert-base-tok")
+        if not os.path.exists(tok_path):
+            tok_path = "microsoft/grapcodebert-base"
+            
+    return tok_path
+    
 def test_retreival(args):
     print("initializing model and tokenizer ..")
-    tok_path = os.path.join(
-        os.path.expanduser("~"), 
-        "codebert-base-tok"
-    )
+    #     tok_path = os.path.join(
+    #         os.path.expanduser("~"), 
+    #         "codebert-base-tok"
+    #     )
+    tok_path = get_tok_path("codebert")
     device = torch.device(args.device_id if torch.cuda.is_available() else "cpu")
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     print(f"loading checkpoint (state dict) from {ckpt_path}")

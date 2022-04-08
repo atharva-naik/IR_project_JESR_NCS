@@ -2,6 +2,12 @@
 Implementation of Joint Embedding Space Retrieval (JESR) for Neural Code Search (NCS) for IR term project.
 Our model is composed of the following components (1) encoders (2) distance function
 
+## Setup
+### Environmet:
+Use the requirements.txt: ```pip install -r requirements.txt```
+
+If you face issues with requirements.txt then please try using our conda environment (py3.7.yml) <br>
+To install from a yml file: ```conda env create -f py3.7.yml```
 
 ## Triplet Generation Process
 **triplet contrastive pretraining (TCP):** <br>
