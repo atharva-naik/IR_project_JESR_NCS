@@ -31,12 +31,7 @@ def get_posts(data: List[dict]) -> Dict[str, dict]:
     return posts
 
 def get_list_complement(l: list, i: int):
-    nl = []
-    for j in range(len(l)):
-        if i == j: continue
-        nl.append(l[j])
-        
-    return nl
+    return l[:i]+l[i+1:]
 
 def sample_list(l: list, k: int=1):
     """get sampled list."""

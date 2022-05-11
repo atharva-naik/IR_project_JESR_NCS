@@ -1,0 +1,1 @@
+python demo.py -q query_and_candidates.json -c candidate_snippets.json -cp GraphCodeBERT/model.pt -d "cuda:1" -bs 32 -k 5 -uco
