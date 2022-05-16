@@ -1,0 +1,1 @@
+python -m models.UniXcoder -t -tp triples/triples_rel_thresh_train.json -vp triples/triples_rel_thresh_val.json -en UniXcoder_rel_thresh -d "cuda:0" -bs 48

@@ -87,7 +87,7 @@ class TextDataset(Dataset):
         text = self.proc_text(self.data[i])
         if self.model_ptr:
             # special tokens are added by default.
-            input_ids = self.model_ptr.tokenize([text], **self.tok_args)[0]            
+            input_ids = self.model_ptr.tokenize([text], **self.tok_args)[0]
             return torch.tensor(input_ids)
         else:
             return [text]
@@ -212,7 +212,7 @@ class UniXcoderTripletNet(nn.Module):
         all_embeds = []
         for step, batch in pbar:
             with torch.no_grad():
-                enc_input_ids = batch[0]
+                enc_input_ids = batch.to(device)
                 _,batch_embed = self.embed_model(enc_input_ids)
                 for embed in batch_embed: all_embeds.append(embed)
                 # if step == 5: break # DEBUG
