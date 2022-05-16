@@ -67,14 +67,16 @@ class Table:
         
         return row_ids
     
-    def highlight_max(self, col_ids: List[int]):
-        self.highlighted_cells = []
+    def highlight_max(self, col_ids: List[int], reset=True):
+        if reset:
+            self.highlighted_cells = []
         row_ids = self.find_max_in_cols(col_ids)
         for i,j in zip(row_ids, col_ids):
             self.highlighted_cells.append((i, j))
     
-    def highlight_min(self, col_ids: List[int]):
-        self.highlighted_cells = []
+    def highlight_min(self, col_ids: List[int], reset=True):
+        if reset:
+            self.highlighted_cells = []
         row_ids = self.find_min_in_cols(col_ids)
         for i,j in zip(row_ids, col_ids):
             self.highlighted_cells.append((i, j))
@@ -110,7 +112,7 @@ for folder in model_list:
             table.append(table_row)
 table.sort(by=0)
 table.highlight_max([1,2,3,6])
-table.highlight_min([4,5])
+table.highlight_min([4,5], reset=False)
 print(table)
 # # create table string
 # table_str = ("|"+"|".join(column_names)+"|\n")
