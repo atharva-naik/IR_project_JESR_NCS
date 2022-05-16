@@ -93,12 +93,12 @@ GraphCodeBERT:
 |CodeBERT_rel_thresh_intra_categ_neg (l2_dist) (code)|0.606|0.718|0.498|11.196|7.707|0.615|
 |CodeBERT_zero_shot (l2_dist) (code)|0.030|0.050|0.028|223.428|204.353|0.167|
 |GraphCodeBERT (l2_dist) (code)|0.662|0.792|0.570|8.636|7.047|0.673|
-|GraphCodeBERT_intra_categ_neg (l2_dist) (code)|**0.684**|0.802|**0.574**|8.088|5.819|**0.677**|
+|GraphCodeBERT_intra_categ_neg (l2_dist) (code)|0.684|0.802|0.574|8.088|5.819|0.677|
 |GraphCodeBERT_rel_thresh (l2_dist) (code)|0.670|0.788|0.574|8.128|5.323|0.676|
 |GraphCodeBERT_rel_thresh_intra_categ_neg (l2_dist) (code)|0.634|0.758|0.540|9.690|7.397|0.649|
 |GraphCodeBERT_zero_shot (l2_dist) (code)|0.120|0.172|0.099|202.382|190.548|0.237|
 |UniXcoder (l2_dist) (code)|0.240|0.304|0.207|79.904|72.060|0.349|
-|UniXcoder_intra_categ_neg (l2_dist) (code)|0.678|**0.810**|0.571|6.930|4.951|0.676|
+|UniXcoder_intra_categ_neg (l2_dist) (code)|0.678|0.810|0.571|**6.930**|**4.951**|0.676|
 |UniXcoder_rel_thresh (l2_dist) (code)|0.240|0.304|0.207|79.904|72.060|0.349|
 |cnn_siamese (l2_dist) (code)|0.054|0.104|0.060|102.886|84.121|0.219|
 |nbow_siamese (l2_dist) (code)|0.080|0.096|0.062|154.880|143.016|0.208|

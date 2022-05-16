@@ -45,7 +45,21 @@ class Table:
         except Exception as e:
             print(f"\x1b[31;1m{e}. failing silently: first row of column {col_id} will be highlighted.\x1b[0m")
             return 0
-    
+        
+    def find_min_in_col(self, col_id: int=0):
+        try:
+            return np.argmin([float(row[col_id]) for row in self.values])
+        except Exception as e:
+            print(f"\x1b[31;1m{e}. failing silently: first row of column {col_id} will be highlighted.\x1b[0m")
+            return 0
+
+    def find_min_in_cols(self, col_ids: List[int]):
+        row_ids = []
+        for i in col_ids:
+            row_ids.append(self.find_min_in_col(i))
+        
+        return row_ids
+        
     def find_max_in_cols(self, col_ids: List[int]):
         row_ids = []
         for i in col_ids:
@@ -59,6 +73,12 @@ class Table:
         for i,j in zip(row_ids, col_ids):
             self.highlighted_cells.append((i, j))
     
+    def highlight_min(self, col_ids: List[int]):
+        self.highlighted_cells = []
+        row_ids = self.find_min_in_cols(col_ids)
+        for i,j in zip(row_ids, col_ids):
+            self.highlighted_cells.append((i, j))
+            
     def __str__(self):
         op = "|"+"|".join(self.fields)+"|\n"+"|"+"|".join(["---"]*len(self))+"|"
         for i, row in enumerate(self.values):
@@ -90,6 +110,7 @@ for folder in model_list:
             table.append(table_row)
 table.sort(by=0)
 table.highlight_max([1,2,3,6])
+table.highlight_min([4,5])
 print(table)
 # # create table string
 # table_str = ("|"+"|".join(column_names)+"|\n")
