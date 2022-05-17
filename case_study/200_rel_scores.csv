@@ -1,0 +1,454 @@
+parent_answer_post_id,prob,snippet,intent,id,question_id
+32792620,0.03428154114136953,"pattern = re.compile('/(\\w+)\\.mp3$')
+for url in urls:
+    pass",Find string with regular expression in python,32792602_32792620_8,32792602
+17037016,0.0342812839020282,"l.addHandler(streamHandler)
+
+def main():
+    setup_logger('log1', 'C:\\temp\\log1.log')
+setup_logger('log2', 'C:\\temp\\log2.log')
+log1 = logging.getLogger('log1')
+log2 = logging.getLogger('log2')
+log1.info('Info for log 1!')
+log2.info('Info for log 2!')
+log1.error('Oh, no! Something went wrong!')
+if '__main__' == __name__:
+    main()",Python Logging to multiple log files from different classes,17035077_17037016_18,17035077
+11728700,0.03428069878521371,"def all_different(objs):
+    return len(frozenset(objs)) == len(objs)",Python: determining whether any item in sequence is equal to any other,11728662_11728700_2,11728662
+883166,0.03428065172487343,import subprocess,Is there a way to poll a file handle returned from subprocess.Popen?,883152_883166_8,883152
+19901478,0.03428036112379946,"Cells(1, 1).Value2 = 'Hello World'",text alignment in xlwt with easyxf,19900972_19901478_7,19900972
+11437766,0.0342803155162432,self.elements[name] = KeepTogether(t),Reportlab platypus - disable table splitting,11423399_11437766_1,11423399
+36333090,0.03427997641221902,"requests.post(myurl, data=data, headers={'Authorization': 'Token {}'.format
+    (mytoken)})",How to use TokenAuthentication for API in django-rest-framework,17560228_36333090_2,17560228
+23250377,0.03427981456881108,"B = np.array([0, 0, 0])
+np.min(np.nonzero(np.hstack((A, 1))))
+np.min(np.nonzero(np.hstack((B, 1))))",Find number of zeros before non-zero in a numpy array,23248169_23250377_6,23248169
+25087484,0.034279684804434836,return solution,Stochastic Optimization in Python,25076711_25087484_3,25076711
+4622449,0.0342796386113145,"fig = plt.figure()
+ax = Axes3D(fig)",Plotting 3D Polygons in python-matplotlib,4622057_4622449_12,4622057
+33823004,0.034279565274727274,"A = [9, 5, 34, 33, 32, 31, 300, 30, 3, 256]",How to sort only few values inside a list in Python,33822603_33823004_6,33822603
+29967188,0.03427932324624253,"if request.method == 'POST':
+    form = CustomerInfoForm(request.POST)",How to upload multiple images in Django using Dropzone for multiple image fields,28623094_29967188_18,28623094
+27404221,0.0342793176009363,"def __init__(self, min_, max_):
+    pass",Implementing a decorator to limit setters,27403691_27404221_9,27403691
+9637908,0.03427914356906593,"import datetime
+s = '01/12/2011'
+time.mktime(datetime.datetime.strptime(s, '%d/%m/%Y').timetuple())",Convert string date to timestamp in Python,9637838_9637908_4,9637838
+16649030,0.03427890285805894,clientEndpoint.connect(factory),Can Perspective Broker be used over stdio instead of TCP?,16642374_16649030_3,16642374
+22651263,0.034278789217648396,"def list_routes():
+    pass",get a list of all routes defined in the app,13317536_22651263_1,13317536
+4917469,0.03427867364126452,"for member in zip_file.namelist():
+    filename = os.path.basename(member)",Extract files from zip without keeping the structure using python ZipFile?,4917284_4917469_2,4917284
+21272904,0.034278538807813605,sols,How to solve sin(z)=2 in Sympy?,21252482_21272904_2,21252482
+36951842,0.03427816836907263,"for key, item in grouped_df:
+    pass",How to print a groupby object,22691010_36951842_10,22691010
+1375576,0.034278005607853546,"from xml.dom.minidom import parse, parseString
+dom1 = parse('c:\\temp\\mydata.xml')
+datasource = open('c:\\temp\\mydata.xml')
+dom2 = parse(datasource)
+dom3 = parseString('<myxml>Some data<empty/> some more data</myxml>')",XML parsing in Python,1373707_1375576_4,1373707
+24097246,0.03427787501870079,""""""" For testing code involving file io operations """"""",How to fix mock_open differences in calls but not in end result,22201038_24097246_6,22201038
+6602462,0.03427777107397621,"for word in text.split():
+    if word.istitle():
+        titled.append(word)
+else:
+    lower.append(word)",how to search for a capital letter within a string and return the list of words with and without capital letters,6602111_6602462_12,6602111
+3487443,0.03427755683609634,source = 'abc',How can I check a Python unicode string to see that it *actually* is proper Unicode?,3487377_3487443_2,3487377
+6795385,0.03427753264855258,"result_dict = collections.defaultdict(list)
+for x in y:
+    result_dict[x.key].append(x.value)","Creating a dict from list of key, value tuples while maintaining duplicate keys",6795361_6795385_9,6795361
+10562903,0.03427737421811358,"contents = codecs.open('foo.txt', encoding='utf-8').read()
+print(contents)",Replacing characters in a file,10562778_10562903_7,10562778
+24591012,0.034277324337380656,"@jit('void(i4[:],i4,i4)')
+def inc(arr, i, j):
+    arr[i, j] += 1",Cython inline function with numpy array as parameter,4641200_24591012_6,4641200
+2853251,0.034277286714039394,"l = [[1, 2, 3], [4], [5, 6]]
+list(itertools.product(*l))",All possible permutations of a set of lists in Python,2853212_2853251_7,2853212
+12385661,0.034277177111969405,"import requests
+response = requests.post('http://httpbin.org/post', files=dict(foo='bar'))
+response.status_code","How to send a ""multipart/form-data"" with requests in python?",12385179_12385661_6,12385179
+38302982,0.034276795240913656,temp_array = [((i + 1) * 10) for i in range((129 - 1) // 10)],Python : Numpy Matrix split,38302523_38302982_5,38302523
+22390947,0.03427668705400509,"out = numpy.zeros((c, d))",Pairwise displacement vectors among set of points,22390418_22390947_4,22390418
+2797466,0.034276667872998594,yield RandomBody(),How to generate random html document,2795134_2797466_6,2795134
+7955249,0.03427654454148445,return True,How to loop through a list of strings to use them in a condition?,7955213_7955249_13,7955213
+15474798,0.03427641469825692,"p.search('miniseries.part 5.720p.avi').groups()
+p.search('miniseries.part VII.720p.avi').groups()",python regex optional capture group,15474741_15474798_4,15474741
+1584198,0.03427635634573355,"filename = '/etc/ipf.conf'
+text = open(filename).read()",edit text file using Python,1582750_1584198_7,1582750
+10795379,0.03427626091659091,"[0, 0, 1, 0, 0],
+[0, 0, 0, 1, 0],",How do I discretize values in a pandas DataFrame and convert to a binary matrix?,10791661_10795379_11,10791661
+37501076,0.03427608443819849,"rv1 = stats.gamma(a, loc, scale)",How to get parameter arguments from a frozen spicy.stats distribution?,37501075_37501076_11,37501075
+19122387,0.0342759369400771,"x = 'Buffalo'
+my_dict[x] = 4",To convert string to variable name,19122345_19122387_4,19122345
+4996681,0.034275689743345154,"def get_new(self):
+    pass",Idiomatic Python for generating a new object from within a class,4996565_4996681_6,4996565
+10964938,0.034275442817815305,"return (d * w).sum() / w.sum()
+grouped.apply(wavg)",Pandas DataFrame aggregate function using multiple columns,10951341_10964938_4,10951341
+24617813,0.03427523937310488,"def test_bad():
+    pass",How to print to console in Py Test?,24617397_24617813_8,24617397
+21322281,0.034274806579534266,a = A(),getting a dictionary of class variables and values,21322244_21322281_4,21322244
+31766209,0.034274775181824646,"my_path = glob.glob('C:\\Windows\\Program Files\\MySWv1*\\bin')[0]
+os.path.exists(my_path)",Interpret path with * in Windows with Python,31766155_31766209_2,31766155
+28697633,0.03427445478175194,"def post(self, request, format='jpg'):
+    pass",Django Rest Framework File Upload,20473572_28697633_4,20473572
+3573405,0.03427439741621082,"method.invoke(instance, args)","How to pass args to method in java, like f(*args) in python?",3573177_3573405_0,3573177
+1777092,0.034274152724477314,"class BaseClass(object):
+    pass",How can a python base class tell whether a sub class has overridden its methods?,1776994_1777092_8,1776994
+7506029,0.03427413570862462,"import sys, os",Importing from a relative path in Python,7505988_7506029_3,7505988
+35044845,0.03427409886305335,"f.axes[3].set_position([0.55, 0.05, 0.4, 0.4])
+f.axes[4].set_position([0.55, 0.45, 0.4, 0.05])
+f.axes[5].set_position([0.95, 0.05, 0.05, 0.4])",How to plot multiple Seaborn Jointplot in Subplot,35042255_35044845_12,35042255
+28641364,0.03427370780156677,"df = df[(df['Delivery Date'].dt.year == nineteen_seventy.tm_year) | (df[
+    'Delivery Date'] >= six_months)]","Pandas - Python, deleting rows based on Date column",28629154_28641364_3,28629154
+9746432,0.034273634123683665,"data = {'ids': [12, 3, 4, 5, 6]}",How do I send a POST request as a JSON?,9746303_9746432_7,9746303
+7829179,0.034273403612328356,from xml.etree import cElementTree as etree,pyparsing - parse xml comment,7825030_7829179_3,7825030
+30072047,0.03427338367389191,t = n.timetuple(),"How to get current time in python and break up into year, month, day, hour, minute?",30071886_30072047_2,30071886
+26922032,0.034273306549621095,x.lhs().symbol(),Chomsky-normal-form grammar extraction from a parse tree,26921862_26922032_1,26921862
+22085081,0.03427301721037275,"import matplotlib as mpl
+mpl.rc('figure', facecolor='white')",How to remove gray border from matplotlib,22084163_22085081_8,22084163
+14106678,0.03427300626582904,"class Case(Base):
+
+    def as_dict(self):
+        return {c.name: (getattr(self, c.name), c.info.get('description')) for
+            c in self.__table__.c}",SQLAlchemy Declarative: Adding a static text attribute to a column,14106348_14106678_3,14106348
+33509205,0.03427294363830839,"with h5py.File('data.mat') as f:
+    pass",how to read Mat v7.3 files in python ？,33509163_33509205_8,33509163
+13287613,0.034272899993309895,draw = ImageDraw.Draw(im),Send to printer a text over an image in python,13287028_13287613_5,13287028
+18659948,0.03427281552065346,r = ran.random(),"Generating a list of random numbers, summing to 1",18659858_18659948_8,18659858
+26558430,0.03427276003576152,"for x, y in itertools.product(a, b):
+    pass",how to combine 2 lists uniquely,26558236_26558430_2,26558236
+14758880,0.03427243938605976,"s = pandas.Series(['a', 'b', 'a', 'c', 'a', 'b', 'a'])
+s
+f = pandas.Factor.from_array(s)
+f
+f.labels
+f.levels",Convert array of string (category) to array of int from a pandas dataframe,7813132_14758880_3,7813132
+32026467,0.03427211977272498,"request = urllib.request.Request('http://thewebsite.com', headers=request_headers)
+contents = urllib.request.urlopen(request).read()
+print(contents)",How do I send a custom header with urllib2 in a HTTP Request?,385262_32026467_3,385262
+23353047,0.03427197489156284,im_dst = im_binary & (1 - im_mask) * 255,How to remove single pixels on the borders of a blob?,23238308_23353047_7,23238308
+13484764,0.03427172772841286,ef21b9ad,safe enough 8-character short unique random string,13484726_13484764_1,13484726
+1489838,0.03427160921051879,"for x in range(7):
+    MyThread().start()",How to exit the entire application from a Python thread?,1489669_1489838_5,1489669
+13751566,0.03427120877188674,"def __getitem__(self, key):
+    return self._dict[key]",Comparing Python dicts with floating point values included,13749218_13751566_17,13749218
+7070651,0.03427097604872073,"for i in range(len(tlist)):
+    pass",getting a boundary of an item from another list,7070526_7070651_2,7070526
+15669848,0.034270566141724225,ghost = Ghost(),How to programmatically measure the elements' sizes in HTML source code using python?,15664000_15669848_1,15664000
+2660138,0.03427031783600214,"indices = [(q * i + min(i, r)) for i in range(n + 1)]
+return [lst[indices[i]:indices[i + 1]] for i in range(n)]",Python: Slicing a list into n nearly-equal-length partitions,2659900_2660138_4,2659900
+15665732,0.03427031570239155,"for line in inFile:
+    lines.append(line)",create a series of tuples using a for loop,15665222_15665732_5,15665222
+35005934,0.034269900862135605,combined_summary = tf.Summary(),How to use image_summary to view images from different batches in Tensorflow?,35005691_35005934_7,35005691
+31867108,0.034269815834482985,"@app.route('/render/<id>', methods=['POST'])
+def render_script(id=None):
+    pass",Making an asynchronous task in Flask,31866796_31867108_8,31866796
+9387070,0.034269789033277306,"def wrapper(*args, **kwargs):
+    return func(*args, **kwargs)
+c = wrapper.__code__",Profiling a system with extensively reused decorators,9386636_9387070_7,9386636
+9309921,0.03426936726912829,"M.search(None, '(BEFORE ""01-Jan-2012"")')",SEARCH BEFORE/AFTER with Pythons imaplib,5621341_9309921_1,5621341
+8934902,0.034269340536447944,"funcC()
+funcB()","Assigning to variable from parent function: ""Local variable referenced before assignment""",8934772_8934902_12,8934772
+35088704,0.03426898513711656,from selenium import webdriver,How to emulate a browser with JavaScript support via Mechanize?,35040318_35088704_6,35040318
+6186180,0.03426894887828327,return None,Custom placeholder like None in python,6185475_6186180_7,6185475
+18755644,0.03426891066866432,"f = open('CT1-All.pdf', 'rb')
+reader = PdfFileReader(f)
+contents = reader.getPage(0).extractText().split('\n')
+f.close()",parse a pdf using python,18755412_18755644_7,18755412
+4392622,0.03426887745896184,"plt.plot(arr[:, (0)], arr[:, (1)], 'b-')
+plt.show()",How can I duplicate this simple matlab plot functionality with mathplotlib?,4392254_4392622_3,4392254
+6552115,0.0342687772162332,"class CustomHorizontalHatch(matplotlib.hatch.HorizontalHatch):
+
+    def __init__(self, hatch, density):
+        char_count = hatch.count('_')
+if char_count > 0:
+    self.num_lines = int(1.0 / char_count * density)
+else:
+    self.num_lines = 0
+self.num_vertices = self.num_lines * 2",How to decrease hatch density in matplotlib,4745937_6552115_4,4745937
+3880175,0.03426820068632956,"while len(L) <= idx:
+    L.append([])",How to create a list or tuple of empty lists in Python?,3880037_3880175_12,3880037
+10063386,0.03426785287172543,pool = Pool(processes=4),"python, how to incrementally create Threads",10063353_10063386_4,10063353
+12859903,0.03426762563102965,"n = 1245427
+n.to_bytes((n.bit_length() + 7) // 8, 'big') or '\x00'",Convert a Python int into a big-endian string of bytes,846038_12859903_2,846038
+32461728,0.03426741398948324,print('return value is {}'.format(fut.result())),Getting values from functions that run as asyncio tasks,32456881_32461728_4,32456881
+39321113,0.03426709270021827,"with h5py.File('h5py_test.h5', 'w') as f:
+    f['buffer_hdf5'] = np.array(nested_list)",deque in python pandas,20091077_39321113_7,20091077
+1415934,0.03426696926273335,"['__class__', '__copy__', '__deepcopy__', '__delattr__', '__doc__',
+    '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__',
+    '__hash__', '__init__', '__le__', '__lt__', '__ne__', '__new__',
+    '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__',
+    '__str__', '__subclasshook__', 'findall', 'finditer', 'flags',
+    'groupindex', 'groups', 'match', 'pattern', 'scanner', 'search',
+    'split', 'sub', 'subn']",how can i obtain pattern string from compiled regexp pattern in python,1415924_1415934_7,1415924
+28570677,0.034266639833492485,"def dothis(self):
+    pass",py.test: Pass a parameter to a fixture function,18011902_28570677_10,18011902
+28570677,0.034266636395399244,"def dothat(self):
+    pass",py.test: Pass a parameter to a fixture function,18011902_28570677_11,18011902
+17120002,0.03426596395009111,"def parse(self, response):
+    pass",How to setup and launch a Scrapy spider programmatically (urls and settings),12996910_17120002_9,12996910
+40441883,0.034265842829563985,"area1 = 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))",Area of polygon calculation inconsistent,40439778_40441883_1,40439778
+34533169,0.03426572888805348,"groups.setdefault(trans.blog_id, {})[trans.field_name] = trans.translation",combine values of several objects into a single dictionary,34532993_34533169_6,34532993
+28246994,0.03426555868883533,"class RecipeSerializer(serializers.ModelSerializer):
+    ingredients = IngredientSerializer(many=True)
+
+
+class Meta:
+    model = Recipe
+
+def create(self, validated_data):
+    ingredients_data = validated_data.pop('ingredients')
+recipe = Recipe.objects.create(**validated_data)",Django Rest Framework writable nested serializers,28078092_28246994_14,28078092
+2308635,0.03426518331032194,"resource.setrlimit(rsrc, (1024, hard))
+soft, hard = resource.getrlimit(rsrc)
+print('Soft limit changed to :', soft)",How to limit the heap size?,2308091_2308635_5,2308091
+6618553,0.03426498034590485,"yx = zip(Y, X)",Sorting list based on values from another list?,6618515_6618553_7,6618515
+6319513,0.03426431512055847,"cur.execute('insert into test(d) values (?)', (d,))
+cur.execute('select d from test')
+data = cur.fetchone()[0]
+print(data)
+print(type(data))
+cur.close()
+con.close()",How to convert Python decimal to SQLite numeric?,6319409_6319513_18,6319409
+10628728,0.03426425522725431,books['auth1'] = {},converting a 2d dictionary to a numpy matrix,10623592_10628728_6,10623592
+20671057,0.034264239161895076,np.diff(data.value.index),Computing diffs in Pandas after using groupby leads to unexpected result,20670726_20671057_4,20670726
+4042173,0.03426411798232864,return a + b,return a function object with parameter binded?,4041934_4042173_4,4041934
+13187638,0.03426371310356203,thorny = flowers[:3],Sublist in List,13187619_13187638_0,13187619
+5357712,0.034263469566432565,self.mainFrame().load(req),Scraping Javascript driven web pages with PyQt4 - how to access pages that need authentication?,5356948_5357712_12,5356948
+35512336,0.0342633900856904,"stop_valid_idx = np.unique(np.searchsorted(stop, start, 'right'))","numpy array set ones between two values, fast",35509345_35512336_4,35509345
+31441157,0.03426337970042938,"gx = 2 / np.sqrt(3) * np.pi ** -0.25 * (1 - x ** 2) * np.exp(-x ** 2 / 2)
+sum_gx = np.trapz(gx, x, dx)",Infinite Summation in Python,31439875_31441157_2,31439875
+11350061,0.03426332733956931,root = tree.getroot(),lxml: add namespace to input file,11346480_11350061_3,11346480
+5373140,0.03426311672348092,"class AllowDynamicCall(object):
+
+    def __call__(self, *args, **kwargs):
+        return self._callfunc(self, *args, **kwargs)",Problem with making object callable in python,1705928_5373140_5,1705928
+17828333,0.03426283763406087,stream.seek(0),Changing request method using hidden field _method in Flask,17233931_17828333_4,17233931
+15828583,0.034262628564979816,"for row in range(1, 10):
+    ws.cell('%s%s' % (col, row)).value = '%s%s' % (col, row)
+column_index = 5
+new_cells = {}
+ws.column_dimensions = {}
+for coordinate, cell in ws._cells.items():
+    column_letter, row = coordinate_from_string(coordinate)
+column = column_index_from_string(column_letter)
+if column >= column_index:
+    column += 1
+column_letter = get_column_letter(column)
+coordinate = '%s%s' % (column_letter, row)
+new_cells[coordinate] = Cell(ws, column_letter, row, cell.value)
+ws._cells = new_cells
+wb.save(filename=dest_filename)",Insert column using openpyxl,15826305_15828583_11,15826305
+10778940,0.03426255453841655,self._locked = False,Lock mutable objects as immutable in python,10778824_10778940_3,10778824
+8148504,0.03426250470684864,"if len(bits) != 2:
+    raise TemplateSyntaxError('...')",How to display string which contains django template variables?,8148143_8148504_7,8148143
+15748054,0.03426240401476038,"a = np.arange(5)
+a
+a[0:5:1]
+a[0:5:-1]
+a[5:0:-1]
+a[::-2]",Reversed array in numpy?,15748001_15748054_8,15748001
+14213401,0.03426236958916313,"self.loadFinished.connect(self.on_loadFinished)
+self.load(QtCore.QUrl('http://jquery.com'))",How to put result of JavaScript function into python variable. PyQt,14208166_14213401_15,14208166
+20968636,0.03426235156310615,"something = B(x=1, page_num=2)",How to pass extra argument when creating object that uses ** (double star) syntax in python?,20967945_20968636_3,20967945
+13244428,0.03426227063534339,"app = Flask(__name__.split('.')[0])
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///path/database.db'",What alterations do I need to make for my Flask python application to use a MySQL database?,13244314_13244428_13,13244314
+8808649,0.034261940953008115,"i, j = I.T",How do I do this array indexing in numpy,8808597_8808649_6,8808597
+30259422,0.03426182686084088,"stdscr.clrtoeol()
+stdscr.refresh()",Keep stdin line at top or bottom of terminal screen,30258999_30259422_8,30258999
+7836591,0.03426173680667918,writer.add_document(name='This is craaazy shit'),Fuzzy String Searching with Whoosh in Python,6709830_7836591_7,6709830
+7836591,0.0342617281584268,writer.add_document(name='This is craaazy beer'),Fuzzy String Searching with Whoosh in Python,6709830_7836591_8,6709830
+5331504,0.03426170892035442,import BeautifulSoup,Python - Easiest way to scrape text from list of URLs using BeautifulSoup,5331266_5331504_18,5331266
+12700216,0.03426167510852381,"prices = [30.4, 32.5, 31.7, 31.2, 32.7, 34.1, 35.8, 37.8, 36.3, 36.3, 35.6]",Calculating change in percentage between two numbers (Python),12700166_12700216_2,12700166
+38376661,0.03426152581259815,"def __hash__(self):
+    return self._hash",Class with changing __hash__ still works with dictionary access,38373881_38376661_1,38373881
+31287793,0.03426129333509701,msvcrt.putwch(c),How to hide passwd and show ' * ' under Python,31287154_31287793_6,31287154
+8941560,0.034260789298664066,clean_up_in_a_hurry(),Is there distributed task queue in Python that enables me to kill hanging tasks that are not willing to cooperate,8882225_8941560_2,8882225
+42371804,0.034260239645678564,"phis = [lambda x: x ** 2, lambda x: x]
+p = lambda x: sum(phi(x) for phi in phis)",Python - function that is sum of arbitrary many other functions,42371268_42371804_3,42371268
+6038550,0.03426013913274186,env = Environment(loader=FileSystemLoader('/path/to/templates')),Call a python function from jinja2,6036082_6038550_2,6036082
+20983033,0.03426009296455704,"d = np.array([[101.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [92.0, 3.0, 0.0, 4.0, 
+    5.0, 6.0, 0.0], [56.0, 7.0, 8.0, 9.0, 23.0, 4.0, 5.0], [81.0, 2.0, 4.0,
+    5.0, 32.0, 33.0, 4.0], [0.0, 45.0, 2.0, 3.0, 45.0, 67.0, 8.0], [99.0, 
+    5.0, 0.0, 0.0, 0.0, 43.0, 56.0]])
+d_heights = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+d_widths = [0.5, 1.0, 3.0, 2.0, 1.0, 2.0]
+d_labels = ['fred', 'julie', 'sam', 'peter', 'rob', 'baz']
+d_colors = ['#2166ac', '#fee090', '#fdbb84', '#fc8d59', '#e34a33',
+    '#b30000', '#777777']",More efficient matplotlib stacked bar chart - how to calculate bottom values,19060144_20983033_3,19060144
+40557979,0.03425975736109816,arr = df.as_matrix(cols),How to keep column names when converting from pandas to numpy,40554179_40557979_7,40554179
+13753506,0.034259709501309306,"c = numpy.array([[9, 10, 11], [12, 1, 2]])",Median combining fits images in python,13753251_13753506_3,13753251
+5764948,0.034259573852271824,"for v, w in zip(a[:-1], a[1:]):
+    pass",Iterate through pairs of items in a Python list,5764782_5764948_4,5764782
+39316680,0.034259569560979884,return pd.concat(retLst),Parallelize pandas apply,39284989_39316680_0,39284989
+20382152,0.0342592453484159,G.node[1]['state'] = 'Y',Networkx: how to show node and edge attributes in a graph drawing,20381460_20382152_15,20381460
+28887363,0.034259158135065235,"if sentinel.startswith('Step'):
+    pass",(Python) How can I let a user open a text file and then change an integer / number,28886107_28887363_12,28886107
+30460089,0.034259116395527436,X2 = np.sort(Z),How to get the cumulative distribution function with NumPy?,10640759_30460089_7,10640759
+8287752,0.034259092600981256,"proxyDict = {'http': http_proxy, 'https': https_proxy, 'ftp': ftp_proxy}",Proxies with Python 'Requests' module,8287628_8287752_5,8287628
+32523784,0.03425897732747121,"p.fig.text(0, 1, 'Left the plot', fontsize=20, rotation=90)
+p.fig.text(1.02, 1, 'Right the plot', fontsize=20, rotation=270)
+p.fig.text(0.1, -0.08, """"""Some multiline
+footnote..."""""", fontsize=10)",How to annotate seaborn pairplots?,32481214_32523784_9,32481214
+11775935,0.034258974933491886,"Z = np.array(((1, 2, 3, 4, 5), (4, 5, 6, 7, 8), (7, 8, 9, 10, 11)))
+im = plt.imshow(Z, cmap='hot')
+plt.colorbar(im, orientation='horizontal')
+plt.show()",How can I display a np.array with pylab.imshow(),11775354_11775935_7,11775354
+4583594,0.03425892459713387,"class MyDict(dict):
+    pass
+d = MyDict(a=1)",What is the best way to make a shallow copy of a Python dictionary?,4583501_4583594_15,4583501
+29634535,0.03425876047780492,unique_items = set(data),python count number of unique elements in csv column,29634417_29634535_3,29634417
+17018994,0.034258750378673,"df = pandas.DataFrame([list(range(3)), list(range(3)), list(range(3))])
+print(df)
+my_columns = ['a', 'b', 'c']
+df.columns = my_columns
+print(df)",Assigning column names from a list to a table,17018638_17018994_11,17018638
+14403228,0.034258691694444954,"q = session.query(ndticket_table, cause_code_table).join(cause_code_table)",Can SQLAlchemy automatically create relationships from a database schema?,14398329_14403228_16,14398329
+33628776,0.034258671009799124,"return cache[s1, s2]",Memoization using dictionary in Python,33628707_33628776_5,33628707
+19278026,0.034258647527115965,imagedata.name = self.request.get('name'),Google App Engine (Python) - Uploading a file (image),18392779_19278026_4,18392779
+21187207,0.03425862170989339,"random.shuffle(lst)
+for i in lst:
+    pass",How to use random.shuffle() on a generator? python,21187131_21187207_11,21187131
+4374720,0.03425857377093989,"for name in dir(obj):
+    attribute = getattr(obj, name)",Python: Call all methods of an object with a given set of arguments,4374563_4374720_10,4374563
+14062605,0.034258174656254824,raise ValueError,Python while loops,14062266_14062605_7,14062266
+10011536,0.034257968608383066,float(repr(2.3)),python numpy arange unexpected results,10011302_10011536_0,10011302
+8529585,0.03425793758177821,"nframes = 44100
+comptype = 'NONE'
+compname = 'not compressed'
+amplitude = 4000
+frequency = 15000
+wav_file = wave.open('15khz_sine.wav', 'w')
+wav_file.setparams((nchannels, sampwidth, framerate, nframes, comptype,
+    compname))
+for i in range(nframes):
+    sample = math.sin(2 * math.pi * frequency * (float(i) / framerate)
+        ) * amplitude / 2
+wav_file.writeframes(struct.pack('h', sample))
+wav_file.close()",Generate a Sound file with a 15Khz tone,8529258_8529585_6,8529258
+10935309,0.034257375326019315,"http_server2 = httpserver.HTTPServer(application2)
+http_server2.listen(8081)
+ioloop.IOLoop.instance().start()",Tornado : support multiple Application on same IOLoop,10934864_10935309_4,10934864
+41422642,0.03425735389015397,import tkinter as tk,Deleting and changing a tkinter event binding in python,6433369_41422642_2,6433369
+1540211,0.03425707889729206,"def applejuice(**args):
+    print(""Running the function 'applejuice'"")",How to print the function name as a string in Python from inside that function,1540177_1540211_4,1540177
+9590053,0.03425702577703594,"with open('slice_{:s}.csv'.format(groupkey), 'wb') as fou:
+    dict_writer = csv.DictWriter(fou, fieldnames=fieldnames)",How do I slice a single CSV file into several smaller ones grouped by a field?,9589453_9590053_10,9589453
+11422901,0.034256963976075264,"x, y = y, x + y",Python-style generators in Go,11385556_11422901_0,11385556
+32910955,0.0342564330792656,"while True:
+    a = int(eval(input(""What's one of the angles?"" + '\n')))",A simple looping command In Python,32910848_32910955_7,32910848
+40240127,0.03425555379975377,"class MyClass(object):
+    pass",How to pass objects to keywords in robot framework?,40238073_40240127_4,40238073
+37123980,0.03425550980572338,"df1 = pd.DataFrame(np.random.randint(10, size=(3, 5)))
+df1.columns = list('ABCDE')",Adding up all columns in a dataframe,37123868_37123980_9,37123868
+11791040,0.03425547804443045,"datasets = []
+for row in table.find_all('tr')[1:]:
+    dataset = zip(headings, (td.get_text() for td in row.find_all('td')))
+datasets.append(dataset)
+print(datasets)",Extracting data from HTML table,11790535_11791040_18,11790535
+10942337,0.0342554574900719,"(5, 4),
+(0, 1), (5, 4)",how to intersect lists in python with respect to index,10941521_10942337_12,10941521
+3047967,0.034255346650713336,"class Meta:
+    model = TheModel",How can I update only certain fields in a Django model form?,3047700_3047967_3,3047700
+1646692,0.03425532051840168,l_sml = len(small),Is there a way to know if a list of elements is on a larger list without using 'in' keyword?,1646641_1646692_9,1646641
+31548752,0.03425531096786625,color = orig_handle.get_colors()[0],Two line styles in legend,31544489_31548752_8,31544489
+40425330,0.034255132847544174,"a = 1
+b = 2
+a = b
+b = a + b",Python multiple variable assignment confusion,40425251_40425330_10,40425251
+28727111,0.034253965781702644,"tdm.write_csv('matrix.csv', cutoff=1)",efficient Term Document Matrix with NLTK,15899861_28727111_6,15899861
+29454791,0.03425390670742189,"all(i.isalpha() or i.isspace() for i in 'test       string')
+all(i.isalpha() or i.isspace() for i in 'test@string')",How can I tell if a string only contains letter AND spaces,29454773_29454791_7,29454773
+39472895,0.03425388318776484,"w_o = tf.Variable(tf.random_normal([n_in, n_out], mean=0.0, stddev=0.05))",Multilabel Text Classification using TensorFlow,35400065_39472895_5,35400065
+6897847,0.034253553436166255,"for word in found:
+    count[word] = count.get(word, 0) + 1",​Breaking a string into individual words(Python),6897214_6897847_13,6897214
+13656668,0.03425319665778697,"list(open('test_newlines.txt', 'U'))
+open('test_newlines.txt').readlines()",Python . How to get rid of '\r' in string?,13656519_13656668_8,13656519
+38124886,0.03425274026217714,"df1 = df.ix[date:, :]",How to nicely measure runs of same-data in a pandas dataframe,38123904_38124886_6,38123904
+39901407,0.034251824642563884,"sorted_ids = ids[sidx]
+out = np.split(sidx, np.nonzero(sorted_ids[1:] > sorted_ids[:-1])[0] + 1)",How to get unique rows and their occurrences for 2D array?,39900208_39901407_3,39900208
+7745585,0.03425180123782675,"listy = [[] for i in range(3)]
+listy[1] = [1, 2]",Appending to 2D lists in Python,7745562_7745585_5,7745562
+41693297,0.03425164436620325,"for c in ['00:00', '01:00', '02:00', '03:00']:
+    x = a, b, c",How to iterate in a cartesian product of lists,12237283_41693297_2,12237283
+37626057,0.03425131720572178,return id_arr.cumsum(),Build numpy array with multiple custom index ranges without explicit loop,37624798_37626057_7,37624798
+35329313,0.03425065144070228,"f = f.simplify()
+print(f)
+print(f.subs(n, 6))
+f = sp.lambdify(n, f, 'numpy')
+a = np.arange(2, 10)
+print(f(a))",Computing factorials efficiently with Python and Numpy,35328941_35329313_10,35328941
+2567221,0.03425014181974638,return any(x[col] == val for x in self.d.items()),Python In-memory table,2565415_2567221_1,2565415
+17601393,0.034250132960185156,print('press enter to exit'),"Is there a way that while running pygame, I can also run the console too?",17597233_17601393_12,17597233
+38550423,0.03425001063086314,"width = 640
+height = 480
+channels = 3
+img = np.zeros((height, width, channels), dtype=np.uint8)
+xx, yy = np.mgrid[:height, :width]
+circle = (xx - 100) ** 2 + (yy - 100) ** 2
+for y in range(img.shape[0]):
+    for x in range(img.shape[1]):
+        r, g, b = circle[y][x], circle[y][x], circle[y][x]
+img[y][x][0] = r
+img[y][x][1] = g
+img[y][x][2] = b
+scipy.misc.imshow(img)
+scipy.misc.imsave('image.png', img)",How do I create an image in PIL using a list of RGB tuples?,12062920_38550423_11,12062920
+836406,0.03424984482399539,"func(*['file1', 'file2', 'file3'])
+func('file1')",How can I tell if a python variable is a string or a list?,836387_836406_4,836387
+4098560,0.034249780226717964,n = 2,Strange result in python,4098425_4098560_5,4098425
+9489768,0.034249463096571585,"mu, sigma = 100, 15",Updating a matplotlib bar graph?,9489669_9489768_12,9489669
+3412743,0.034249362255392525,"return object.__getattribute__(self, attr_name)",Python decorator makes function forget that it belongs to a class,306130_3412743_4,306130
+23062183,0.034249300371891916,import matplotlib.pyplot as plt,Plot histogram with colors taken from colormap,23061657_23062183_4,23061657
+2054374,0.03424919382885236,"if __name__ == '__main__':
+    pass",Asynchronous data through Bloomberg's new data API (COM v3) with Python?,2005234_2054374_19,2005234
+41754927,0.0342490497597453,fig.add_tools(bokeh.models.TapTool(callback=TapCallback)),Bokeh - how to make HoverTool tooltips stick to points on click?,41640536_41754927_9,41640536
+4498956,0.03424904454759716,"p = subprocess.Popen(['p:\\ath\\to\\gsprint.exe', 'test.pdf'], stdout=
+    subprocess.PIPE, stderr=subprocess.PIPE)",Silent printing of a PDF in Python,4498099_4498956_2,4498099
+9873804,0.03424898601173068,"f = lambda m, n: [(i * n // m + n // (2 * m)) for i in range(m)]",Choose m evenly spaced elements from a sequence of length n,9873626_9873804_1,9873626
+1818241,0.034248898563411075,"def __unicode__(self):
+    return '%i' % self.sumid",Django-Use of unicode,1818224_1818241_2,1818224
+3934647,0.03424867233905419,"view_menu.add_checkbutton(label='Show Not Done', onvalue=1, offvalue=0,
+    variable=show_not_done)
+menubar.add_cascade(label='View', menu=view_menu)
+parent.config(menu=menubar)
+parent.mainloop()",Making Menu options with Checkbutton in Tkinter?,3929355_3934647_14,3929355
+10422157,0.03424858895607403,return self.x + z,Emit reStructuredText from sphinx autodoc?,10377576_10422157_9,10377576
+26483691,0.03424854995333167,"column2 = []
+readfile = open(file, 'r')
+data_separator = ' '
+column_separator = '    '
+for line in readfile.readlines():
+    line = line.rstrip('\n')
+print(line)
+columns = line.split(column_separator)
+for column in columns:
+    if not column:
+        continue
+column1.append(column.split(data_separator)[0])
+column2.append(column.split(data_separator)[1])
+readfile.close()",How to Split into Columns,26483287_26483691_15,26483287
+7399453,0.03424836868815917,cron.get_next(datetime.datetime),Parsing crontab-style lines,7390170_7399453_1,7390170
+4573259,0.034248273989506854,self.user = 'foo',Using Tornado with Pika for Asynchronous Queue Monitoring,4483440_4573259_14,4483440
+22612295,0.03424827301434795,font_size = 36,How to use unicode characters with PIL?,18942605_22612295_13,18942605
+1306571,0.03424823602816111,m = hashlib.sha256(),Calculating a SHA hash with a string + secret key in python,1306550_1306571_1,1306550
+7217110,0.03424807679435401,sport.check_all(),How to split python script in parts and to import the parts in a loop?,7216993_7217110_7,7216993
+2811103,0.03424775940447565,"def __unicode__(self):
+    return self.poll.question",Model Django Poll,2811075_2811103_2,2811075
+27404221,0.03424770103672353,"def __get__(self, instance, owner):
+    return self.value",Implementing a decorator to limit setters,27403691_27404221_7,27403691
+778399,0.03424763600459061,"def clean_email(self):
+    email = self.cleaned_data['username']
+return email",Accepting email address as username in Django,778382_778399_7,778382
+12762056,0.03424758707427767,break,How to use append with pickle in python?,12761991_12762056_15,12761991
+2504486,0.03424746415417072,"fprintf(stderr, 'Slave device: %s\n', ptsname(pt))",Fake serial communication under Linux,2500420_2504486_1,2500420
+8204981,0.03424728479248442,x = np.random.random(10),Matplotlib scatterplot; colour as a function of a third variable,8202605_8204981_9,8202605
+14547584,0.034247143813438435,from collections import defaultdict,Hachoir - Retrieving data from a group,14546533_14547584_7,14546533
+2428785,0.03424704338459503,import time,datetime command line argument in python 2.4,2428746_2428785_3,2428746
+17690013,0.034246784853027255,"class strings:
+    pass",constant string file in python,17689911_17690013_4,17689911
+31419530,0.034246763060236295,"def hello():
+    client_ip = request.environ.get('REMOTE_ADDR')",How to get client IP address using python bottle framework,31405812_31419530_5,31405812
+8177393,0.034246727385064644,"session.add(doc)
+session.commit()","SQLAlchemy expects an object, but finds a Table",8170333_8177393_8,8170333
