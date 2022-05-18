@@ -97,12 +97,13 @@ GraphCodeBERT:
 |GraphCodeBERT_rel_thresh (l2_dist) (code)|0.670|0.788|0.574|8.128|5.323|0.676|
 |GraphCodeBERT_rel_thresh_intra_categ_neg (l2_dist) (code)|0.634|0.758|0.540|9.690|7.397|0.649|
 |GraphCodeBERT_zero_shot (l2_dist) (code)|0.120|0.172|0.099|202.382|190.548|0.237|
-|UniXcoder (l2_dist) (code)|0.240|0.304|0.207|79.904|72.060|0.349|
-|UniXcoder_intra_categ_neg (l2_dist) (code)|**0.698**|**0.808**|**0.592**|**6.890**|**5.318**|**0.691**|
-|UniXcoder_rel_thresh (l2_dist) (code)|0.240|0.304|0.207|79.904|72.060|0.349|
+|UniXcoder (l2_dist) (code)|0.692|**0.830**|**0.598**|**6.786**|5.605|**0.695**|
+|UniXcoder_intra_categ_neg (l2_dist) (code)|**0.698**|0.808|0.592|6.890|**5.318**|0.691|
+|UniXcoder_rel_thresh (l2_dist) (code)|0.676|0.802|0.594|8.228|5.847|0.690|
 |cnn_siamese (l2_dist) (code)|0.054|0.104|0.060|102.886|84.121|0.219|
 |nbow_siamese (l2_dist) (code)|0.080|0.096|0.062|154.880|143.016|0.208|
 |rnn_siamese (l2_dist) (code)|0.156|0.244|0.129|61.868|54.458|0.292|
+
 <!-- |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
 |---|---|---|---|---|---|---|
 |CodeBERT (l2_dist) (code)|0.622|0.780|0.519|8.342|6.115|0.634|

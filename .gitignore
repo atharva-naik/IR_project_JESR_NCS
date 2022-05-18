@@ -137,3 +137,4 @@ triples_*.json
 triplet_CodeBERT_fixed
 triplet_CodeBERT_rel_thresh_fixed
 rel_regressor_CodeBERT
+model_*.pt

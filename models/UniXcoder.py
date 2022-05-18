@@ -325,7 +325,9 @@ def test_retreival(args):
     
     print("creating model object")
     triplet_net = UniXcoderTripletNet(**vars(args))
-    if state_dict: triplet_net.load_state_dict(state_dict)
+    if state_dict: 
+        print(f"loading state dict read from: \x1b[34;1m{ckpt_path}\x1b[0m")
+        triplet_net.load_state_dict(state_dict)
     print(f"loading candidates from {args.candidates_path}")
     code_and_annotations = json.load(open(args.candidates_path))
     

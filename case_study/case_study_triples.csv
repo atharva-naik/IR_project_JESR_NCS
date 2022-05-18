@@ -1,0 +1,232 @@
+,intent,code L,code R,L > R,rel L,rel R
+0,How do I update Kivy elements from a thread?,"Clock.schedule_once(partial(self.update, message), 0)","def message(self, message):
+    Clock.schedule_once(partial(self.update, message), 0)",1,0.3681597341139385,0.10390691378395132
+1,"In python, how do I cast a class object to a dict",dict(my_object),"dict(MyClass(5, 6, 7))",1,0.5492172642224273,0.25383598101319943
+2,Querying Many to many fields in django template,"options = models.ManyToManyField('Option', editable=False)",return profile.options.filter(id=option_id).count(),1,0.21150921632410358,0.13849558633308434
+3,How can I get the full file path of an icon name?,print(icon_info.get_filename()),print(icon_info.get_filename()),1,0.23351766034829644,0.16015935934397735
+4,Conditional passing of arguments to methods in python,result = my_func(**vars(args)),"args = parser.parse_args()
+result = my_func(**vars(args))",1,0.25069081593720893,0.1911821995854577
+5,"How to find the index of n largest elements in a list or np.array, Python",np.argsort(K)[-5:],"sorted(list(range(len(K))), key=lambda x: K[x])[-5:]",1,0.33233384151488377,0.3028912924617957
+6,Calculating a directory size using Python?,sum(os.path.getsize(f) for f in os.listdir('.') if os.path.isfile(f)),"fp = os.path.join(dirpath, f)",1,0.38091624854816203,0.09150684681596905
+7,Python - manipulating lists to create another list,"'slide1', 1, 'banana'",print(x),1,0.054857768111324576,0.040218900345332737
+8,List manipulation in python,"var1, var2, var3 = (ll + [None] * 3)[:3]","var1, var2, var3 = ll + [None] * (3 - len(ll))",1,0.4058424282931246,0.15558753909984033
+9,How to retrieve function call argument values using libclang,"map(print_node, ts.cursor.get_children())",return 0,1,0.12532791364126006,0.07419604172639871
+10,Most efficient way in Python to iterate over a large file (10GB+),"collections.Counter(map(uuid, open('log.txt')))",uuid_generator = (line.split(SPLIT_CHAR)[UUID_FIELD] for line in file),1,0.5245008134232892,0.04517102832969216
+11,The truth value of an array with more than one element is ambigous when trying to index an array,"c[np.logical_or(a, b)]","c[np.logical_and(a, b)]",1,0.5301216532137002,0.49257883164696864
+12,Changing a specific column name in pandas DataFrame,"df.rename(columns={'two': 'new_name'}, inplace=True)",df.columns.values[2] = 'new_name',1,0.3950028957620674,0.27483251173045026
+13,reading mails using python,"M = imaplib.IMAP4_SSL('imap.gmail.com', 993)","import imaplib
+M = imaplib.IMAP4_SSL('imap.gmail.com', 993)",1,0.25434642414684466,0.04437634448649217
+14,Efficiently expand lines from pandas DataFrame,"output.ix[:, (['TDR1', 'TDR2', 'TDR3', 'TDR4', 'TDR'])]",test.ix[i::4],1,0.24286606586384804,0.23264893558797517
+15,Parsing EDGAR filings,edgar.database.load(quarters),"quarters.add(2009, 3)",1,0.07963452841912853,0.0789941770425239
+16,draw random element in numpy,"np.random.uniform(0, cutoffs[-1])",cutoffs.searchsorted(0.9723114393023948),1,0.5432600153356842,0.16569478293417622
+17,Does Python assume a symbol is a type before trying to see if it is a function?,"def __init__(self, init_val=0):
+    pass","print(Int, type(Int), obj, type(obj))",1,0.042856898336851475,0.03339051923775506
+18,how to normalize array numpy?,print(np.all(norm1 == norm2)),print(normalized(np.arange(3))),1,0.2713720000085227,0.1965443708488512
+19,python return lists of continuous integers from list,from itertools import groupby,"full_list = [0, 1, 2, 3, 10, 11, 12, 59]",1,0.05514004456042409,0.04923083184345869
+20,Using git-remote-hg on windows,setup(console=['git-remote-hg.py']),from distutils.core import setup,1,0.12661536269289156,0.03600710923363837
+21,webpy: How to serve JSON,return json.dumps(pyDict),"web.header('Content-Type', 'application/json')",1,0.2527268789467346,0.23088208417861886
+22,"Run command and get its stdout, stderr separately in near real time like in a terminal",p.wait(),print('STDOUT:'),1,0.11060184984467074,0.09081801984474012
+23,Using global variables between files?,hello_world = 'hello world!',main.mylist.append('hey'),1,0.2093939325003011,0.14084461306960494
+24,Python regular expression for Beautiful Soup,"soup.find_all('div', class_=re.compile('comment-'))",[div['class'] for div in soup.find_all('div')],1,0.6560179009454937,0.6132669964604058
+25,Python - Exact Number of Arguments Defined by Variable,inspect.getargspec(g),"print((name, val))",1,0.3095777574108031,0.25260865602523663
+26,SQLAlchemy commit changes to object modified through __dict__,"setattr(a, 'desc', 1)",a.__dict__['desc'] = 0,1,0.125003103414355,0.12247943673170827
+27,Set products in Python,"set(product(s1, repeat=3))","set(itertools.product(s1, s1, s1))",1,0.16935092965572693,0.06437038051408533
+28,calculate 95 percentile of the list values in python,"print(np.percentile(map(int, i), 95))","for i in list(finalvalues.values()):
+    pass",1,0.2095320727858098,0.03639670956452408
+29,"how to use ""group"" in pymongo to group similar rows?","[{'event': 'd', '_id': ObjectId('4d5b...0003'), 'uid': 3, 'time': 4}]","[{'event': 'c', '_id': ObjectId('4d5b...0002'), 'uid': 2, 'time': 2}]",1,0.3139190386107524,0.20987593308114702
+30,Specific font_face based on syntax in Sublime Text 2,{'font_face': 'Source Code Pro'},{'font_face': 'Source Code Pro'},1,0.2569558430425143,0.19517223972875636
+31,Python: how to modify/edit the string printed to screen and read it back?,print('\x1b[1A\x1b[4CO!'),sys.stdout.flush(),1,0.1714191354803329,0.14108306239349605
+32,dynamically adding functions to a Python module,"setattr(current_module, new_name, func)",current_module.new_name = func,1,0.38126634934530373,0.2540713609816415
+33,Loading Temporary DLLs into Python on Win32,os.path.exists('./lib.dll'),os.remove('./lib.dll'),1,0.3964519196230835,0.15151693083030096
+34,Python decorator as a staticmethod,print(A.__dict__['f']),pass,1,0.1472795215067612,0.09350557746346712
+35,Decode json and Iterate through items in django template,"return render_to_response('foo.html', {'results': decoded_json['Result']})",decoded_json = json.loads(json_string),1,0.39007586716901943,0.08676777273988348
+36,How do you unpack javascript using jsbeautifier in python?,"""""""eval(function(p,a,c,k,e,r){e=String;if('0'.replace(0,e)==0){while(c--)r[e(c)]=k[c];k=[function(e){return r[e]||e}];e=function(){return'^$'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c]);return p}('document.body.innerHTML=""<iframe width=\\'100%\\' scrolling=\\'no\\' height=\\'2500\\' frameborder=\\'0\\' src=\\'http://www.exmaple.com\\'>"";',[],1,''.split('|'),0,{}))""""""","p = subprocess.Popen(['node'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)",1,0.15867884265981197,0.11045128862208252
+37,Converting python datetime to timestamp and back in UTC still uses local timezone,"dt = datetime.fromtimestamp(ts, tz)",aware_utc_dt = utc_dt.replace(tzinfo=pytz.utc),1,0.16704589988166813,0.15294341085423382
+38,Bundling data files with PyInstaller (--onefile),"return os.path.join(base_path, relative_path)",base_path = os.path.abspath('.'),1,0.2190575052719482,0.11874196370130151
+39,How to send a xml-rpc request in python?,server.serve_forever(),server.serve_forever(),1,0.49026692888638723,0.3744481439101468
+40,How to apply decorators to Cython cpdef functions,"return f(*args, **kwargs) + 1",return wrapper,1,0.10468274774258332,0.09626437339442208
+41,Make bokeh charts with interactive controls in django,from bokeh.io import vform,"plot.line('x', 'y', source=source, line_width=3, line_alpha=0.6)",1,0.061048497270473345,0.053521503477499836
+42,Converting user nickname to formal first name in Python,"first_name_dict = {'David': ['Dave', 'Davy'], 'Lucas': ['Luke']}",get_real_first_name('Dave'),1,0.350514907639875,0.12393256349552462
+43,make python replace un-encodable chars with a string by default,help(''.encode),"x.decode('ascii', 'replace')",1,0.14807066329119234,0.13087746844891376
+44,How do I reverse Unicode decomposition using Python?,"print(unicodedata.normalize('NFC', 'c\u0327'))","s = unicodedata.normalize('NFC', s)",1,0.4193808430356033,0.22124395788628132
+45,pip install dependency links,"'https://github.com/egemsoft/django-simple-sso/tarball/master#egg=999.0.0',",bitbucket.org,1,0.049808522826763776,0.029172964641941183
+46,classifying a series to a new column in pandas,df['D'] = 'c3',df['D'][(df['A'] > 0) & (df['B'] == 0) & (df['C'] == 0)] = 'c1',1,0.19923124221997443,0.18660270547277905
+47,Keep track of instances in python,foo_vars = {id(instance): instance.foo for instance in A.instances},A.instances.append(self),1,0.15733205742711343,0.10336567689781277
+48,PyCharm show full diff when unittest fails for multiline string?,"t_assert.equal(expected, actual)",actual = open('actual.csv').read(),1,0.024233627527126808,0.022339797668707334
+49,Removing last element of a list in Python fails,del di['children'][:],di['children'].remove(el),1,0.27776814295318997,0.159533524218214
+50,Subset of dictionary keys,{v[0]: data[v[0]] for v in list(by_ip.values())},{key: data[key] for key in data if not_seen(key.split(':')[0])},1,0.43545542838162304,0.40305291330531706
+51,Scale image in matplotlib without changing the axis,plt.show(),"ax.set_ylim(0, 1)",1,0.48363041282328195,0.41884958578157994
+52,How to create a django User using DRF's ModelSerializer,"return self.create(request, *args, **kwargs)",obj.user.set_password(obj.user.password),1,0.24659682406153952,0.23859244222054954
+53,Upload files in Google App Engine,self.response.out.write('<html><body>'),"self.send_blob(blobstore.BlobInfo.get(blob_key), save_as=True)",1,0.20171594937466736,0.1901389797484266
+54,Change date of a DateTimeIndex,"df.index.map(lambda t: t.replace(year=2013, month=2, day=1))","df.index = df.index.map(lambda t: t.replace(year=2013, month=2, day=1))",1,0.41773679823990295,0.3717532855646765
+55,Very Long If Statement in Python,"raise ValueError('sorry, you lose')",pass,1,0.2427344614660327,0.16000762459681592
+56,How to add a variable into my re.compile expression,regex2 = re.compile('.*({}).*'.format(what2look4)),regex2 = re.compile('.*(%s).*' % what2look4),1,0.383161061627321,0.27907435228681277
+57,Organizing of Dynamic Lists of Lists,print(like['likes'][0]),"facebook_likes = [{'first_name': 'John', 'last_name': 'Smith', 'image_link':
+    'link', 'likes': ['foo']}, {'first_name': 'John', 'last_name': 'Doe',
+    'image_link': 'link', 'likes': ['foo', 'bar']}]
+for like in facebook_likes:
+    print(like)
+print(like['likes'])
+print(like['likes'][0])",1,0.14720502026832483,0.07585852799740132
+58,Bit vector vs list of boolean values performance,"[0.32564058749026437, 0.3303359144351621, 0.31772896318809885]","[1.0055455609592512, 1.007462347465074, 1.012826469701654]",1,0.20946053380768914,0.20468300324019725
+59,sqlalchemy CompileError Unconsumed column names when deleting row from m2m table,connection.execute(q),"q = companies_connections.delete().where(and_(companies_connections.c.
+    parent_id == 10, companies_connections.c.child_id == 23))
+connection.execute(q)",1,0.10817807403186364,0.018744706853990833
+60,Python RE to search digit along with decimal,"print(line.rsplit(None, 1)[1])","s.rsplit(None, 1)[0]",1,0.15547488025735037,0.1505250202249938
+61,Regex divide with upper-case,"print(' '.join(re.findall(pattern, 'HDMWhoSomeMONKEYThingX')))",print(' '.join(result)),1,0.3064481161177202,0.16271479692016352
+62,Mapping dict keys to column of pandas dataframe if they're close,df['cat'] = np.array(list(prob_dict.values()))[indi],df['cat'] = df.prob.map(prob_dict),1,0.15260336737566804,0.03176964012177252
+63,How do I search for an executable file using python in linux?,"print((filename, oct(mode)))",st = os.stat(filename),1,0.16048696650753005,0.10619359157612047
+64,n**n**n heuristics in Python,sys.getsizeof(10 ** 10 ** 7),sys.getsizeof(10 ** 10 ** 6),1,0.2617205113705255,0.15930982249959696
+65,django rollback transaction in save method,transaction.commit(),transaction.rollback(),1,0.21720676559510135,0.1430091736352979
+66,join two lists by interleaving,"map(list, zip(charlist, numlist))","newlist.append([a, numlist[key]])",1,0.43218277986912357,0.11885113263711349
+67,Getting number of messages in a RabbitMQ queue,"cl.get_messages('example_vhost', 'example_queue')[0]['message_count']",print(queue.method.message_count),1,0.2981775078588156,0.20286409993674812
+68,Binning frequency distribution in Python,collections.Counter([(i - i % 3 + 3) for i in d]),"hist, _ = np.histogram(values, bins=[1, 4, 7, 10], weights=freqs)",1,0.06249693627384988,0.058884785287498624
+69,Celery Logging: consistent way to log inside and outside of a task,logger.debug('SOME OUTPUT HERE'),logger = logging.getLogger(__name__),1,0.2335730834315706,0.13732225687662775
+70,"Using Mayavi to make 3D graphs, with Matplotlib-style axes",plt.show(),"mayavi.mlab.points3d(x, y, z, s, colormap='copper', scale_factor=0.25)",1,0.30564122807179134,0.15347766946884422
+71,Change IntegerProperty to FloatProperty of existing AppEngine DataStore,cost1 = db.FloatProperty(default=0.0),"class Person(db.Model):
+    name = db.StringProperty()
+age = db.StringProperty()",1,0.10320854180057847,0.06126783406046381
+72,Response time for urllib in python,response = requests.get('http://www.google.com'),import requests,1,0.14751025996929276,0.026905711911645626
+73,Convert date from mm/dd/yyyy to another format in Python,"print(d.strftime('%B %d, %Y'))","print(date_object.strftime('%B %d, %Y'))",1,0.2148546739211049,0.19219824123953905
+74,Making all variables global,f2(),f1(),1,0.04630383538361057,0.025386109486451022
+75,Hotter/Colder Number Game in Python,"y = random.randint(1, 10)","n = random.randint(1, 10)",1,0.2534363131688008,0.17450893400093173
+76,How do I get a content-type of a file in Python? (with url..),print(f.info()),"conn.request('HEAD', '/thevideofile.mp4')",1,0.178901768158568,0.17150546396996671
+77,fors in python list comprehension,[y for y in x for x in data],[y for y in x for x in data],1,0.46119974000703107,0.34887167147921766
+78,Using a regular expression backreference as part of the regular expression in Python,"m = re.match('\\d{2,}$', s)",print(checkNum('1234567')),1,0.2456779483907091,0.12410675246456834
+79,How to use Beautiful Soup to find a tag with changing id?,"soup.select('div[id^=""value_xxx_c_1_f_8_a_""]')",soup.findAll(id=re.compile('para$')),1,0.5236581735256874,0.5220031467828871
+80,"Combine two Pandas dataframes, resample on one time column, interpolate","df = pd.concat((ser1, ser2), axis=1)",print(df),1,0.18452366093553363,0.08144983543964578
+81,Column and Row manipulation Python Pandas,"other_data.set_index(['Nos', 'Time'], inplace=True)","master.set_index('Nos', inplace=True)",1,0.13607125496562228,0.11762503050670951
+82,Can we get the following flexibility in Python as In Perl,"s = 'This is string : %d' % (page + 1,)",mystr = 'This string is: %s' % (int(page) + 1),1,0.2166765779178283,0.14885995137502106
+83,Is there a fast way to generate a dict of the alphabet in Python?,"d = dict.fromkeys(string.ascii_lowercase, 0)","letter_count = dict.fromkeys(string.ascii_lowercase, 0)",1,0.4411544189046115,0.21713101127345638
+84,Is it possible to get color gradients under curve in matplotlb?,np.random.seed(1977),plt.show(),1,0.26049421268148854,0.23563488433238583
+85,Regexp finding longest common prefix of two strings,b = 'common',"a[:[(x[0] == x[1]) for x in zip(a, b)].index(0)]",1,0.03770010334176583,0.03074229551355286
+86,Python reference to callback in dictionary,foo.fire('one'),self.handlers[event].add(callback),1,0.185007932080241,0.09614679637537288
+87,Keep a subprocess alive and keep giving it commands? Python,process.stdin.write('World\n'),process.stdin.write('Hello\n'),1,0.25916930761090706,0.17827682092667094
+88,How to understand the functional programming code for converting IP string to an integer?,bin(((1 << 8 | 2) << 8 | 3) << 8 | 4),bin(2),1,0.08316398445493349,0.06613322463154848
+89,Probit regression using PyMC 3,return 0.5 * (1 + tsr.erf((x - mu) / (sd * tsr.sqrt(2)))),"sd = 1
+return 0.5 * (1 + tsr.erf((x - mu) / (sd * tsr.sqrt(2))))",1,0.13893040348217248,0.025189518468591028
+90,Loss of precision with very small numbers in Python arrays,Yf[0],Xi[0] = Yf[0],1,0.10496358811477752,0.0810712980619869
+91,Trying to vectorize iterative calculation with numpy,"np.multiply(np.arange(1, 5), np.cumprod([1, 2, 2, 2])[np.newaxis].T)","np.multiply(np.arange(1, 5), 2 ** np.arange(0, 4)[np.newaxis].T)",1,0.3286161001928359,0.2928264579341824
+92,Using python PIL to turn a RGB image into a pure black and white image,image_file.save('result.png'),image_file = Image.open('convert_image.png'),1,0.21878388448728212,0.12974969890196347
+93,Update a MongoEngine document using a python dict?,"p.update(**{'set__name': 'Hank', 'set__address': 'Far away'})","data = {'name': 'Hank', 'address': 'Far away', 'pets': [{'name': 'Scooter'}]}",1,0.33221916888178615,0.19724519173899066
+94,How to search a string with the url patterns in django?,user_profile_view.name = 'User Profile View',from django.core.urlresolvers import resolve,1,0.2322993837249571,0.15176601693261402
+95,Overriding the newline generation behaviour of Python's print statement,pass,"print(data, end=' ')",1,0.042769341959957824,0.03646959399695744
+96,"Automatic insertion of a colon after 'def', 'if' etc",return '',endfun,1,0.05914731749017068,0.03322072372565213
+97,Remove all javascript tags and style tags from html with python and the lxml module,print(lxml.html.tostring(lxml.html.parse('http://www.google.com'))),"[x.extract() for x in soup.findAll(['script', 'style'])]",1,0.22024432714545708,0.19172629265433402
+98,"matplotlib. How do I switch between subplots, rather than replotting them from scratch?","plt2 = fig.add_subplot(2, 1, 2)","fig = matplotlib.pyplot.figure()
+plt1 = fig.add_subplot(2, 1, 1)
+plt2 = fig.add_subplot(2, 1, 2)",1,0.12183463353818999,0.08557939152923993
+99,Deploy Python programs on Windows and fetch big library dependencies,import numpy,import ftplib,1,0.003960438755764565,0.0015488107160339152
+100,How to check the version of scipy,scipy.__version__,scipy.version.version,1,0.13696642286396876,0.1194088027180813
+101,Creating thumbnails from video files with Python,pil_image.save('frame5sec.jpeg'),pil_image = VideoStream('0.flv').get_frame_at_sec(5).image(),1,0.15717241537342674,0.03129017955170506
+102,Wxpython: Positioning a menu under a toolbar button,app.MainLoop(),"wx.Frame.__init__(self, parent, id, title, size=(350, 250))",1,0.2536829647143098,0.19162971942473553
+103,Display image with a zoom = 1 with Matplotlib imshow() (how to?),plt.show(),"ax.imshow(np.random.random((xpixels, ypixels)), interpolation='none')",1,0.333848711801839,0.21368705384294287
+104,"argparse - Combining parent parser, subparsers and default values",args = parser.parse_args(),parser = argparse.ArgumentParser(description='bla bla'),1,0.07720682362584394,0.07590514113448388
+105,How can I detect errors programatically when building an egg with setuptools?,"orig_py_compile(file, cfile=cfile, dfile=dfile, doraise=True)",py_compile.compile = doraise_py_compile,1,0.08651926480558934,0.025485690240060963
+106,"Numpy, how to get a sub matrix with boolean slicing","np.array(m2)[:, (1)] > 10","m2[np.array(m2[:, (1)] > 10)[:, (0)]]",1,0.3992878628945009,0.30932378456502013
+107,How to optimize multiprocessing in Python,multiprocessing.Process.__init__(self),multiprocessing.Process.__init__(self),1,0.4805281407537226,0.38966318181294785
+108,How to overwrite the previous print to stdout in python?,sys.stdout.write('\r2'),sys.stdout.write('1'),1,0.3708924811482683,0.23092931869639857
+109,IPython: how do I pipe something into a Python script,main(),"if __name__ == '__main__':
+    main()",1,0.3172572917879143,0.13048862928206653
+110,Removing sub-folders in Python,shutil.rmtree(sub_folder),"for sub_folder in sub_folders_list:
+    shutil.rmtree(sub_folder)",1,0.3092615541423373,0.07758869600141217
+111,Queue remote calls to a Python Twisted perspective broker?,reactor.run(),"print('Finishing job', n)",1,0.1252306675474813,0.07741688480871303
+112,"How to get files in a directory, including all subdirectories","print(os.path.join(dirpath, filename))","files.extend(glob(os.path.join(dir, pattern)))",1,0.446099989117423,0.27747611998345634
+113,I want to retrieve multiple logs from a server with minimum lines of code,"sftp.get(log_file, local_name)","sftp.get(filepath, localpath)",1,0.14461055999454905,0.05150292006359804
+114,"python head, tail and backward read by lines of a text file","self.seek(0, 2)",self.seek(0),1,0.14642796262904878,0.14014266925806237
+115,python pandas/numpy quick way of replacing all values according to a mapping scheme,"params.apply(lambda x: list(np.arange(**x)), axis=1)","array([6, 4, 12, 8]),",1,0.10011215957914799,0.07483878550953138
+116,Python Pandas to R dataframe,base.summary(my_pandas_dataframe),from rpy2.robjects.packages import importr,1,0.06584206309562034,0.046241635639137225
+117,Mapping a NumPy array in place,"a = numpy.arange(25).reshape(5, 5)",a = a.reshape(-1),1,0.22889475678906107,0.20241739397248856
+118,Integration Testing Multiple Celery Workers and a DB Backed Django API,worker3_result = worker2_result.get(),device - --worker1 - --worker2 - --django - --worker3 - --django,1,0.04889366578573561,0.0425884116309443
+119,Creating a list of objects in Python,instancelist = [MyClass() for i in range(29)],simplelist.append(x),1,0.6155250832868726,0.4153749637725314
+120,Python: How can I get the previous 5 values in a Pandas dataframe after skipping the very last one?,"df.iloc[-6:-1, (2)]",df.iloc[-6:-1]['2'],1,0.36432957554683804,0.22142923176050497
+121,python chaco axis labels time formatting,"TimeFormatter._formats['days'] = '%d/%m', '%d%a'",axis = PlotAxis(tick_generator=tick_gen),1,0.060475685215976634,0.0589704004726946
+122,How to convert a MultiDict to nested dictionary,answer[pk].append({sk: L[i][1]}),answer.append(tuple(i.split('='))),1,0.21738323105428142,0.09240124409283475
+123,How do I maximize efficiency with numpy arrays?,file.write('Multiple of 1000!\r\n' * sum([i for i in a2 if i % 1000 == 0])),file.write('Multiple of 1000!\r\n' * (a2 % 1000 == 0).sum()),1,0.16944956018630972,0.1434930936118228
+124,How to use pandas to find consecutive same data in time series,df['value_grp'] = (df.Values.diff(1) != 0).astype('int').cumsum(),"pd.DataFrame({'BeginDate': df.groupby('value_grp').Date.first(), 'EndDate':
+    df.groupby('value_grp').Date.last(), 'Consecutive': df.groupby(
+    'value_grp').size(), 'No': df.groupby('value_grp').No.first()}
+    ).reset_index(drop=True)",1,0.3678750228488798,0.07504221799131754
+125,way to generate a specified number dataframe of new csv file from existing csv file in python using pandas,data_frame.to_csv('C:/users/raju/sample.csv'),data_frame.iloc[:100],1,0.19905124555107323,0.11616852563407168
+126,Matrix operations with rows of pandas dataframes,"x = pd.DataFrame(data=rot, index=['X', 'Y', 'Z'])","x = pd.DataFrame(data=rot, index=['X', 'Y', 'Z'])
+rotated_df = largest_haloes.dot(x)",1,0.11848018169855747,0.0965536758041932
+127,Deleting files which start with a name Python,os.remove(filename),"os.remove(os.path.join(my_dir, fname))",1,0.3111846844102851,0.20216589503461713
+128,How to take input in an array + PYTHON?,n = int(input('Enter how many elements you want: ')),arr = [int(num) for num in str_arr],1,0.1079531961924363,0.10290757869731172
+129,Regular expression matching all but a string,"re.findall('-(?!aa|bb)([^-]+)', string)","re.findall('-(?!aa-|bb-)([^-]+)', string)",1,0.6918792785736302,0.6918792251149934
+130,How to monitor events from workers in a Celery-Django application?,app.start(),sys.exit(),1,0.21983892776455072,0.18629970894922437
+131,One int for every python object,"def __init__(self):
+    pass",MyObject().id,1,0.08244266050289341,0.05206378300008088
+132,Updating GUI elements in MultiThreaded PyQT,QtCore.QThread.__init__(self),sys.exit(app.exec_()),1,0.29074600053340455,0.20643788604172517
+133,Making RSA keys from a password in python,from Crypto.PublicKey import RSA,password = 'swordfish',1,0.07835340984037473,0.04900093077884638
+134,creating subprojects in bottle,"root_app.mount('/admin/', admin_app)","app.mount('/demo', core.app)",1,0.3751717545784748,0.2237452750662029
+135,Detecting thresholds in HSV color space (from RGB) using Python / PIL,"scipy.misc.imsave('v.png', v)","scipy.misc.imsave('s.png', s)",1,0.1955580870120393,0.15135713688507163
+136,Namespace packages with a core part?,mylibrary.some_function(),mylibrary.some_function = some_function,1,0.07837150972710125,0.021625690659799572
+137,How to take partial screenshot with Selenium WebDriver in python?,fox.get('http://stackoverflow.com/'),fox.save_screenshot('screenshot.png'),1,0.27133072255509744,0.2461245236526934
+138,Is the order of dictionary items reliable **at creation**?,"expr1, expr2, expr3, expr4","{expr1: expr2, expr3: expr4}",1,0.15057686630722705,0.10618383719296008
+139,Python - multi-line array,[([0] * 8) for x in range(8)],array.append([0] * 8),1,0.3076793235312194,0.18450869631821254
+140,Defining a list in Python using the multiply operator,L = [0] * 10,"L = [0] * 10
+L",1,0.05882205564753757,0.056502590936871135
+141,Class variables of same type in Python,self.x = x,self.x = x,1,0.0650358043606818,0.06442122690138796
+142,"In Django, how do I filter based on all entities in a many-to-many relation instead of any?","Task.objects.exclude(prerequisites__status__in=['A', 'P', 'F'])",c = Task.objects.create(status='P'),1,0.7634013297939075,0.08744191376753019
+143,Changing request method using hidden field _method in Flask,app.run(debug=True),return jsonify({'method': 'UNKNOWN'}),1,0.17898668640465873,0.15511639499223523
+144,How do I tell if the returned cursor is the last cursor in App Engine,"result, cursor, more = query.fetch_page(10)",pass,1,0.08910891541286896,0.04874088850195502
+145,Python: Replace with regex,"output = re.sub('(<textarea.*>).*(</textarea>)', '\\1Bar\\2', s)","match = re.search('(<textarea.*>).*(</textarea>)', s)",1,0.5733109292913978,0.1113230984002173
+146,Best way of removing duplicates from a list by object attribute,"toolz.unique(obj_list, key=lambda x: x.my_attr)",obj_list = [x.obj for x in set(HashMyAttr(obj) for obj in obj_list)],1,0.36746642702389515,0.17118637252275978
+147,Class to position a window on the screen,app.exec_(),gui.show(),1,0.1566354531525464,0.08258362205268382
+148,How to use viridis in matplotlib 1.4,"[0.269944, 0.014625, 0.341379],","[0.983868, 0.904867, 0.136897],",0,0.18970165279404408,0.18970165279404408
+149,Python mechanize - two buttons of type 'submit',"submit_response = self.br.submit(name='action', label='Save')",self.br.select_form(name='my_form'),1,0.23779452775333876,0.210503401556682
+150,Navigation with BeautifulSoup,soup.select('div.container a[href]'),"soup.find_all('a', text=re.compile('^[pP]rice'))",1,0.45746497940755254,0.3562297462867052
+151,Click on a dropdown element menu with Selenium Webdriver,link.click(),option.click(),1,0.23653926987043225,0.2010593905815687
+152,python listing dirs in a different order based upon platform,files.sort(),dirs.sort(),1,0.0375413191672903,0.03590803840689671
+153,Insert variable into global namespace from within a function?,globals()['var'] = 'an object',self.__dict__['builtin'] = sys.modules['builtins'].__dict__,1,0.41942516923581125,0.13037785618764097
+154,How to run a function/thread in a different terminal window in python?,proc.wait(),proc.wait(),1,0.4077817539863895,0.3045497036897415
+155,Saving openpyxl file via text and filestream,print(save_virtual_workbook(wb)),wb = Workbook(),1,0.09050534085482376,0.07591085735531286
+156,How to remove NaN from a Pandas Series where the dtype is a list?,pd.Series([np.array(e)[~np.isnan(e)] for e in x.values]),print(x.apply(lambda a: list([v for v in a if v == v]))),1,0.4357964414926579,0.24739321842492412
+157,Scrape the HTML from a webpage after rendering the JSON/Javascript without Selenium while supporting POSTing,q.form().submit(),hf.write(html),1,0.06361849507871958,0.04741196297417389
+158,"How do I access the properties of a many-to-many ""through"" table from a django template?","return render_to_response('group_details.html', {'group': group})",rel = Membership.objects.filter(group=your_group).select_related(),1,0.349402890630743,0.31618828539640226
+159,Django store uploaded file in S3,file_obj.seek(0),AWS_S3_ACCESS_KEY_ID = 'KEY',1,0.3461816413827244,0.0878757200313744
+160,recover dict from 0-d numpy array,x = np.load('/tmp/data.npy'),x.item(),1,0.09620975769912048,0.09150888192388072
+161,Compress(minimize) HTML from python,print(minified),"minified = htmlmin.minify(html.decode('utf-8'), remove_empty_space=True)",1,0.05169810791696069,0.0415121114009604
+162,Generating a large number of columns based on the unique values in the dataframe,df,df_a = df.filter(like='a'),1,0.3041143270248305,0.0693265292575316
+163,Saving work after a SIGINT,time.sleep(1),time.sleep(5),1,0.2186323502421546,0.17969651467332312
+164,Moving Beyond Factories in Python,"def __init__(self, name):
+    pass",return p,1,0.06677298426812248,0.05119249100079716
+165,python recursive function that prints from 0 to n?,print(n),print(n),1,0.12476882686859704,0.0843468036477829
+166,Microsoft Outlook Create Rule Run Application/Script Python,pythoncom.PumpMessages(),"command = re.search('%(.*?)%', subject).group(1)",1,0.2597220712261382,0.020581344121027415
+167,Rearranging entries of rows in numpy array,B = np.zeros_like(A),"rows, cols = A.shape",1,0.05887725714557982,0.029881634312385594
+168,pandas replace only part of a column,a = np.array(df.C),"df = pd.DataFrame({'A': list1, 'B': list2}, columns=['A', 'B'])",1,0.26920577048855143,0.24134448453947377
+169,TCP Connection to Pure Data with Blender Python,"s.connect((host, port))","s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)",1,0.18688919875398943,0.1666147131247706
+170,Google App Engine Jinja2 template extends base template from parent folder,self.response.write(template.render()),"template = env.get_template('folder/content.html')
+self.response.write(template.render())",1,0.1371592250522631,0.13476354619394315
+171,Find the biggest number formed by digits of input numer,"return int(''.join(sorted(str(n), reverse=True)))","return int(''.join(sorted(str(inputNumber), reverse=True)))",1,0.15085003234999825,0.09453590034621198
+172,Access to variables from outside function,"print('globals=', globals())","print('locals=', locals())",1,0.11660608868393876,0.08832414300011915
+173,Alternative to Double Iteration,"my_list = [y for y in my_list if not any(meets_requirement(x, y) for x in
+    my_list)]",to_be_removed.append(value2),1,0.07288949040640448,0.03020278551988813
+174,Ignore part of a python tuple,"a1, b1, c1 = (a[i] for i in idxs)","idxs = [0, 3, 4]",1,0.10941415622404423,0.07232626655214201
+175,Is there an easy way to manipulate XML documents in Python?,print(et.tostring(tree)),"print(et.tostring(tree, pretty_print=True))",1,0.3553371791144689,0.3423609943415313
+176,Check if string in strings,taxlistcomplete = result.split('$'),[element for element in arr if 'xx' in element],1,0.23137954051145934,0.20166173885029337
+177,Finding intersection points of two ellipses (Python),"plot(b[:, (0)], b[:, (1)])","plot(a[:, (0)], a[:, (1)])",1,0.2491212668623752,0.17577889329576254
+178,transpose/rotate a block of a matrix in python,"block3[:] = np.rot90(block3.copy(), -1)",block3[:] = np.rot90(block3.copy()),1,0.4451580575920534,0.12952618926926557
+179,Maintain a list sorted by multiple attributes?,"insert_sort(descend_list, i, lambda x, y: x[1:] < y[1:])","insert_sort(ascend_list, i, lambda x, y: x[1:] >= y[1:])",1,0.17054817277450457,0.15469801065584385
+180,python tkinter how to bind key to a button,"master.bind('s', self.sharpen)","self.bind('s', self.sharpen)",1,0.5658611055805955,0.32889257541731454
+181,Include variables in template context on every page with Bottle.py,SimpleTemplate.defaults['get_url'] = app.get_url,SimpleTemplate.defaults['url'] = lambda : request.url,1,0.048379613842652075,0.03331022481123212
+182,Python standard library function for rearranging a list,((a + a[:0:-1]) * len(a))[::len(a)][:len(a)],"list(chain.from_iterable(zip(a, reversed(a))))[:len(a)]",1,0.24478656888397346,0.22083119954632585
+183,pause/resume a python script in middle,time.sleep(1),input(),1,0.2528934640684156,0.1783542108486382
+184,Access an arbitrary element in a dictionary in Python,next(iter(list(dict.values()))),next(iter(dict.values())),1,0.649426432943929,0.5144419545876141
+185,Data Frame Indexing,"p_value = pd.DataFrame(np.zeros((2, 2), dtype='float'), columns=df.columns)","df.columns = ['FABL', 'HINOON']",1,0.4327645055497996,0.34897540433915314
+186,"Is there a matplotlib counterpart of Matlab ""stem3""?",plt.show(),"ax.set_ylim3d(-1, 1)",1,0.4552968028536738,0.21407708969358605
+187,Selenium fails to start Chromedriver,browser.get('http://www.google.com'),browser = webdriver.Chrome(),1,0.24574347065683905,0.11245855191240357
+188,Comparing 2 lists consisting of dictionaries with unique keys in python,"[[(k, x[k], y[k]) for k in x if x[k] != y[k]] for x, y in pairs if x != y]","[[k for k in x if x[k] != y[k]] for x, y in pairs if x != y]",1,0.43910963285963256,0.37721708461321646
+189,How to send cookies in a post request with the Python Requests library?,"r = requests.post('http://wikipedia.org', cookies=cookie)","r2 = requests.post('http://www.yourapp.com/somepage', cookies=r1.cookies)",1,0.5255256840568514,0.23122125650995778
+190,If I truncate a file to zero in Python 3 do I also need to seek to position zero?,test.write('world'),test.write('hello!'),1,0.17524060590304813,0.06760570607374573
+191,Writing Unicode text to a text file?,f.close(),print(f.read().decode('utf8')),1,0.43291585270961225,0.3962256713620308
+192,Trying to write a cPickle object but get a 'write' attribute type error,"with open(outfile, 'wb') as pickle_file:
+    cPickle.dump(all, pickle_file)","cPickle.dump(all, pickle_file)",1,0.07470425665189057,0.051896507668465756
+193,How to find number of bytes taken by python variable,struct.calcsize('i'),print(sys.getsizeof(myint)),1,0.23880853828096957,0.14508079372128593
+194,"Finding the ""best"" combination for a set",print(sorted_word_dict[::-1][:20]),"'you dont think', 'yes i do', 'no you dont', 'i dont think you think'",1,0.20918858497577336,0.17570820382519145
+195,How do I get a list of all windows on my gnome2 desktop using pygtk?,root = gtk.gdk.get_default_root_window(),w = gtk.gdk.window_foreign_new(id),1,0.09076636472536688,0.03147068295027048
+196,Interacting with long-running python script,time.sleep(5),os.getpid(),1,0.25780610397908194,0.22223320081189735
+197,Get primary key after inserting rows using sqlalchemy,print(e.inserted_primary_key),"for e in topic_res:
+    pass",1,0.058924645469356836,0.012402916232462249
+198,Shift all indices in NumPy array,"y = numpy.r_[0, x[:-1]]",y[0] = 0,1,0.3408964411018612,0.22138710249590512
+199,Stop concordance printing 'no matches' in python,text.concordance(t_word),text = nltk.Text(Ellis),1,0.033323027288578666,0.02699085545598648
