@@ -10,7 +10,7 @@ GraphCodeBERT = []
 triplet_CodeBERT = []
 for x in ["", "_rel_thresh"]:
     for y in ["", "_intra_categ_neg"]:
-        triplet_CodeBERT.append("triplet_CodeBERT"+x+y)
+        triplet_CodeBERT.append("CodeBERT"+x+y)
         GraphCodeBERT.append("GraphCodeBERT"+x+y)
         UniXcoder.append("UniXcoder"+x+y)
 # print(triplet_CodeBERT)
@@ -113,7 +113,53 @@ for folder in model_list:
 table.sort(by=0)
 table.highlight_max([1,2,3,6])
 table.highlight_min([4,5], reset=False)
+print("### Code only retrieval L2 dist function")
 print(table)
+
+top_100k_table = Table(*column_names)
+zero_shot_table = Table(*column_names)
+print(f"len(top_100k_table)={len(top_100k_table)}")
+print(f"len(zero_shot_table)={len(zero_shot_table)}")
+for model in ["CodeBERT", "GraphCodeBERT", "UniXcoder"]:
+    dist_fn = "l2_dist"
+    for setting in ["code", "annot", "code+annot"]:
+        path = os.path.join(
+            model+"_zero_shot", 
+            f"test_metrics_{dist_fn}_{setting}.json"
+        )
+        if not os.path.exists(path): continue
+        with open(path) as f: metric_data = json.load(f)
+        table_row = [model+f" ({setting})"]
+        table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
+        table_row.append(f'{metric_data["recall"]["@10"]:.3f}')
+        for metric in metrics:
+            table_row.append(f"{metric_data[metric]:.3f}")
+        table_rows.append(table_row)
+        zero_shot_table.append(table_row)
+        
+        for filt in ["", "_100k"]:
+            path = os.path.join(
+                model+filt, 
+                f"test_metrics_{dist_fn}_{setting}.json"
+            )
+            if not os.path.exists(path): continue
+            with open(path) as f: metric_data = json.load(f)
+            table_row = [model+filt.replace("_"," ")+f" ({setting})"]
+            table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
+            table_row.append(f'{metric_data["recall"]["@10"]:.3f}')
+            for metric in metrics:
+                table_row.append(f"{metric_data[metric]:.3f}")
+            table_rows.append(table_row)
+            top_100k_table.append(table_row)
+        
+zero_shot_table.sort(by=0)
+zero_shot_table.highlight_max([1,2,3,6])
+table.highlight_min([4,5], reset=False)
+print("\n### Zero shot retrieval L2 dist function")
+print(zero_shot_table)
+print("\n### Top 100k vs whole data (L2 dist function)")
+print(top_100k_table)
+
 # # create table string
 # table_str = ("|"+"|".join(column_names)+"|\n")
 # table_str += ("|"+"|".join(["---"]*len(column_names))+"|\n")

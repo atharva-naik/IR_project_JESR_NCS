@@ -3,15 +3,20 @@
 import os
 import sys
 import random
+from typing import *
 from tqdm import tqdm
-from typing import List
 from datautils.utils import * 
 # from datautils import TextCodeTriplets
 
 random.seed(2022)
+def filt_topk_by_rel(data: List[dict], k: int=10**5):
+    """filter top k examples by relevance scores."""
+    return sorted(data, reverse=True, key=lambda x: x["prob"])[:k]
+
 # valid modes: ['default', 'rel_thresh']
 def main(data_path: str, triples_path: str, mode: str="default"):
     data: List[dict] = read_jsonl(data_path)
+    data: List[dict] = filt_topk_by_rel(data)
     posts: List[List[dict]] = list(get_posts(data).values())
     singleton_samples = 0
     if os.path.exists(triples_path):
@@ -62,8 +67,12 @@ if __name__ == "__main__":
     try: mode = sys.argv[1]
     except IndexError: mode = "default"
     # "rel_thresh_intra_categ_neg" # "default" # "rel_thresh"
-    if mode == "default": triples_path: str = "triples.json"
-    else: triples_path = os.path.join("triples", f"triples_{mode}.json")
+    if mode == "default": 
+        triples_path: str = "triples_100k.json"
+    else: 
+        triples_path = os.path.join(
+            "triples", f"triples_100k_{mode}.json"
+        )
     triples = main(data_path="data/conala-mined.jsonl", 
                    triples_path=triples_path, mode=mode)
     val_ratio: int=0.2
