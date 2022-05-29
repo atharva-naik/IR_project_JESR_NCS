@@ -319,7 +319,7 @@ def test_retreival(args):
     
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     print(f"loading checkpoint (state dict) from {ckpt_path}")
-    try: state_dict = torch.load(ckpt_path)
+    try: state_dict = torch.load(ckpt_path, map_location="cpu")
     except Exception as e: 
         state_dict = None; print(e)
     

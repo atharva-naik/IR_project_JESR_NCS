@@ -876,13 +876,17 @@ def test_retreival(args):
     
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     print(f"loading checkpoint (state dict) from {ckpt_path}")
-    try: state_dict = torch.load(ckpt_path)
+    try: state_dict = torch.load(ckpt_path, map_location="cpu")
     except Exception as e: 
-        state_dict = None; print(e)
+        state_dict = None
+        print("Couldn't load state dict because:")
+        print(e)
     
     print("creating model object")
     triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
-    if state_dict: triplet_net.load_state_dict(state_dict)
+    if state_dict: 
+        print(f"\x1b[32;1mloading state dict from {ckpt_path}\x1b[0m")
+        triplet_net.load_state_dict(state_dict)
     print(f"loading candidates from {args.candidates_path}")
     code_and_annotations = json.load(open(args.candidates_path))
     
@@ -1029,21 +1033,15 @@ def test_retreival(args):
                 
 if __name__ == "__main__":
     args = get_args()
-    if args.train_cls:
-        # do relevance classification.
+    if args.train_cls: # do relevance classification.
         train_classifier(args)
-    if args.test_cls:
-        # test relevance classification.
+    if args.test_cls: # test relevance classification.
         test_classifier(args)
-    if args.train_rel:
-        # do regression.
+    if args.train_rel: # do regression.
         train_regressor(args)
-    if args.test_rel:
-        # test regression,
+    if args.test_rel: # test regression,
         test_regressor(args)
-    if args.train:
-        # finetune.
+    if args.train: # finetune.
         main(args)
-    if args.test:
-        # setting in ['code', 'annot', 'code+annot']
+    if args.test: # setting in ['code', 'annot', 'code+annot']
         test_retreival(args)

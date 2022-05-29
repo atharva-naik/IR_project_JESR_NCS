@@ -120,24 +120,24 @@ GraphCodeBERT:
 ### Top 100k vs whole data (L2 dist function)
 |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
 |---|---|---|---|---|---|---|
-|CodeBERT (code)|0.622|0.780|0.519|8.342|6.115|0.634|
-|CodeBERT 100k (code)|0.030|0.050|0.028|223.428|204.353|0.167|
-|CodeBERT (annot)|0.792|0.876|0.706|6.696|5.756|0.774|
-|CodeBERT 100k (annot)|0.194|0.244|0.165|149.210|141.545|0.299|
-|CodeBERT (code+annot)|0.800|0.882|0.685|4.454|3.584|0.762|
-|CodeBERT 100k (code+annot)|0.086|0.124|0.076|183.616|168.751|0.218|
-|GraphCodeBERT (code)|0.662|0.792|0.570|8.636|7.047|0.673|
-|GraphCodeBERT 100k (code)|0.120|0.172|0.099|202.382|190.548|0.237|
-|GraphCodeBERT (annot)|0.822|0.886|0.713|6.560|5.416|0.781|
-|GraphCodeBERT 100k (annot)|0.284|0.336|0.217|104.924|95.784|0.353|
-|GraphCodeBERT (code+annot)|0.818|0.896|0.717|4.474|3.490|0.786|
-|GraphCodeBERT 100k (code+annot)|0.246|0.286|0.183|168.970|158.405|0.313|
-|UniXcoder (code)|0.692|0.830|0.598|6.786|5.605|0.695|
-|UniXcoder 100k (code)|0.240|0.304|0.207|79.904|72.060|0.349|
-|UniXcoder (annot)|0.814|0.878|0.755|5.024|4.455|0.813|
-|UniXcoder 100k (annot)|0.560|0.604|0.490|37.312|34.200|0.591|
-|UniXcoder (code+annot)|0.844|0.916|0.766|3.038|2.422|0.823|
-|UniXcoder 100k (code+annot)|0.516|0.582|0.447|37.372|33.792|0.557|
+|experiments/CodeBERT (code)|0.622|0.780|0.519|8.342|6.115|0.634|
+|experiments/CodeBERT 100k (code)|0.622|0.774|0.547|8.416|6.345|0.653|
+|experiments/CodeBERT (annot)|0.792|0.876|0.706|6.696|5.756|0.774|
+|experiments/CodeBERT 100k (annot)|0.780|0.872|0.682|8.382|7.381|0.756|
+|experiments/CodeBERT (code+annot)|0.800|0.882|0.685|4.454|3.584|0.762|
+|experiments/CodeBERT 100k (code+annot)|0.784|0.876|0.691|4.766|3.871|0.765|
+|experiments/GraphCodeBERT (code)|0.662|0.792|0.570|8.636|7.047|0.673|
+|experiments/GraphCodeBERT 100k (code)|0.698|0.832|0.574|7.062|5.381|0.678|
+|experiments/GraphCodeBERT (annot)|0.822|0.886|0.713|6.560|5.416|0.781|
+|experiments/GraphCodeBERT 100k (annot)|0.822|0.884|0.732|10.184|8.605|0.795|
+|experiments/GraphCodeBERT (code+annot)|0.818|0.896|0.717|4.474|3.490|0.786|
+|experiments/GraphCodeBERT 100k (code+annot)|0.820|0.878|0.724|4.498|3.512|0.792|
+|experiments/UniXcoder (code)|0.692|0.830|0.598|6.786|5.605|0.695|
+|experiments/UniXcoder 100k (code)|0.696|0.830|0.598|7.510|5.384|0.695|
+|experiments/UniXcoder (annot)|0.814|0.878|0.755|5.024|4.455|0.813|
+|experiments/UniXcoder 100k (annot)|0.824|0.886|0.762|6.320|5.203|0.818|
+|experiments/UniXcoder (code+annot)|0.844|0.916|0.766|3.038|2.422|0.823|
+|experiments/UniXcoder 100k (code+annot)|0.836|0.908|0.753|3.824|2.833|0.813|
 <!-- |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
 |---|---|---|---|---|---|---|
 |CodeBERT (l2_dist) (code)|0.622|0.780|0.519|8.342|6.115|0.634|

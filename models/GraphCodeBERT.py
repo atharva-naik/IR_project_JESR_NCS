@@ -788,13 +788,17 @@ def test_retreival(args):
     
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     print(f"loading checkpoint (state dict) from {ckpt_path}")
-    try: state_dict = torch.load(ckpt_path)
+    try: state_dict = torch.load(ckpt_path, map_location="cpu")
     except Exception as e: 
-        state_dict = None; print(e)
+        state_dict = None
+        print("\x1b[31;1mCouldn't load state dict because\x1b[0m")
+        print(e)
     
     print("creating model object")
     triplet_net = GraphCodeBERTripletNet(tok_path=tok_path)
-    if state_dict: triplet_net.load_state_dict(state_dict)
+    if state_dict: 
+        print(f"\x1b[32;1msuccesfully loaded state dict from {ckpt_path}\x1b[0m")
+        triplet_net.load_state_dict(state_dict)
     print(f"loading candidates from {args.candidates_path}")
     code_and_annotations = json.load(open(args.candidates_path))
     

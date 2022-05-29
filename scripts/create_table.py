@@ -5,15 +5,15 @@ import json
 import numpy as np
 from typing import *
 
+CodeBERT = []
 UniXcoder = []
 GraphCodeBERT = []
-triplet_CodeBERT = []
 for x in ["", "_rel_thresh"]:
     for y in ["", "_intra_categ_neg"]:
-        triplet_CodeBERT.append("CodeBERT"+x+y)
-        GraphCodeBERT.append("GraphCodeBERT"+x+y)
-        UniXcoder.append("UniXcoder"+x+y)
-# print(triplet_CodeBERT)
+        CodeBERT.append("experiments/CodeBERT"+x+y)
+        GraphCodeBERT.append("experiments/GraphCodeBERT"+x+y)
+        UniXcoder.append("experiments/UniXcoder"+x+y)
+
 def get_model_name(folder: str, dist_fn: str="", setting: str=""):
     model_name = folder.replace("triplet_", "")#.replace('CodeBERT_', "")
     if model_name == "": model_name = "-"
@@ -92,7 +92,7 @@ class Table:
 metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank", "ndcg"]
 column_names = ["model name", "recall@5", "recall@10"] + metrics
 table_rows = []
-model_list = ["CodeBERT_zero_shot"] + triplet_CodeBERT + ["GraphCodeBERT_zero_shot"] + GraphCodeBERT + UniXcoder + ["nbow_siamese", "cnn_siamese", "rnn_siamese"]
+model_list = ["experiments/CodeBERT_zero_shot"] + CodeBERT + ["experiments/GraphCodeBERT_zero_shot"] + GraphCodeBERT + UniXcoder + ["experiments/nbow_siamese", "experiments/cnn_siamese", "experiments/rnn_siamese"]
 table = Table(*column_names)
 print(f"len(table)={len(table)}")
 for folder in model_list:
@@ -100,7 +100,7 @@ for folder in model_list:
     for dist_fn in ["l2_dist"]: #["inner_prod", "l2_dist"]:
         for setting in ["code"]:#["code", "annot", "code+annot"]:
             path = os.path.join(folder, f"test_metrics_{dist_fn}_{setting}.json")
-            if not os.path.exists(path): continue
+            if not os.path.exists(path): print(path); continue
             with open(path) as f: metric_data = json.load(f)
             table_row = [get_model_name(folder, dist_fn, setting)]
             table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
@@ -120,14 +120,16 @@ top_100k_table = Table(*column_names)
 zero_shot_table = Table(*column_names)
 print(f"len(top_100k_table)={len(top_100k_table)}")
 print(f"len(zero_shot_table)={len(zero_shot_table)}")
-for model in ["CodeBERT", "GraphCodeBERT", "UniXcoder"]:
+for model in ["experiments/CodeBERT", "experiments/GraphCodeBERT", "experiments/UniXcoder"]:
     dist_fn = "l2_dist"
     for setting in ["code", "annot", "code+annot"]:
         path = os.path.join(
             model+"_zero_shot", 
             f"test_metrics_{dist_fn}_{setting}.json"
         )
-        if not os.path.exists(path): continue
+        if not os.path.exists(path): 
+            print("\x1b[33;1m131: "+path+"\x1b[0m")
+            continue
         with open(path) as f: metric_data = json.load(f)
         table_row = [model+f" ({setting})"]
         table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
@@ -137,12 +139,15 @@ for model in ["CodeBERT", "GraphCodeBERT", "UniXcoder"]:
         table_rows.append(table_row)
         zero_shot_table.append(table_row)
         
+    for setting in ["code", "annot", "code+annot"]:
         for filt in ["", "_100k"]:
             path = os.path.join(
                 model+filt, 
                 f"test_metrics_{dist_fn}_{setting}.json"
             )
-            if not os.path.exists(path): continue
+            if not os.path.exists(path): 
+                print("\x1b[31;1m146: "+path+"\x1b[0m")
+                continue
             with open(path) as f: metric_data = json.load(f)
             table_row = [model+filt.replace("_"," ")+f" ({setting})"]
             table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
