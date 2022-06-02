@@ -160,10 +160,65 @@ for model in ["experiments/CodeBERT", "experiments/GraphCodeBERT", "experiments/
 zero_shot_table.sort(by=0)
 zero_shot_table.highlight_max([1,2,3,6])
 table.highlight_min([4,5], reset=False)
-print("\n### Zero shot retrieval L2 dist function")
-print(zero_shot_table)
-print("\n### Top 100k vs whole data (L2 dist function)")
-print(top_100k_table)
+
+metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank", "ndcg"]
+column_names = ["dataset", "top k", "temperature", "recall@5", "recall@10"] + metrics
+external_knowledge_table = Table(*column_names)
+print(f"len(external_knowledge)={len(top_100k_table)}")
+for ret_type in ["intent", "snippet"]:
+    for topk in [1, 5]:
+        temp = 2
+        setting = "code"
+        dist_fn = "l2_dist"
+        model = "GraphCodeBERT"
+        path = os.path.join(
+            f"experiments/{model}_{ret_type}_count100k_topk{topk}_temp{temp}",
+            f"test_metrics_{dist_fn}_{setting}.json"
+        )
+        if not os.path.exists(path): 
+            print("\x1b[32;1m179: "+path+"\x1b[0m")
+            continue
+        with open(path) as f: 
+            metric_data = json.load(f)
+        table_row = [ret_type, topk, temp]
+        table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
+        table_row.append(f'{metric_data["recall"]["@10"]:.3f}')
+        for metric in metrics:
+            table_row.append(f"{metric_data[metric]:.3f}")
+        external_knowledge_table.append(table_row)
+        
+path = os.path.join(
+    f"experiments/{model}_100k",
+    f"test_metrics_{dist_fn}_{setting}.json"
+)
+if os.path.exists(path):
+    with open(path) as f:
+        metric_data = json.load(f)
+    table_row = ["CoNaLa 100k", "-", "-"]
+    table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
+    table_row.append(f'{metric_data["recall"]["@10"]:.3f}')
+    for metric in metrics:
+        table_row.append(f"{metric_data[metric]:.3f}")
+    external_knowledge_table.append(table_row)
+else: print("\x1b[32;1m179: "+path+"\x1b[0m")
+
+path = os.path.join(
+    f"experiments/{model}",
+    f"test_metrics_{dist_fn}_{setting}.json"
+)
+if os.path.exists(path):
+    with open(path) as f:
+        metric_data = json.load(f)
+    table_row = ["CoNaLa", "-", "-"]
+    table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
+    table_row.append(f'{metric_data["recall"]["@10"]:.3f}')
+    for metric in metrics:
+        table_row.append(f"{metric_data[metric]:.3f}")
+    external_knowledge_table.append(table_row)
+else: print("\x1b[32;1m179: "+path+"\x1b[0m")
+
+print(f"\n### GraphCodeBERT code retrieval L2 dist function: (training on external knowledge only vs CoNaLa only)")
+print(external_knowledge_table)
 
 # # create table string
 # table_str = ("|"+"|".join(column_names)+"|\n")

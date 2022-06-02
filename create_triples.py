@@ -3,6 +3,7 @@
 import os
 import sys
 import random
+import pathlib
 from typing import *
 from tqdm import tqdm
 from datautils.utils import * 
@@ -16,7 +17,7 @@ def filt_topk_by_rel(data: List[dict], k: int=10**5):
 # valid modes: ['default', 'rel_thresh']
 def main(data_path: str, triples_path: str, mode: str="default"):
     data: List[dict] = read_jsonl(data_path)
-    data: List[dict] = filt_topk_by_rel(data)
+    # data: List[dict] = filt_topk_by_rel(data)
     posts: List[List[dict]] = list(get_posts(data).values())
     singleton_samples = 0
     if os.path.exists(triples_path):
@@ -66,15 +67,18 @@ if __name__ == "__main__":
     os.makedirs("triples", exist_ok=True)
     try: mode = sys.argv[1]
     except IndexError: mode = "default"
+    try: data_path = sys.argv[2]
+    except IndexError: data_path = "data/conala-mined.jsonl"
     # "rel_thresh_intra_categ_neg" # "default" # "rel_thresh"
+    TYPE = pathlib.Path(data_path).stem
     if mode == "default": 
-        triples_path: str = "triples_100k.json"
+        triples_path: str = f"triples_{TYPE}.json"
     else: 
         triples_path = os.path.join(
-            "triples", f"triples_100k_{mode}.json"
+            "triples", f"triples_{TYPE}_{mode}.json"
         )
-    triples = main(data_path="data/conala-mined.jsonl", 
-                   triples_path=triples_path, mode=mode)
+    triples = main(data_path=data_path, mode=mode, 
+                   triples_path=triples_path)
     val_ratio: int=0.2
     val_size = int(len(triples)*val_ratio)
     stem, ext = os.path.splitext(triples_path)

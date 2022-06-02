@@ -138,6 +138,15 @@ GraphCodeBERT:
 |experiments/UniXcoder 100k (annot)|0.824|0.886|0.762|6.320|5.203|0.818|
 |experiments/UniXcoder (code+annot)|0.844|0.916|0.766|3.038|2.422|0.823|
 |experiments/UniXcoder 100k (code+annot)|0.836|0.908|0.753|3.824|2.833|0.813|
+
+### GraphCodeBERT code retrieval L2 dist function: (training on external knowledge only vs CoNaLa)
+|dataset|top k|temperature|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
+|---|---|---|---|---|---|---|---|---|
+|intent|1|2|0.468|0.578|0.387|25.628|21.425|0.518|
+|snippet|1|2|0.458|0.574|0.383|27.566|23.403|0.513|
+|snippet|5|2|0.406|0.520|0.345|31.004|26.384|0.481|
+|CoNaLa 100k|-|-|0.698|0.832|0.574|7.062|5.381|0.678|
+|CoNaLa|-|-|0.662|0.792|0.570|8.636|7.047|0.673|
 <!-- |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
 |---|---|---|---|---|---|---|
 |CodeBERT (l2_dist) (code)|0.622|0.780|0.519|8.342|6.115|0.634|
