@@ -1,1 +1,1 @@
-python -m models.GraphCodeBERT -t -tp triples/triples_goldmine_snippet_count100k_topk1_temp2_train.json -vp triples/triples_goldmine_snippet_count100k_topk1_temp2_train.json -en GraphCodeBERT_snippet_count100k_topk1_temp2 --device_id "cuda:0" -bs 32
+python -m models.GraphCodeBERT -t -tp triples/triples_goldmine_intent_count100k_topk5_temp2_train.json -vp triples/triples_goldmine_intent_count100k_topk5_temp2_train.json -en experiments/GraphCodeBERT_intent_count100k_topk5_temp2 --device_id "cuda:0" -bs 32

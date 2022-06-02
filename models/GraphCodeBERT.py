@@ -13,12 +13,12 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import AdamW
 from typing import Union, List
+from tree_sitter import Language, Parser
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
 from models.metrics import recall_at_k, TripletAccuracy
 from sklearn.metrics import label_ranking_average_precision_score as MRR
-from tree_sitter import Language, Parser
 from datautils.parser import DFG_python
 from datautils.parser import (remove_comments_and_docstrings,
                               tree_to_token_index,
