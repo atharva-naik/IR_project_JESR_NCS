@@ -8,7 +8,6 @@ from typing import *
 from tqdm import tqdm
 from datautils.utils import * 
 # from datautils import TextCodeTriplets
-
 random.seed(2022)
 def filt_topk_by_rel(data: List[dict], k: int=10**5):
     """filter top k examples by relevance scores."""

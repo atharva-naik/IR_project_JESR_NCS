@@ -4,10 +4,33 @@
 # Author: Atharva Naik (18CS10067)
 import json
 import random
+from typing import *
 from tqdm import tqdm
-from typing import List, Dict, Tuple
 
+def shuffle_dict(d: dict, seed: int=42) -> dict:
+    """shuffle a dictionary."""
+    ids = list(range(len(d)))
+    random.seed(seed)
+    random.shuffle(ids)
+    keys = list(d.keys())
+    new_keys = []
+    for id in ids:
+        new_keys.append(keys[id])
+    shuffled_d = {}
+    for k in new_keys:
+        shuffled_d[k] = d[k]
+        
+    return shuffled_d
 
+def index_dict(d: dict, start: int=0, end: Union[int, None]=None) -> dict:
+    """index a dictionary using the start and end indices"""
+    if end is None: end = len(d)
+    indexed_d = {}
+    for k in list(d.keys())[start:end]:
+        indexed_d[k] = d[k]
+        
+    return indexed_d
+            
 def read_jsonl(path: str) -> List[dict]:
     """
     read data into list of dicts from a .jsonl file

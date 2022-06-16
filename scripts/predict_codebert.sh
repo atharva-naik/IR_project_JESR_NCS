@@ -1,1 +1,1 @@
-python -m models.CCodeBERT -te -c candidate_snippets.json -q query_and_candidates.json -en triplet_CodeBERT_rel_thresh -d "cuda:0" -bs 48
+python -m models.CodeBERT -te -c candidate_snippets.json -q query_and_candidates.json -en triplet_CodeBERT_rel_thresh -d "cuda:0" -bs 48
