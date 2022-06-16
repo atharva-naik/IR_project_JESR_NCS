@@ -1,11 +1,17 @@
 # This package contains main model files, for our "Universal Joint/Shared Space Encoder"
 # some common utilites.
 import os
+import json
+import torch
 import argparse
+import numpy as np
 from typing import *
+from sklearn.metrics import ndcg_score as NDCG
+from models.metrics import TripletAccuracy, recall_at_k 
+from sklearn.metrics import label_ranking_average_precision_score as MRR
 
 def get_tok_path(model_name: str) -> str:
-    assert model_name in ["codebert", "graphcodebert"]
+    assert model_name in ["codebert", "graphcodebert", "unixcoder"]
     if model_name == "codebert":
         tok_path = os.path.expanduser("~/codebert-base-tok")
         if not os.path.exists(tok_path):
@@ -14,16 +20,18 @@ def get_tok_path(model_name: str) -> str:
         tok_path = os.path.expanduser("~/graphcodebert-base-tok")
         if not os.path.exists(tok_path):
             tok_path = "microsoft/grapcodebert-base"
+    elif model_name == "unixcoder":
+        tok_path = os.path.expanduser("~/unixcoder-base-tok")
+        if not os.path.exists(tok_path):
+            tok_path = "microsoft/unixcoder-base"
             
     return tok_path
 
-def test_ood_performance(model_name: str, query_paths: List[str], 
-                         cand_paths: List[str], args: argparse.Namespace):
+def test_ood_performance(triplet_net, model_name: str, query_paths: List[str], 
+                         cand_paths: List[str], args: argparse.Namespace,
+                         dataset_names: List[str]=["CoNaLa", "External Knowledge"]):
     # do only code retrieval with l2 distance as distance function
-    print("initializing model and tokenizer ..")
-    tok_path = get_tok_path(model_name)
     device = args.device_id if torch.cuda.is_available() else "cpu"
-    
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     print(f"loading checkpoint (state dict) from {ckpt_path}")
     try: state_dict = torch.load(ckpt_path, map_location="cpu")
@@ -31,32 +39,28 @@ def test_ood_performance(model_name: str, query_paths: List[str],
         state_dict = None
         print("Couldn't load state dict because:")
         print(e)
-    
-    print("creating model object")
-    if model_name == "codebert":
-        triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
-    elif model_name == "graphcodebert":
-        triplet_net = GraphCodeBERTripletNet(tok_path=tok_path, **vars(args))
+    # load model checkpoint.
     if state_dict: 
         print(f"\x1b[32;1mloading state dict from {ckpt_path}\x1b[0m")
         triplet_net.load_state_dict(state_dict)
+    ID = 0
+    all_metrics = {}
     for query_path, cand_path in zip(query_paths, cand_paths):
         # load code candidates.
         print(f"loading candidates from {cand_path}")
         code_and_annotations = json.load(open(cand_path))
         candidates = code_and_annotations["snippets"]
-
+        dataset_name = dataset_names[ID]
+        ID += 1
+        all_metrics[dataset_name] = {}
+        # loading query data.
         print(f"loading queries from {query_path}")
         queries_and_cand_labels = json.load(open(query_path))
         queries = [i["query"] for i in queries_and_cand_labels]
         labels = [i["docs"] for i in queries_and_cand_labels]
         # distance function to be used.
-        dist_fn = args.dist_fn
-        assert dist_fn in ["l2_dist", "inner_prod"]
-        metrics_path = os.path.join(
-            args.exp_name, 
-            f"test_metrics_{dist_fn}_{setting}.json"
-        )
+        dist_fn ="l2_dist"
+        # assert dist_fn in ["l2_dist", "inner_prod"]
         # encode queries.
         print(f"encoding {len(queries)} queries:")
         query_mat = triplet_net.encode_emb(queries, mode="text", 
@@ -65,71 +69,28 @@ def test_ood_performance(model_name: str, query_paths: List[str],
         query_mat = torch.stack(query_mat)
         # encode candidates.
         print(f"encoding {len(candidates)} candidates:")
-        if setting == "code":
-            cand_mat = triplet_net.encode_emb(candidates, mode="code", 
-                                              batch_size=args.batch_size,
-                                              use_tqdm=True, device_id=device)
-            cand_mat = torch.stack(cand_mat)
-        elif setting == "annot":
-            cand_mat = triplet_net.encode_emb(candidates, mode="text", 
-                                              batch_size=args.batch_size,
-                                              use_tqdm=True, device_id=device)
-            cand_mat = torch.stack(cand_mat)
-        else:
-            cand_mat_code = triplet_net.encode_emb(code_candidates, mode="code", 
-                                                   batch_size=args.batch_size,
-                                                   use_tqdm=True, device_id=device)
-            cand_mat_annot = triplet_net.encode_emb(annot_candidates, mode="text",
-                                                    batch_size=args.batch_size,
-                                                    use_tqdm=True, device_id=device)
-            cand_mat_code = torch.stack(cand_mat_code)
-            cand_mat_annot = torch.stack(cand_mat_annot)
-                # cand_mat = (cand_mat_code + cand_mat_annot)/2
-        # print(query_mat.shape, cand_mat.shape)
-        if dist_func == "inner_prod": 
-            if setting == "code+annot":
-                scores_code = query_mat @ cand_mat_code.T
-                scores_annot = query_mat @ cand_mat_annot.T
-                scores = scores_code + scores_annot
-            else:
-                scores = query_mat @ cand_mat.T
-            # print(scores.shape)
-        elif dist_func == "l2_dist": 
-            if setting == "code+annot":
-                scores_code = torch.cdist(query_mat, cand_mat_code, p=2)
-                scores_annot = torch.cdist(query_mat, cand_mat_annot, p=2)
-                scores = scores_code + scores_annot
-            else:
-                scores = torch.cdist(query_mat, cand_mat, p=2)
-        # elif mode == "joint_cls": scores = triplet_net.joint_classify(queries, candidates)
+        cand_mat = triplet_net.encode_emb(candidates, mode="code", 
+                                          batch_size=args.batch_size,
+                                          use_tqdm=True, device_id=device)
+        # score and rank documents.
+        cand_mat = torch.stack(cand_mat)
+        scores = torch.cdist(query_mat, cand_mat, p=2)
         doc_ranks = scores.argsort(axis=1)
-        if dist_func == "inner_prod":
-            doc_ranks = doc_ranks.flip(dims=[1])
+        # compute recall@k for various k
+        recall_at_ = []
+        for i in range(1,10+1):
+            recall_at_.append(recall_at_k(labels, doc_ranks.tolist(), k=5*i))
+        # compute LRAP.
+        lrap_GT = np.zeros((len(queries), len(candidates)))
+        for i in range(len(labels)):
+            for j in labels[i]:
+                lrap_GT[i][j] = 1
+        # compute micro average and average best label candidate rank
         label_ranks = []
         avg_rank = 0
         avg_best_rank = 0 
         N = 0
         M = 0
-
-        lrap_GT = np.zeros(
-            (
-                len(queries), 
-                len(candidates)
-            )
-        )
-        recall_at_ = []
-        for i in range(1,10+1):
-            recall_at_.append(
-                recall_at_k(
-                    labels, 
-                    doc_ranks.tolist(), 
-                    k=5*i
-                )
-            )
-        for i in range(len(labels)):
-            for j in labels[i]:
-                lrap_GT[i][j] = 1
-
         for i, rank_list in enumerate(doc_ranks):
             rank_list = rank_list.tolist()
             # if dist_func == "inner_prod": rank_list = rank_list.tolist()[::-1]
@@ -146,6 +107,9 @@ def test_ood_performance(model_name: str, query_paths: List[str],
             M += 1
             avg_best_rank += min(ranks)
             label_ranks.append(instance_label_ranks)
+        # compute MRR and NDCG.
+        mrr = MRR(lrap_GT, -scores.cpu().numpy())
+        ndcg = NDCG(lrap_GT, -scores.cpu().numpy())
         metrics = {
             "avg_candidate_rank": avg_rank/N,
             "avg_best_candidate_rank": avg_best_rank/M,
@@ -153,29 +117,20 @@ def test_ood_performance(model_name: str, query_paths: List[str],
                 f"@{5*i}": recall_at_[i-1] for i in range(1,10+1) 
             },
         }
+        metrics["mrr"] = mrr
+        metrics["ndcg"] = ndcg
+        all_metrics[dataset_name] = metrics
+        # print metrics:
         print("avg canditate rank:", avg_rank/N)
         print("avg best candidate rank:", avg_best_rank/M)
         for i in range(1,10+1):
             print(f"recall@{5*i} = {recall_at_[i-1]}")
-        if dist_func == "inner_prod":
-            # -scores for distance based scores, no - for innert product based scores.
-            mrr = MRR(lrap_GT, scores.cpu().numpy())
-            ndcg = NDCG(lrap_GT, scores.cpu().numpy())
-        elif dist_func == "l2_dist":
-            # -scores for distance based scores, no - for innert product based scores.
-            mrr = MRR(lrap_GT, -scores.cpu().numpy())
-            ndcg = NDCG(lrap_GT, -scores.cpu().numpy())
-
-        metrics["mrr"] = mrr
-        metrics["ndcg"] = ndcg
         print("NDCG:", ndcg)
         print("MRR (LRAP):", mrr)
-        if not os.path.exists(args.exp_name):
-            print("missing experiment folder: assuming zero-shot setting")
-            metrics_path = os.path.join(
-                "CodeBERT_zero_shot", 
-                f"test_metrics_{dist_func}_{setting}.json"
-            )
-            os.makedirs("CodeBERT_zero_shot", exist_ok=True)
-        with open(metrics_path, "w") as f:
-            json.dump(metrics, f)
+    metrics_path = os.path.join(args.exp_name, 
+                   "ood_test_metrics_l2_code.json")
+    # write metrics to path.
+    with open(metrics_path, "w") as f:
+        json.dump(all_metrics, f)
+        
+    return all_metrics

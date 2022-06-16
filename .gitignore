@@ -128,15 +128,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 # large dataset files
-triples.json
 data/
 data
 external_knowledge/
 external_knowledge
 triples/
+# model checkpoints
 *model.pt
 triples_*.json
 triplet_CodeBERT_fixed
 triplet_CodeBERT_rel_thresh_fixed
 rel_regressor_CodeBERT
 model_*.pt
+experiments.zip

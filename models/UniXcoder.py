@@ -14,8 +14,10 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import AdamW
 from models.unixcoder import UniXcoder
-from sklearn.metrics import ndcg_score as NDCG
+from models import test_ood_performance
 from torch.utils.data import Dataset, DataLoader
+# load metrics.
+from sklearn.metrics import ndcg_score as NDCG
 from models.metrics import TripletAccuracy, recall_at_k 
 from sklearn.metrics import label_ranking_average_precision_score as MRR
 
@@ -39,6 +41,7 @@ def get_args():
     parser.add_argument("-lr", "--lr", type=float, default=1e-5, help="learning rate for training (defaults to 1e-5)")
     parser.add_argument("-te", "--test", action="store_true", help="flag to do testing")
     parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
+    parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     parser.add_argument("-bs", "--batch_size", type=int, default=32, help="batch size")
     parser.add_argument("-e", "--epochs", type=int, default=20, help="no. of epochs")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="UniXcoder_rel_thresh/model.pt")
@@ -476,4 +479,13 @@ if __name__ == "__main__":
     args = get_args()
     if args.train: main(args) # finetune.
     if args.test: test_retreival(args)
+    if args.test_ood: 
+        print("creating model object")
+        # instantiate model class.
+        triplet_net = UniXcoderTripletNet(**vars(args))
+        test_ood_performance(
+            triplet_net, model_name="unixcoder", args=args,
+            query_paths=["query_and_candidates.json", "external_knowledge/queries.json"],
+            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json"], 
+        )
     # setting in ['code', 'annot', 'code+annot']

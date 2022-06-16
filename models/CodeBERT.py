@@ -19,6 +19,7 @@ from typing import Union, List
 from datautils import read_jsonl
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
+from models import test_ood_performance, get_tok_path
 from transformers import RobertaModel, RobertaTokenizer
 from models.metrics import TripletAccuracy, recall_at_k 
 from sklearn.metrics import label_ranking_average_precision_score as MRR
@@ -48,6 +49,7 @@ def get_args():
     parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
     parser.add_argument("-bs", "--batch_size", type=int, default=32, help="batch size")
     parser.add_argument("-e", "--epochs", type=int, default=20, help="no. of epochs")
+    parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     return parser.parse_args()
 
@@ -1045,3 +1047,13 @@ if __name__ == "__main__":
         main(args)
     if args.test: # setting in ['code', 'annot', 'code+annot']
         test_retreival(args)
+    if args.test_ood: 
+        print("creating model object")
+        # instantiate model class.
+        tok_path = get_tok_path("codebert")
+        triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
+        test_ood_performance(
+            triplet_net, model_name="codebert", args=args,
+            query_paths=["query_and_candidates.json", "external_knowledge/queries.json"],
+            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json"], 
+        )

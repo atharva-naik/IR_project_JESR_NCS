@@ -16,6 +16,7 @@ from typing import Union, List
 from tree_sitter import Language, Parser
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
+from models import test_ood_performance, get_tok_path
 from transformers import RobertaModel, RobertaTokenizer
 from models.metrics import recall_at_k, TripletAccuracy
 from sklearn.metrics import label_ranking_average_precision_score as MRR
@@ -42,6 +43,7 @@ def get_args():
     parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
     parser.add_argument("-bs", "--batch_size", type=int, default=32, help="batch size")
     parser.add_argument("-e", "--epochs", type=int, default=20, help="no. of epochs")
+    parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     
     return parser.parse_args()
     
@@ -944,3 +946,13 @@ if __name__ == "__main__":
         main(args=args) 
     elif args.predict:
         test_retreival(args=args)
+    if args.test_ood: 
+        print("creating model object")
+        # instantiate model class.
+        tok_path = get_tok_path("graphcodebert")
+        triplet_net = GraphCodeBERTripletNet(tok_path=tok_path, **vars(args))
+        test_ood_performance(
+            triplet_net, model_name="graphcodebert", args=args,
+            query_paths=["query_and_candidates.json", "external_knowledge/queries.json"],
+            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json"], 
+        )
