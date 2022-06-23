@@ -1,1 +1,1 @@
-python -m models.UniXcoder -t -tp triples/triples_rel_thresh_train.json -vp triples/triples_rel_thresh_val.json -en UniXcoder_rel_thresh -d "cuda:0" -bs 48
+python -m models.UniXcoder -t -tp triples/triples_100k_train.json -vp triples/triples_100k_val.json -en UniXcoder_dyn_neg_sample_100k -d "cuda:1" -bs 48 -dns -e 3

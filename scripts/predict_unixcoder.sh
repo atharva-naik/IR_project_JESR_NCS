@@ -1,1 +1,1 @@
-python -m models.UniXcoder -te -c candidate_snippets.json -q query_and_candidates.json -en UniXcoder_rel_thresh -d "cuda:0" -bs 48
+python -m models.UniXcoder -te -c candidate_snippets.json -q query_and_candidates.json -en UniXcoder_dyn_neg_sample -d "cuda:1" -bs 48

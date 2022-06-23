@@ -134,3 +134,58 @@ def test_ood_performance(triplet_net, model_name: str, query_paths: List[str],
         json.dump(all_metrics, f)
         
     return all_metrics
+
+def dynamic_negative_sampling(model, batch: list, model_name: str="codebert", device: str="cpu", k=1) -> list:
+    """take the original batch of triplets and return new dynamically sampled batch of triplets"""
+    new_batch = []
+    batch_size, seq_len = batch[0].shape
+    # copy the intent & positive sample ids and masks as it is.
+    if model_name == "codebert":
+        for i in range(4): # indices are 0, 1, 2, 3.
+            new_batch.append(batch[i].repeat(k,1))
+    elif model_name == "graphcodebert":
+        new_batch = [None for i in range(7)]
+        for i in [0,2,3,5,6]: new_batch[i] = batch[i].repeat(k,1)
+        for i in [1,4]: new_batch[i] = batch[i].repeat(k,1,1)
+    elif model_name == "unixcoder":
+        for i in range(2):
+            new_batch.append(batch[i].repeat(k,1))
+    # don't modify model params.
+    with torch.no_grad():
+        if model_name == "codebert":
+            # batch_size x seq_len
+            args = (batch[0].to(device), batch[1].to(device)) # batch intents.
+            enc_intents = model(*args).pooler_output # returns batch_size x hidden_size
+            # batch_size x seq_len
+            args = (batch[2].to(device), batch[3].to(device)) # pos snippets.
+            enc_pos_snippets = model(*args).pooler_output # returns batch_size x hidden_size
+        elif model_name == "graphcodebert":
+            batch[0] = batch[0].to(device)
+            batch[1] = batch[1].to(device)
+            batch[2] = batch[2].to(device)
+            batch[-1] = batch[-1].to(device)
+            enc_intents = model(nl_inputs=batch[-1]) # returns batch_size x hidden_size
+            enc_pos_snippets = model(
+                code_inputs=batch[0], 
+                attn_mask=batch[1], 
+                position_idx=batch[2]
+            ) # returns batch_size x hidden_size
+        elif model_name == "unixcoder":
+            _, enc_intents = model(batch[0].to(device)) # returns batch_size x hidden_size
+            _, enc_pos_snippets = model(batch[1].to(device)) # returns batch_size x hidden_size
+        # create mask, compute scores and rank.
+        mask = (torch.ones(batch_size, batch_size)-torch.eye(batch_size)).to(device)
+        scores = mask*(enc_intents @ enc_pos_snippets.T) # batch_size x batch_size
+        ranks = torch.topk(scores, k=k, axis=1).indices.T # k x batch_size
+        # update stuff related to negative snippets.
+        if model_name == "codebert":
+            new_batch.append(batch[4].reshape(k*batch_size, seq_len))
+            new_batch.append(batch[5].reshape(k*batch_size, seq_len))
+        elif model_name == "graphcodebert":
+            new_batch[3] = batch[3].reshape(k*batch_size, seq_len)
+            new_batch[4] = batch[4].reshape(k*batch_size, seq_len, seq_len)
+            new_batch[5] = batch[5].reshape(k*batch_size, seq_len)
+        elif model_name == "unixcoder":
+            new_batch.append(batch[2].reshape(k*batch_size, seq_len))
+        
+    return new_batch

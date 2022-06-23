@@ -1,0 +1,1 @@
+# best model was at epoch 2 (3rd epoch)

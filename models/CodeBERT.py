@@ -19,10 +19,10 @@ from typing import Union, List
 from datautils import read_jsonl
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
-from models import test_ood_performance, get_tok_path
 from transformers import RobertaModel, RobertaTokenizer
-from models.metrics import TripletAccuracy, recall_at_k 
+from models.metrics import TripletAccuracy, recall_at_k
 from sklearn.metrics import label_ranking_average_precision_score as MRR
+from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
 
 # set logging level of transformers.
 transformers.logging.set_verbosity_error()
@@ -48,7 +48,9 @@ def get_args():
     parser.add_argument("-te", "--test", action="store_true", help="flag to do testing")
     parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
     parser.add_argument("-bs", "--batch_size", type=int, default=32, help="batch size")
-    parser.add_argument("-e", "--epochs", type=int, default=20, help="no. of epochs")
+    parser.add_argument("-e", "--epochs", type=int, default=5, help="no. of epochs")
+    parser.add_argument("-dns", "--dynamic_negative_sampling", action="store_true", 
+                        help="do dynamic negative sampling at batch level")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     return parser.parse_args()
@@ -743,6 +745,12 @@ class CodeBERTripletNet(nn.Module):
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             train_acc.reset()
             for step, batch in pbar:
+                if args.get("dynamic_negative_sampling", False):
+                    batch = dynamic_negative_sampling(
+                        self.embed_model, batch, 
+                        model_name="codebert", 
+                        device=device, k=1,
+                    )
                 anchor_title = (batch[0].to(device), batch[1].to(device))
                 pos_snippet = (batch[2].to(device), batch[3].to(device))
                 neg_snippet = (batch[4].to(device), batch[5].to(device))
@@ -781,12 +789,10 @@ def main(args):
     triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
     print("commencing training")
     
-    metrics = triplet_net.fit(train_path=args.train_path, 
-                              batch_size=args.batch_size,
-                              device_id=args.device_id,
-                              val_path=args.val_path, 
-                              exp_name=args.exp_name,
-                              epochs=args.epochs)
+    metrics = triplet_net.fit(train_path=args.train_path, batch_size=args.batch_size,
+                              device_id=args.device_id, val_path=args.val_path, 
+                              exp_name=args.exp_name, epochs=args.epochs,
+                              dynamic_negative_sampling=args.dynamic_negative_sampling)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")

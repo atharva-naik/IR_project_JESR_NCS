@@ -16,7 +16,6 @@ from typing import Union, List
 from tree_sitter import Language, Parser
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
-from models import test_ood_performance, get_tok_path
 from transformers import RobertaModel, RobertaTokenizer
 from models.metrics import recall_at_k, TripletAccuracy
 from sklearn.metrics import label_ranking_average_precision_score as MRR
@@ -25,6 +24,7 @@ from datautils.parser import (remove_comments_and_docstrings,
                               tree_to_token_index,
                               index_to_code_token,
                               tree_to_variable_index)
+from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
 # seed
 random.seed(0)
 np.random.seed(0)
@@ -42,8 +42,10 @@ def get_args():
     parser.add_argument("-p", "--predict", action="store_true", help="flag to do prediction/testing")
     parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
     parser.add_argument("-bs", "--batch_size", type=int, default=32, help="batch size")
-    parser.add_argument("-e", "--epochs", type=int, default=20, help="no. of epochs")
+    parser.add_argument("-e", "--epochs", type=int, default=5, help="no. of epochs")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
+    parser.add_argument("-dns", "--dynamic_negative_sampling", action="store_true", 
+                        help="do dynamic negative sampling at batch level")
     
     return parser.parse_args()
     
@@ -157,7 +159,7 @@ class CodeDataset(Dataset):
 
         #calculate graph-guided masked function
         attn_mask=np.zeros((self.args["code_length"]+self.args["data_flow_length"],
-                            self.args["code_length"]+self.args["data_flow_length"]),dtype=np.bool)
+                            self.args["code_length"]+self.args["data_flow_length"]),dtype=bool)
         #calculate begin index of node and max length of input
         node_index=sum([i>1 for i in position_idx])
         max_length=sum([i!=1 for i in position_idx])
@@ -316,7 +318,7 @@ class TextCodePairDataset(Dataset):
 
         #calculate graph-guided masked function
         attn_mask=np.zeros((self.args["code_length"]+self.args["data_flow_length"],
-                            self.args["code_length"]+self.args["data_flow_length"]),dtype=np.bool)
+                            self.args["code_length"]+self.args["data_flow_length"]),dtype=bool)
         #calculate begin index of node and max length of input
         node_index=sum([i>1 for i in position_idx])
         max_length=sum([i!=1 for i in position_idx])
@@ -447,7 +449,7 @@ class TriplesDataset(Dataset):
 
         # calculate graph-guided masked function
         pos_attn_mask=np.zeros((self.args["code_length"]+self.args["data_flow_length"],
-                            self.args["code_length"]+self.args["data_flow_length"]),dtype=np.bool)
+                            self.args["code_length"]+self.args["data_flow_length"]),dtype=bool)
         # calculate begin index of node and max length of input
         node_index=sum([i>1 for i in pos_position_idx])
         max_length=sum([i!=1 for i in pos_position_idx])
@@ -502,7 +504,7 @@ class TriplesDataset(Dataset):
 
         # calculate graph-guided masked function
         neg_attn_mask=np.zeros((self.args["code_length"]+self.args["data_flow_length"],
-                            self.args["code_length"]+self.args["data_flow_length"]),dtype=np.bool)
+                            self.args["code_length"]+self.args["data_flow_length"]),dtype=bool)
         # calculate begin index of node and max length of input
         node_index=sum([i>1 for i in neg_position_idx])
         max_length=sum([i!=1 for i in neg_position_idx])
@@ -735,6 +737,12 @@ class GraphCodeBERTripletNet(nn.Module):
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             train_acc.reset()
             for step, batch in pbar:
+                if args.get("dynamic_negative_sampling", False):
+                    batch = dynamic_negative_sampling(
+                        self.embed_model, batch, 
+                        model_name="graphcodebert", 
+                        device=device, k=1
+                    )
                 anchor_title = batch[-1].to(device)
                 pos_snippet = (batch[0].to(device), batch[1].to(device), batch[2].to(device))
                 neg_snippet = (batch[3].to(device), batch[4].to(device), batch[5].to(device))
