@@ -130,8 +130,7 @@ dmypy.json
 # large dataset files
 data/
 data
-external_knowledge/
-external_knowledge
+external_knowledge/.*jsonl
 triples/
 # model checkpoints
 *model.pt
