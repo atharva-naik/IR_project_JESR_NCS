@@ -142,4 +142,3 @@ if __name__ == "__main__":
     data["lib_fn_snippet_ids"] = fn_snippet_ids
     with open(args.path, "w") as f:
         json.dump(data, f, indent=4)
-        

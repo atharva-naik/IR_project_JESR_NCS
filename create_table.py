@@ -88,7 +88,7 @@ class Table:
             op += "\n|"+"|".join(row)+"|"
             
         return op
-    
+"""
 metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank", "ndcg"]
 column_names = ["model name", "recall@5", "recall@10"] + metrics
 table_rows = []
@@ -219,10 +219,37 @@ else: print("\x1b[32;1m179: "+path+"\x1b[0m")
 
 print(f"\n### GraphCodeBERT code retrieval L2 dist function: (training on external knowledge only vs CoNaLa only)")
 print(external_knowledge_table)
-
+"""
 # # create table string
 # table_str = ("|"+"|".join(column_names)+"|\n")
 # table_str += ("|"+"|".join(["---"]*len(column_names))+"|\n")
 # for table_row in table_rows:
 #     table_str += ("|"+"|".join(table_row)+"|\n")
 # print(table_str)
+metrics = ["mrr", "avg_candidate_rank", "avg_best_candidate_rank", "ndcg"]
+column_names = ["model", "dataset", "recall@5", "recall@10"] + metrics
+dyn_neg_sample_table = Table(*column_names)
+for model in ["CodeBERT", "UniXcoder", "GraphCodeBERT"]:
+    for datasize in ["", "_100k"]:
+        temp = 2
+        setting = "code"
+        dist_fn = "l2_dist"
+        path = os.path.join(
+            f"experiments/{model}_dyn_neg_sample{datasize}",
+            f"test_metrics_{dist_fn}_{setting}.json"
+        )
+        if not os.path.exists(path): 
+            print("\x1b[32;1m179: "+path+"\x1b[0m")
+            continue
+        with open(path) as f: 
+            metric_data = json.load(f)
+        table_row = [model, "CoNaLa" if datasize is "" else "CoNaLa 100k"]
+        table_row.append(f'{metric_data["recall"]["@5"]:.3f}')
+        table_row.append(f'{metric_data["recall"]["@10"]:.3f}')
+        for metric in metrics:
+            table_row.append(f"{metric_data[metric]:.3f}")
+        dyn_neg_sample_table.append(table_row)
+dyn_neg_sample_table.sort(by=0)
+dyn_neg_sample_table.highlight_max([2,3,4,7])
+dyn_neg_sample_table.highlight_min([5,6], reset=False)
+print(dyn_neg_sample_table)

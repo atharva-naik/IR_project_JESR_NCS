@@ -1,1 +1,1 @@
-python -m models.GraphCodeBERT -p -c candidate_snippets.json -q query_and_candidates.json -en experiments/GraphCodeBERT_dyn_neg_sample -d "cuda:1" -bs 32
+python -m models.GraphCodeBERT -p -c candidate_snippets.json -q query_and_candidates.json -en experiments/GraphCodeBERT_dyn_neg_sample_100k -d "cuda:0" -bs 32

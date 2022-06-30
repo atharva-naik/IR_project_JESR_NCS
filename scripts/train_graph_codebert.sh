@@ -1,1 +1,1 @@
-python -m models.GraphCodeBERT -t -tp triples/triples_100k_train.json -vp triples/triples_100k_val.json -en experiments/GraphCodeBERT_dyn_neg_sample_100k --device_id "cuda:1" -bs 32 -dns
+python -m models.GraphCodeBERT -t -tp triples/triples_100k_train.json -vp triples/triples_100k_val.json -en experiments/GraphCodeBERT_dyn_neg_sample_100k --device_id "cuda:0" -bs 32 -dns

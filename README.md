@@ -84,6 +84,16 @@ GraphCodeBERT:
 
 ## Results
 
+### Performance with dynamic negative sampling
+
+|---|---|---|---|---|---|---|---|
+|CodeBERT|CoNaLa|0.630|0.772|0.533|7.682|5.507|0.643|
+|CodeBERT|CoNaLa 100k|0.662|0.798|0.550|7.298|5.852|0.658|
+|GraphCodeBERT|CoNaLa|0.670|0.798|0.545|8.126|6.101|0.655|
+|GraphCodeBERT|CoNaLa 100k|0.676|0.808|**0.593**|7.594|4.707|**0.693**|
+|UniXcoder|CoNaLa|**0.730**|**0.850**|0.592|**5.734**|**4.652**|0.691|
+|UniXcoder|CoNaLa 100k|0.724|0.842|0.591|6.216|4.759|0.690|
+
 ### Code Retrieval Performance Comparison (L2 dist):
 |model name|recall@5|recall@10|mrr|avg_candidate_rank|avg_best_candidate_rank|ndcg|
 |---|---|---|---|---|---|---|
