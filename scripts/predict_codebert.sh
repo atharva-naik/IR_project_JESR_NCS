@@ -1,1 +1,1 @@
-python -m models.CodeBERT -te -c candidate_snippets.json -q query_and_candidates.json -en experiments/CodeBERT_dyn_neg_sample -d "cuda:1" -bs 48
+python -m models.CodeBERT -te -c data/query_codeseachnet.json -q data/query_codesearchnet.json -en experiments/CodeBERT_codesearchnet -d "cuda:1" -bs 48

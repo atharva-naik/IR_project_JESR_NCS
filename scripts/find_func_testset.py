@@ -122,11 +122,18 @@ def find_fn_test_subset(snippets):
         enumerate(snippets), 
         total=len(snippets),
     )
+    syntax_err_count = 0
     for i, snippet in pbar:
-        tree = ast.parse(bytes(snippet, "utf8"))
+        try:
+            tree = ast.parse(bytes(snippet, "utf8"))
+        except SyntaxError as e:
+            pbar.set_description(f"SyntaxError: {e}")
+            syntax_err_count += 1
+            continue
         lff.visit(tree)
         has_lib_fn, _ = lff.reset()
         if has_lib_fn: fn_snippet_ids.append(i)
+    print(f"syntax error encountered for: {syntax_err_count} ({100*syntax_err_count/len(snippets):.2f}%)")
             
     return fn_snippet_ids
 

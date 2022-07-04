@@ -98,7 +98,7 @@ def create_triples(posts: List[List[dict]], neg_to_pos_ratio: int=3) -> List[Tup
             for neg_post in sample_list(neg_samples, k=neg_to_pos_ratio):
                 neg_sample = neg_post["snippet"]
                 triples.append((anchor, pos_sample, neg_sample))
-                
+        
     return triples
 
 def create_triples_fixed(posts: List[List[dict]], neg_to_pos_ratio: int=3) -> List[Tuple[str, str, str]]:

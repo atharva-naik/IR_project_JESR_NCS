@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # create test set for retrieval settings.
 import json
-data = json.load(open("data/conala-test.json"))
+# data = json.load(open("data/conala-test.json"))
+data = json.load(open("data/codesearchnet-test.json"))
 
 posts = {}
 queries = {}
@@ -14,14 +15,16 @@ candi_id = 0
 for rec in data:
     intent = rec["intent"]
     snippet = rec["snippet"]
-    code_annot = rec['rewritten_intent']
+    try: code_annot = rec['rewritten_intent']
+    except KeyError: code_annot = None
     try: posts[intent].append((snippet, code_annot))
     except KeyError: posts[intent] = [(snippet, code_annot)]
 
 for i, rec in enumerate(data):
     intent = rec["intent"]
     snippet = rec["snippet"]
-    code_annot = rec['rewritten_intent']
+    try: code_annot = rec['rewritten_intent']
+    except KeyError: code_annot = None
     try:
         queries[intent]+1
     except KeyError:
@@ -48,12 +51,13 @@ for _, code_annotation in candidates.values():
         null_ctr += 1
     else: candi_records["annotations"].append(code_annotation)
 print(null_ctr)
-with open("candidate_snippets.json", "w") as f:
+del candi_records["annotations"]
+with open("data/candidates_codesearchnet.json", "w") as f:
     json.dump(
         candi_records,        
         f, indent=4
     )
-with open("query_and_candidates.json", "w") as f:
+with open("data/queries_codesearchnet.json", "w") as f:
     json.dump(
         query_map, 
         f, indent=4

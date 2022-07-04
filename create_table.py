@@ -21,7 +21,7 @@ def get_model_name(folder: str, dist_fn: str="", setting: str=""):
     
     return model_name
 
-
+# table of metrics.
 class Table:
     def __init__(self, *fields):
         self.fields = fields

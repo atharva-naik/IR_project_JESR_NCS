@@ -3,13 +3,11 @@
 # Author: Atharva Naik (18CS10067)
 
 # code for creating Dataset instance for the dataloader.
-
 import os
+from typing import *
 from tqdm import tqdm
 from datautils.utils import *
 from torch.utils.data import Dataset
-from typing import List, Dict, Tuple
-
 # text code pairs dataset.
 # class TextCodeTriplets(Dataset):
 #     def __init__(self, data_path: str, triples_path: str="triples.json", 

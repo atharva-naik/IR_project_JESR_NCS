@@ -1,1 +1,1 @@
-python -m models.CodeBERT -t -tp triples/triples_train.json -vp triples/triples_val.json -en experiments/CodeBERT_dyn_neg_sample -d "cuda:1" -bs 48 -dns
+python -m models.CodeBERT -t -tp triples/triples_codesearchnet_fixed_train.json -vp triples/triples_codesearchnet_fixed_val.json -en experiments/CodeBERT_codesearchnet -d "cuda:0" -bs 48

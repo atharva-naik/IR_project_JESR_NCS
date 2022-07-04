@@ -29,7 +29,7 @@ def get_tok_path(model_name: str) -> str:
 
 def test_ood_performance(triplet_net, model_name: str, query_paths: List[str], 
                          cand_paths: List[str], args: argparse.Namespace,
-                         dataset_names: List[str]=["CoNaLa", "External Knowledge"]):
+                         dataset_names: List[str]=["CoNaLa", "External Knowledge", "CodeSearchNet"]):
     # do only code retrieval with l2 distance as distance function
     device = args.device_id if torch.cuda.is_available() else "cpu"
     ckpt_path = os.path.join(args.exp_name, "model.pt")

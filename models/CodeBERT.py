@@ -700,6 +700,7 @@ class CodeBERTripletNet(nn.Module):
         device_id = args.get("device_id", "cuda:0")
         batch_size = args.get("batch_size", 32)
         epochs = args.get("epochs", 5)
+        do_dynamic_negative_sampling = args.get("dynamic_negative_sampling", False)
         
         device = device_id if torch.cuda.is_available() else "cpu"
         save_path = os.path.join(exp_name, "model.pt")
@@ -712,6 +713,7 @@ class CodeBERTripletNet(nn.Module):
         self.config["exp_name"] = exp_name
         self.config["val_path"] = val_path
         self.config["epochs"] = epochs
+        self.config["dynamic_negative_sampling"] = do_dynamic_negative_sampling
         
         config_path = os.path.join(exp_name, "config.json")
         with open(config_path, "w") as f:
@@ -745,7 +747,7 @@ class CodeBERTripletNet(nn.Module):
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             train_acc.reset()
             for step, batch in pbar:
-                if args.get("dynamic_negative_sampling", False):
+                if do_dynamic_negative_sampling:
                     batch = dynamic_negative_sampling(
                         self.embed_model, batch, 
                         model_name="codebert", 
@@ -1060,6 +1062,6 @@ if __name__ == "__main__":
         triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
         test_ood_performance(
             triplet_net, model_name="codebert", args=args,
-            query_paths=["query_and_candidates.json", "external_knowledge/queries.json"],
-            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json"], 
+            query_paths=["query_and_candidates.json", "external_knowledge/queries.json", "data/queries_codesearchnet.json"],
+            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json", "data/candidates_codesearchnet.json"], 
         )
