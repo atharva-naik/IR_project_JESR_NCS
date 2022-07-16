@@ -659,7 +659,7 @@ class CodeBERTripletNet(nn.Module):
                 # if step == 5: break # DEBUG
         return val_acc.get(), np.mean(batch_losses)
         
-    def encode_emb(self, text_or_snippets: List[str], mode: str="text", **args):
+    def encode_emb(self, text_or_snippets: List[str], mode: str="text", **args) -> list:
         """Note: our late fusion CodeBERT is a universal encoder for text and code, so the same function works for both."""
         device_id = args.get("device_id", "cuda:0")
         batch_size = args.get("batch_size", 32)
@@ -694,7 +694,41 @@ class CodeBERTripletNet(nn.Module):
                 # if step == 5: break # DEBUG
         # print(type(all_embeds[0]), len(all_embeds))
         return all_embeds
-
+    
+    def write_encode_emb_libsvm(self, text_or_snippets: List[str], 
+                                path: str, mode: str="text", **args):
+        """write the encoded embedding directly to a LIBSVM style text file."""
+        device_id = args.get("device_id", "cuda:0")
+        batch_size = args.get("batch_size", 32)
+        use_tqdm = args.get("use_tqdm", False)
+        
+        device = device_id if torch.cuda.is_available() else "cpu"
+        self.to(device)
+        self.eval()
+        file_ptr = open(path, "w")
+        
+        if mode == "text":
+            dataset = TextDataset(text_or_snippets, tokenizer=self.tokenizer,
+                                  truncation=True, padding="max_length",
+                                  max_length=100, add_special_tokens=True,
+                                  return_tensors="pt")
+        elif mode == "code":
+            dataset = CodeDataset(text_or_snippets, tokenizer=self.tokenizer,
+                                  truncation=True, padding="max_length",
+                                  max_length=100, add_special_tokens=True,
+                                  return_tensors="pt")
+        else: raise TypeError("Unrecognized encoding mode")
+        datalloader = DataLoader(dataset, shuffle=False, 
+                                 batch_size=batch_size)
+        pbar = tqdm(enumerate(datalloader), total=len(datalloader), 
+                    desc=f"enocding {mode}", disable=not(use_tqdm))
+        for step, batch in pbar:
+            with torch.no_grad():
+                enc_args = (batch[0].to(device), batch[1].to(device))
+                batch_embed = self.embed_model(*enc_args).pooler_output
+                for embed in batch_embed:
+                    file_ptr.write(str(embed)+"\n")
+                # if step == 5: break # DEBUG
     def fit(self, train_path: str, val_path: str, **args):
         exp_name = args.get("exp_name", "experiment")
         device_id = args.get("device_id", "cuda:0")

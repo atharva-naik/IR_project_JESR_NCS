@@ -93,7 +93,7 @@ class CodeDataset(Dataset):
         try:
             code = remove_comments_and_docstrings(code, 'python')
         except:
-            print(f"error in {code}")
+            print(f"error in removing comments and docstrings: {code}")
         # print(type(code))
         tree = self.parser[0].parse(bytes(code,'utf8'))    
         root_node = tree.root_node  
@@ -106,7 +106,7 @@ class CodeDataset(Dataset):
         try:
             DFG,_=self.parser[1](root_node,index_to_code,{}) 
         except Exception as e:
-            print("Ln 101:", e)
+            print("Parsing error:", e)
             DFG=[]
         DFG=sorted(DFG,key=lambda x:x[1])
         indexs=set()
@@ -120,7 +120,8 @@ class CodeDataset(Dataset):
             if d[1] in indexs:
                 new_DFG.append(d)
         dfg=new_DFG 
-        return code_tokens,dfg
+        
+        return code_tokens, dfg
     
     def __getitem__(self, item: int):
         tokenizer = self.tokenizer
@@ -658,6 +659,7 @@ class GraphCodeBERTripletNet(nn.Module):
                     all_embeds.append(embed)
                 # if step == 5: break # DEBUG
         # print(type(all_embeds[0]), len(all_embeds))
+        print(len(all_embeds))
         return all_embeds
 #     def joint_classify(self, text_snippets: List[str], 
 #                        code_snippets: List[str], **args):
@@ -961,6 +963,6 @@ if __name__ == "__main__":
         triplet_net = GraphCodeBERTripletNet(tok_path=tok_path, **vars(args))
         test_ood_performance(
             triplet_net, model_name="graphcodebert", args=args,
-            query_paths=["query_and_candidates.json", "external_knowledge/queries.json"],
-            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json"], 
+            query_paths=["query_and_candidates.json", "external_knowledge/queries.json", "data/queries_codesearchnet.json"],
+            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json", "data/candidates_codesearchnet.json"], 
         )

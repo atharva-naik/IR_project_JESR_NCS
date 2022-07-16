@@ -1,1 +1,1 @@
-python -m models.GraphCodeBERT -t -tp triples/triples_codesearchnet_fixed_train.json -vp triples/triples_codesearchnet_fixed_val.json -en experiments/GraphCodeBERT_codesearchnet --device_id "cuda:1" -bs 32
+python -m models.GraphCodeBERT -t -tp triples/triples_codesearchnet_fixed_train.json -vp triples/triples_codesearchnet_fixed_val.json -en experiments/GraphCodeBERT_codesearchnet_dyn_neg_sample --device_id "cuda:1" -bs 32 -e 1 -dns

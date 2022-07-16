@@ -20,7 +20,6 @@ fn_names.extend(builtin_fn_names)
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('-p', '--path', type=str, default="candidate_snippets.json",
                     help='path to test data candidates (default: candidate_snippets.json)')
-
 args = parser.parse_args()
 
 # find library function calls.
@@ -65,7 +64,7 @@ class LibFunctionFinder(ast.NodeVisitor):
             return self.get_full_name(value.value, value.attr+"."+attr)
         # for cases like open("file.txt").read(), "".join(), Entry.objects.filter()[:1].get()
         # and (datetime.datetime.now() - datetime.timedelta(days=7)).date()
-        elif isinstance(value, (_ast.Call, _ast.Str, _ast.Subscript, _ast.BinOp)): 
+        elif isinstance(value, (_ast.Call, _ast.Str, _ast.Subscript, _ast.BinOp, _ast.UnaryOp)): 
             return attr
         # base case.
         else: return value.id+"."+attr
@@ -123,6 +122,7 @@ def find_fn_test_subset(snippets):
         total=len(snippets),
     )
     syntax_err_count = 0
+    attr_err_count = 0
     for i, snippet in pbar:
         try:
             tree = ast.parse(bytes(snippet, "utf8"))
@@ -130,10 +130,16 @@ def find_fn_test_subset(snippets):
             pbar.set_description(f"SyntaxError: {e}")
             syntax_err_count += 1
             continue
-        lff.visit(tree)
+        try: lff.visit(tree)
+        except AttributeError as e:
+            attr_err_count += 1
+            # print("—"*20)
+            # print(f"{e} for:", snippet)
+            # print("—"*20)
         has_lib_fn, _ = lff.reset()
         if has_lib_fn: fn_snippet_ids.append(i)
     print(f"syntax error encountered for: {syntax_err_count} ({100*syntax_err_count/len(snippets):.2f}%)")
+    print(f"attribute error encountered for: {attr_err_count} ({100*attr_err_count/len(snippets):.2f}%)")
             
     return fn_snippet_ids
 
