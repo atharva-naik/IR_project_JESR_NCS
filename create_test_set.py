@@ -7,24 +7,20 @@ from datautils import read_jsonl
 
 def get_args():
     parser = argparse.ArgumentParser("script to create candidate and query subset for test sets.")    
-    parser.add_argument("-p", "--path", type=str, 
-                        help="path to JSON/JSONL test file",
-                        default="data/codesearchnet_test.jsonl")
-    parser.add_argument("-n", "--name", type=str, 
-                        help="name of the dataset",
-                        default="codesearchnet")
-    
+    parser.add_argument("-p", "--path", type=str, help="path to JSON/JSONL test file", required=True)
+                        # default="data/codesearchnet_test.jsonl")
+    parser.add_argument("-n", "--name", type=str, help="name of the dataset", required=True)
+                        # default="codesearchnet")
     return parser.parse_args()
 
 def Intent(d: dict):
-    try: return d["intent"]
-    except KeyError:
-        return d["docstring"]
+    if "intent" in d: return d["intent"] # CoNaLa
+    elif "docstring" in d: return ["docstring"] # codesearchet
+    elif "doc" in d: return d["doc"] # webquery
     
 def Snippet(d: dict):
-    try: return d["snippet"]
-    except KeyError:
-        return d["code"]
+    if "snippet" in d: return d["snippet"] # CoNaLa
+    elif "code" in d: return d["code"] # codesearchet, webquery
 
 args = get_args()
 # "data/conala-test.json"

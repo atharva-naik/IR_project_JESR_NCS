@@ -48,7 +48,7 @@ if x is True:
     print('Hi')
 else: 
     print('Bye')
-""", """max(x, abs(i+1))"""]
+""", """[max(LIST[i], abs(i+1)) for i in range(5)]"""]
 def rand_str(k: int=10) -> str:
     """sample random string of length k.
     Args:
@@ -91,7 +91,7 @@ class RuleFilter:
     rule4_metadata:str="Change type of constant `int`/`float` to `str` and vice-versa"
     rule5_metadata:str="Flip boolean constants"
     random_fn_sub:bool=True
-    recursive_sub:bool=False
+    recursive_sub:bool=True
     fn_choose_index:int=0
 
     def RecursiveSub(self):
@@ -102,6 +102,10 @@ class RuleFilter:
         self.random_fn_sub = False
         self.fn_choose_index = fn_choose_index
         return self
+    
+    def smartFnSub(self, fn_choose_index: int=0):
+        self.random_fn_sub = False
+        self.fn_choose_index = fn_choose_index
 
     @classmethod
     def OneHot(cls, index: int):
@@ -260,9 +264,10 @@ class PerturbAst(ast.NodeTransformer):
         self.visit_sequence = []
         super(PerturbAst, self).__init__(*args, **kwargs)
         if rule_filter is None:
-            self.rule_filter = RuleFilter.allowAll()
+            self.rule_filter = RuleFilter.AllowAll()
         else: self.rule_filter = rule_filter
         self.use_rules = {}
+        self.rule1_search_cache = {}
 
     def init(self):
         from sortedcontainers import SortedSet
@@ -409,38 +414,45 @@ class PerturbAst(ast.NodeTransformer):
     def apply_rule1_smart(self, func, verbose=False):
         if isinstance(func, _ast.Name): fn_name = func.id
         elif isinstance(func, _ast.Attribute): fn_name = func.attr
-        scores = []
-        breakups = []
-        for cand_name, cand_list in self.signatures.items():
-            if cand_name == fn_name: 
-                scores.append(0)
-                breakups.append({})
-                continue
-            fn_dict = self.signatures.get(fn_name)[0]
-            if fn_dict is None:
-                score = self.fn_name_sim_score(fn_name, cand_name)
-                breakup = {"name_sim_score": score}
-            else:
-                cand_scores = []
-                for cand_dict in cand_list:
-                    score, breakup = self.fn_def_sim_score(fn_dict, cand_dict)
-                    cand_scores.append(score)
-                score = max(cand_scores)
-            scores.append(score)
-            breakups.append(breakup)
-        
-        rank_list = sorted(
-            [
-                (
-                    name, scores[i],
-                    breakups[i],
-                ) for i, name in enumerate(self.signatures)
-            ], key=lambda x: x[1], reverse=True, 
-        )
-        if verbose:
-            for name, score, breakup in rank_list[:5]:
-                print(f"{name}: {score} {breakup}")
-        new_fn_name = rank_list[self.rule_filter.fn_choose_index][0]
+        if fn_name not in self.rule1_search_cache:
+            scores = []
+            breakups = []
+            for cand_name, cand_list in self.signatures.items():
+                if cand_name == fn_name: 
+                    scores.append(0)
+                    breakups.append({})
+                    continue
+                fn_dicts = self.signatures.get(fn_name)
+                if fn_dicts is None:
+                    score = self.fn_name_sim_score(fn_name, cand_name)
+                    breakup = {"name_sim_score": score}
+                else:
+                    fn_dict = fn_dicts[0]
+                    cand_scores = []
+                    for cand_dict in cand_list:
+                        score, breakup = self.fn_def_sim_score(fn_dict, cand_dict)
+                        cand_scores.append(score)
+                    score = max(cand_scores)
+                scores.append(score)
+                breakups.append(breakup)
+            
+            rank_list = sorted(
+                [
+                    (
+                        name, scores[i],
+                        breakups[i],
+                    ) for i, name in enumerate(self.signatures)
+                ], key=lambda x: x[1], reverse=True, 
+            )
+            if verbose:
+                for name, score, breakup in rank_list[:5]:
+                    print(f"{name}: {score} {breakup}")
+            new_fn_name = rank_list[self.rule_filter.fn_choose_index][0]
+            self.rule1_search_cache[fn_name] = rank_list[:10]
+            # print(f"caching results for: {fn_name}")
+        else: 
+            # print(f"getting cached result for: {fn_name}")
+            new_fn_name = self.rule1_search_cache[fn_name][self.rule_filter.fn_choose_index][0] 
         if isinstance(func, _ast.Name): func.id = new_fn_name 
         elif isinstance(func, _ast.Attribute): func.attr = new_fn_name
 
@@ -464,6 +476,32 @@ class PerturbAst(ast.NodeTransformer):
 
         return list(rules)
 
+    def serialize_tree(self, tree):
+        # convert tree back to code block.
+        content = ""
+        fname = f"{rand_str(16)}.py"
+        with open(fname, "w") as f:
+            Unparser(tree, file=f)
+        with open(fname, "r") as f:
+            content = f.read()
+        os.remove(fname)
+        
+        return content.strip("\n")
+
+    def _generate_i(self, tree, code: str, verbose: bool) -> str:
+        # get the perturbed tree.
+        perturbed_tree: _ast.Module = self.visit(tree)
+        perturbed_code = self.serialize_tree(perturbed_tree)
+        if verbose:
+            print(f"original code: {code}")
+            print(f"`PerturbAst.visit` returned code as `{type(perturbed_tree)}` object")
+            print(f"new code: {perturbed_code}")
+            print(f"visit sequence: {self.visit_sequence}")
+        # reset perturber.
+        self.reset()
+
+        return perturbed_code
+
     def generate(self, code: str, maxm: int=10, verbose: bool=False) -> List[str]:
         candidates: List[str] = []
         tree: _ast.Module = ast.parse(bytes(code, "utf8")) # get parsed AST.
@@ -471,19 +509,17 @@ class PerturbAst(ast.NodeTransformer):
         # NOTE: if no rules applicable, then FAIL SILENTLY
         if valid_rules == []: return [code]
         if verbose: print("applicable rules: ", valid_rules)
+        print(valid_rules)
         for rule in valid_rules:
+            copy_tree = copy.deepcopy(tree)
             self.rule_filter.setOneHotFromName(rule)
-            # get the perturbed tree.
-            perturbed_tree: _ast.Module = self.visit(tree)
-            perturbed_code = serialize_tree(perturbed_tree)
-            if verbose:
-                print(f"original code: {code}")
-                print(f"`PerturbAst.visit` returned code as `{type(perturbed_tree)}` object")
-                print(f"new code: {perturbed_code}")
-                print(f"visit sequence: {self.visit_sequence}")
-            # reset perturber.
-            self.reset()
-            candidates.append(perturbed_code)
+            if rule == "rule1":
+                for i in range(5):
+                    copy_tree = copy.deepcopy(tree)
+                    self.rule_filter.smartFnSub(i)
+                    candidates.append(self._generate_i(copy_tree, code, verbose))
+            else: 
+                candidates.append(self._generate_i(copy_tree, code, verbose))
         
         return candidates
 
@@ -531,14 +567,14 @@ class PerturbAst(ast.NodeTransformer):
         if verbose:
             print(f"original code: {code}")
             print(f"`PerturbAst.visit` returned code as `{type(perturbed_tree)}` object")
-            print(f"new code: {serialize_tree(perturbed_tree)}")
+            print(f"new code: {self.serialize_tree(perturbed_tree)}")
             print(f"visit sequence: {self.visit_sequence}")
         # reset perturber.
         self.reset()
         
         return perturbed_tree, {
             "original_code": code,
-            "perturbed_code": serialize_tree(perturbed_tree),
+            "perturbed_code": self.serialize_tree(perturbed_tree),
             "rule_applied": sampled_rule,
         }
     # NOTE: depreceated for version 3.8, not available for version > 3.9
@@ -574,8 +610,7 @@ class PerturbAst(ast.NodeTransformer):
                     subs_type = random.choice([int,float])
                     n = subs_type(len(node.s))
             node = _ast.Num(
-                n=n,
-                lineno=node.lineno,
+                n=n, lineno=node.lineno,
                 col_offset=node.col_offset
             )
             return super(PerturbAst, self).generic_visit(node)
@@ -598,8 +633,7 @@ class PerturbAst(ast.NodeTransformer):
             self.applied_rules.add("rule1")
             if self.rule_filter.random_fn_sub:
                 self.apply_rule1_rand(node.func)
-            else:
-                self.apply_rule1_smart(node.func)
+            else: self.apply_rule1_smart(node.func)
 
         return super(PerturbAst, self).generic_visit(node)
 
@@ -677,6 +711,35 @@ def perturb_test(code: str, rule_index: int=1) -> None:
     _, op = data_gen(code, rule_probs=rule_probs, verbose=False)
     print(f"\x1b[1mperturbed code: \x1b[0m {op['perturbed_code']}")
 
+def perturb_test2(code: str) -> None:
+    data_gen = PerturbAst()
+    data_gen.init()
+    candidates = data_gen.generate(code)
+    print(f"\x1b[34;1moriginal code: \x1b[0m {code}")
+    print(f"\x1b[34;1mperturbed candidates: \x1b[0m")
+    for cand in candidates:
+        print(cand)
+
+def perturb_test3(codes: List[str]) -> None:
+    import time
+    data_gen = PerturbAst()
+    data_gen.init()
+    s1 = time.time()
+    batch_candidates = data_gen.batch_generate(codes)
+    s2 = time.time()
+    cand_ctr = 0
+    num_cands = []
+    for code, candidates in zip(codes, batch_candidates): 
+        cand_ctr += len(candidates)
+        num_cands.append(len(candidates))
+        print(f"\x1b[34;1moriginal code: \x1b[0m {code}")
+        print(f"\x1b[34;1mperturbed candidates: \x1b[0m")
+        for cand in candidates:
+            print(cand)
+    print(num_cands)
+    print(f"{(cand_ctr/len(codes)):.3f} perturbed AST candidates per code on avg.")
+    print(f"took {(s2-s1):.3f}s !")
+
 if __name__ == "__main__":
     # print(json.dumps(
     #     perturb_codes(
@@ -684,38 +747,6 @@ if __name__ == "__main__":
     #         verbose=False,
     #     ), indent=4,
     # ))
-    perturb_test(CODES[-1], 1)
-"""
-**main models:**
-CodeBERT: CoNaLa, PyDocs, CodeSearchNet
-GraphCodeBERT: CoNaLa, PyDocs, CodeSearchNet
-UniXcoder: CoNaLa, PyDocs
-
-**baselines:**
-n-BOW, CNN, LSTM, Code2Vec, Code2Seq 
-
-**ablations:** no augmentations, dynamic sampling, neg e.g. generation and dynamic sampling.
-(2*3+2)+2*(3*1) = 14
-
-**Related work:**
-
-Pretrained CodeBERT , GraphCodeBERT on CodeSearchNet
-use predictions on test set of rank of the correct candidate.
-pick examples with lowest rank (both models do poorly)
-~400 examples
-
-# noisy supervision
-# weighted supervised e.g. (x, y, w)
-
-# Hypothesis
-# Observations and corresponding Tables:
-1. CoNaLa is harder than CodeSearchNet.
-2. L2 distance is better.
-3. Dynamic negative sampling works better for UniXcoder than GraphCodeBERT
-
-#change forward: (get state from decoder)
-#add loss: value_function*(neg_reward+value_function)
-#check how to handle multiple loss functions with optimizer_idx/multiple optimizers.
-#wandb syncing
-#wandb sync /offline/run/path
-"""
+    # perturb_test(CODES[-1], 1)
+    # perturb_test2(CODES[-1])
+    perturb_test3(CODES)
