@@ -1,5 +1,7 @@
 numpy
 torch
 pandas
+fuzzywuzzy
 tree-sitter
 transformers
+sortedcontainers

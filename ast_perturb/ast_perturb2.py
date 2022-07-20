@@ -509,17 +509,21 @@ class PerturbAst(ast.NodeTransformer):
         # NOTE: if no rules applicable, then FAIL SILENTLY
         if valid_rules == []: return [code]
         if verbose: print("applicable rules: ", valid_rules)
-        print(valid_rules)
+        ctr = 0
         for rule in valid_rules:
             copy_tree = copy.deepcopy(tree)
             self.rule_filter.setOneHotFromName(rule)
             if rule == "rule1":
-                for i in range(5):
+                for i in range(10):
                     copy_tree = copy.deepcopy(tree)
                     self.rule_filter.smartFnSub(i)
+                    ctr += 1
                     candidates.append(self._generate_i(copy_tree, code, verbose))
-            else: 
+                    if ctr >= maxm: break
+            else:
+                ctr += 1
                 candidates.append(self._generate_i(copy_tree, code, verbose))
+                if ctr >= maxm: break
         
         return candidates
 
@@ -545,16 +549,16 @@ class PerturbAst(ast.NodeTransformer):
             "rule_applied": None,
         }
         
-        print("applicable rules: ", rules)
+        # print("applicable rules: ", rules)
         rules_mask: List[int]= self.rule_filter.getMaskFromNames(rules)
-        print("rules mask: ", rules_mask)
+        # print("rules mask: ", rules_mask)
         # pick a random rule.
         N: int = len(self.rule_filter)
         if rule_probs is None:
             rule_probs = np.ones(N)
         rule_probs = np.array(rule_probs)*rules_mask
         rule_probs /= rule_probs.sum()
-        print("rule probs: ", rule_probs)
+        # print("rule probs: ", rule_probs)
         sampled_rule = np.random.choice(
             [f"rule{i+1}" for i in range(N)], 
             1, p=rule_probs
