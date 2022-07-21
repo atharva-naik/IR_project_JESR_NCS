@@ -1,1 +1,1 @@
-python -m models.GraphCodeBERT -too -en experiments/GraphCodeBERT_codesearchnet_dyn_neg_sample -d "cuda:0" -bs 48
+python -m models.GraphCodeBERT -too -en experiments/GraphCodeBERT_100k -d "cuda:1" -bs 48

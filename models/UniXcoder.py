@@ -491,7 +491,7 @@ if __name__ == "__main__":
         triplet_net = UniXcoderTripletNet(**vars(args))
         test_ood_performance(
             triplet_net, model_name="unixcoder", args=args,
-            query_paths=["query_and_candidates.json", "external_knowledge/queries.json"],
-            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json"], 
+            query_paths=["query_and_candidates.json", "external_knowledge/queries.json", "data/queries_webquery.json"],
+            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json", "data/candidates_webquery.json"], 
         )
     # setting in ['code', 'annot', 'code+annot']
