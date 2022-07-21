@@ -8,7 +8,6 @@ dependencies:
   - ca-certificates=2022.4.26=h06a4308_0
   - certifi=2020.12.5=py37h06a4308_0
   - cudatoolkit=10.0.130=0
-  - faiss-gpu=1.6.3=py37h1a5d453_0
   - intel-openmp=2021.4.0=h06a4308_3561
   - ld_impl_linux-64=2.33.1=h53a641e_7
   - libffi=3.3=he6710b0_2
@@ -65,7 +64,6 @@ dependencies:
     - dill==0.3.4
     - docker-pycreds==0.4.0
     - emoji==1.7.0
-    - en-core-web-sm==3.1.0
     - entrypoints==0.3
     - et-xmlfile==1.1.0
     - filelock==3.3.2
@@ -217,4 +215,4 @@ dependencies:
     - xxhash==2.0.2
     - yarl==1.7.2
     - zipp==3.6.0
-prefix: /home/bt1/18CS10067/anaconda3/envs/py3.7
+prefix: /home/bt2/18CS10067/miniconda3/envs/py3.7

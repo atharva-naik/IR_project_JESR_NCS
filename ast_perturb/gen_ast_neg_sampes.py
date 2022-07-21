@@ -4,20 +4,18 @@
 # Author: Atharva Naik
 import os
 import json
-import torch
 import random
 import argparse
 import numpy as np
-import transformers
 from typing import *
 from tqdm import tqdm
 from ast_perturb2 import PerturbAst
 # set logging level of transformers.
-transformers.logging.set_verbosity_error()
+# transformers.logging.set_verbosity_error()
 # seed
 random.seed(0)
 np.random.seed(0)
-torch.manual_seed(0)
+# torch.manual_seed(0)
 # dataset options.
 DATASETS = ["CoNaLa", "PyDocs"]
 DATASETS_TRAIN_MAP = {
@@ -27,8 +25,10 @@ DATASETS_TRAIN_MAP = {
 # get arguments
 def get_args():
     parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the CodeBERT in Late Fusion configuration for Neural Code Search.")
-    parser.add_argument("-td", "--target_dataset", type=str, default="CoNaLa", 
+    parser.add_argument("-d", "--dataset", type=str, default="CoNaLa", 
                         help=f"dataset to work with from: {DATASETS}")
+    parser.add_argument("-ns", "--num_splits", type=int, default=4)
+    parser.add_argument("-si", "--split_index", type=int, required=True)
 #     parser.add_argument("-topk", "--topk", default=10, type=int,
 #                         help="no. of similar intents to be paired with each intent")
 #     parser.add_argument("-bs", "--batch_size", type=int, default=64, help="batch size")
@@ -86,15 +86,21 @@ def round_list(l: list, k: int=3) -> list:
 # main function
 if __name__ == "__main__":
     args = get_args()
-    assert args.target_dataset in DATASETS
+    assert args.dataset in DATASETS
     # load all the NL-PL data.
-    path = DATASETS_TRAIN_MAP[args.target_dataset]
+    path = DATASETS_TRAIN_MAP[args.dataset]
     snippets = get_snippets(path)
     # create AST perturber to generate negative samples.
     perturber = PerturbAst()
     perturber.init()
     # create a map of snippet to AST perturbed negative samples per snippet.
     snippet_ast_neg_map: Dict[str, List[str]] = {}
+    # index the split.
+    split_size = len(snippets) // args.num_splits
+    print(f"num_splits: {args.num_splits}")
+    print(f"split_index: {args.split_index}")
+    print(f"snippets = snippets[{args.split_index*split_size} : {(args.split_index+1)*split_size}]")
+    snippets = snippets[args.split_index*split_size : (args.split_index+1)*split_size]
     # generate perturbed AST samples for code snippets.
     pbar = tqdm(snippets, disable=not(args.use_tqdm))
     i = 0
@@ -102,7 +108,7 @@ if __name__ == "__main__":
     for code in pbar:
         i += 1
         try: candidates = perturber.generate(code)
-        except AttributeError as e:
+        except Exception as e:
             print(e); candidates = []
         tot += len(candidates)
         pbar.set_description(f"avg AST neg samples: {(tot/i):.3f}")
@@ -112,7 +118,7 @@ if __name__ == "__main__":
     print(f"code snippets: {len(snippets)}")
     print(f"code snippets: {avg_neg_samples}")
     # serialize and save the snippet AST negative samples map.
-    path = f"{args.target_dataset}_AST_neg_samples.json"
+    path = f"{args.dataset}_AST_neg_samples_{args.num_splits}_{args.split_index+1}.json"
     with open(path, "w") as f:
         json.dump(snippet_ast_neg_map, f)
         

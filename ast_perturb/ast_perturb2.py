@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import time
 import numpy as np
 from typing import *
 import random, pprint
+from threading import Thread
 from dataclasses import dataclass
 from ast_unparse37 import Unparser
 import os, ast, _ast, copy, json, string
 
+# global variable (dict) to collect AST key value pairs of candidates for a given code in the multi-threaded setting.
+AST_NEG_SAMPLES_DB = {}
 # show details of an object.
 def details(varname: str, obj: object):
     """details of a particular variable given the variable name and object/reference corresponding to it.
@@ -508,6 +512,9 @@ class PerturbAst(ast.NodeTransformer):
         valid_rules: List[str] = self.applicable_rules(tree) # find list of applicable rules.
         # NOTE: if no rules applicable, then FAIL SILENTLY
         if valid_rules == []: return [code]
+        # give less preference to rule1 as it can lead to the most number of candidates.
+        # this is done to prevent bias towards the rule1.
+        valid_rules = sorted(valid_rules, reverse=True)
         if verbose: print("applicable rules: ", valid_rules)
         ctr = 0
         for rule in valid_rules:
@@ -515,16 +522,24 @@ class PerturbAst(ast.NodeTransformer):
             self.rule_filter.setOneHotFromName(rule)
             if rule == "rule1":
                 for i in range(10):
+                    ctr += 1
+                    if ctr > maxm: break
                     copy_tree = copy.deepcopy(tree)
                     self.rule_filter.smartFnSub(i)
-                    ctr += 1
+                    
                     candidates.append(self._generate_i(copy_tree, code, verbose))
-                    if ctr >= maxm: break
-            else:
+            else: 
                 ctr += 1
+                if ctr > maxm: break
                 candidates.append(self._generate_i(copy_tree, code, verbose))
-                if ctr >= maxm: break
-        
+        # store in global variable (for multi-threaded setting.)
+        AST_NEG_SAMPLES_DB[code] = candidates 
+        # print("###############")
+        # print(f"\x1b[33m{code}\x1b[0m")
+        # print("———————————————")
+        # for i, cand in enumerate(candidates):
+        #     print(f"{i+1}. \x1b[34m{cand}\x1b[0m")
+        # print("###############")
         return candidates
 
     def batch_generate(self, codes: List[str], **args):
@@ -724,8 +739,7 @@ def perturb_test2(code: str) -> None:
     for cand in candidates:
         print(cand)
 
-def perturb_test3(codes: List[str]) -> None:
-    import time
+def perturb_test3(codes: List[str], verbose: bool=False) -> Dict[str, List[str]]:
     data_gen = PerturbAst()
     data_gen.init()
     s1 = time.time()
@@ -733,16 +747,49 @@ def perturb_test3(codes: List[str]) -> None:
     s2 = time.time()
     cand_ctr = 0
     num_cands = []
+    ast_neg_map = {}
     for code, candidates in zip(codes, batch_candidates): 
         cand_ctr += len(candidates)
         num_cands.append(len(candidates))
-        print(f"\x1b[34;1moriginal code: \x1b[0m {code}")
-        print(f"\x1b[34;1mperturbed candidates: \x1b[0m")
-        for cand in candidates:
-            print(cand)
-    print(num_cands)
+        if verbose:
+            print(f"\x1b[34;1moriginal code: \x1b[0m {code}")
+            print(f"\x1b[34;1mperturbed candidates: \x1b[0m")
+            for cand in candidates:
+                print(cand)
+        ast_neg_map[code] = candidates
+    # print(num_cands)
     print(f"{(cand_ctr/len(codes)):.3f} perturbed AST candidates per code on avg.")
     print(f"took {(s2-s1):.3f}s !")
+
+    return ast_neg_map
+
+def perturb_multi_threaded(codes: List[str], num_workers: int=4) -> Dict[str, List[str]]:
+    perturbers: List[PerturbAst] = []
+    steps: int = 1 + len(codes) // num_workers
+    for i in range(num_workers):
+        perturber = PerturbAst()
+        perturber.init()
+        perturbers.append(perturber)
+    # clear AST negative samples.
+    global AST_NEG_SAMPLES_DB
+    AST_NEG_SAMPLES_DB = {}
+
+    s1 = time.time()
+    for i in range(steps):
+        threads = []
+        for j in range(num_workers):
+            if num_workers*i+j == len(codes): break
+            thread = Thread(
+                target=perturbers[i].generate, 
+                args=(codes[num_workers*i+j],),
+            )
+            threads.append(thread)
+        for j in range(len(threads)): threads[j].start()
+        for j in range(len(threads)): threads[j].join()
+    print(f"took {(time.time()-s1):.3f}s !")
+    print(f"{(sum(len(v) for v in AST_NEG_SAMPLES_DB.values())/len(AST_NEG_SAMPLES_DB)):.3f} perturbed AST candidates per code on avg.")
+
+    return AST_NEG_SAMPLES_DB
 
 if __name__ == "__main__":
     # print(json.dumps(
@@ -753,4 +800,8 @@ if __name__ == "__main__":
     # ))
     # perturb_test(CODES[-1], 1)
     # perturb_test2(CODES[-1])
-    perturb_test3(CODES)
+    print("\x1b[32;1m******************* correct AST *******************\x1b[0m")
+    correct_ans = perturb_test3(CODES)
+    print("\x1b[31;1m******************* multi-threaded AST *******************\x1b[0m")
+    to_check = perturb_multi_threaded(CODES)
+    print(f"multi-threaded output is correct?: {correct_ans == to_check}")
