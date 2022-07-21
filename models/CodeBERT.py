@@ -1096,6 +1096,8 @@ if __name__ == "__main__":
         triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
         test_ood_performance(
             triplet_net, model_name="codebert", args=args,
-            query_paths=["query_and_candidates.json", "external_knowledge/queries.json", "data/queries_codesearchnet.json"],
-            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json", "data/candidates_codesearchnet.json"], 
+            query_paths=["query_and_candidates.json", "external_knowledge/queries.json", 
+                         "data/queries_webquery.json", "data/queries_codesearchnet.json"],
+            cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json",
+                        "data/candidates_webquery.json", "data/candidates_codesearchnet.json"], 
         )
