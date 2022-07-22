@@ -110,10 +110,6 @@ class DynamicTriplesDataset(Dataset):
         sim_intents: List[str] = self.sim_intents_map[NL]
         codes_for_sim_intents: List[str] = []
         for intent, _ in sim_intents:
-            print(intent)
-            # print(codes_for_sim_intents)
-            # print(type(self.intent_to_code))
-            # print(self.intent_to_code[intent])
             codes_for_sim_intents += self.intent_to_code[intent]
         if use_AST:
             codes_for_sim_intents += self.perturbed_codes[PL] # codes from AST.
