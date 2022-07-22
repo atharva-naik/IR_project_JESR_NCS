@@ -46,8 +46,13 @@ def get_args():
     parser.add_argument("-e", "--epochs", type=int, default=5, help="no. of epochs")
     parser.add_argument("-dns", "--dynamic_negative_sampling", action="store_true", 
                         help="do dynamic negative sampling at batch level")
-    parser.add_argument("-idns", "--intent_level_dynamic_negative_sampling", 
-                        action="store_true", help="dynamic sampling based on similar intents")
+    parser.add_argument("-sip", "--sim_intents_path", type=str, default=None, 
+                        help="path to dictionary containing similar intents corresponding to a given intent")
+    parser.add_argument("-pcp", "--perturbed_codes_path", type=str, default=None, 
+                        help="path to dictionary containing AST perturbed codes corresponding to a given code")
+    parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
+    parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
+                        help="dynamic sampling based on similar intents")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="UniXcoder_rel_thresh/model.pt")
     return parser.parse_args()
 
@@ -232,6 +237,11 @@ class UniXcoderTripletNet(nn.Module):
         batch_size = args.get("batch_size", 32)
         epochs = args.get("epochs", 5)
         
+        use_AST = args.get("use_AST", False)
+        sim_intents_path = args.get("sim_intents_path")
+        perturbed_codes_path = args.get("perturbed_codes_path")
+        intent_level_dynamic_sampling = args.get("intent_level_dynamic_sampling", False)
+        
         device = device_id if torch.cuda.is_available() else "cpu"
         save_path = os.path.join(exp_name, "model.pt")
         # create experiment folder.
@@ -251,14 +261,39 @@ class UniXcoderTripletNet(nn.Module):
         print(f"model will be saved at {save_path}")
         print(f"moving model to {device}")
         self.embed_model.to(device)
-        trainset = TriplesDataset(train_path, model=self.embed_model, 
-                                  max_length=100, padding=True)
-        valset = TriplesDataset(val_path, model=self.embed_model, 
-                                max_length=100, padding=True)
-        trainloader = DataLoader(trainset, shuffle=True, 
-                                 batch_size=batch_size)
-        valloader = DataLoader(valset, shuffle=False,
-                               batch_size=batch_size)
+        if intent_level_dynamic_sampling:
+            from datautils import DynamicTriplesDataset
+            
+            assert sim_intents_path is not None, "Missing path to dictionary containing similar intents corresponding to an intent"
+            sim_intents_map = json.load(open(sim_intents_path))
+            perturbed_codes = {}
+            if use_AST:
+                assert perturbed_codes_path is not None, "Missing path to dictionary containing perturbed codes corresponding to a given code snippet"
+                perturbed_codes = json.load(open(perturbed_codes_path))
+            # creat the data loaders.
+            trainset = DynamicTriplesDataset(
+                train_path, "unixcoder",
+                sim_intents_map=sim_intents_map,
+                perturbed_codes=perturbed_codes,
+                use_AST=use_AST, model=self, 
+                device=device_id,
+                max_length=100, padding=True,
+            )
+            valset = DynamicTriplesDataset(
+                val_path, "unixcoder",
+                sim_intents_map=sim_intents_map,
+                perturbed_codes=perturbed_codes,
+                use_AST=use_AST, model=self, 
+                device=device_id,
+                max_length=100, padding=True,
+            )
+        else:
+            trainset = TriplesDataset(train_path, model=self.embed_model, 
+                                      max_length=100, padding=True)
+            valset = TriplesDataset(val_path, model=self.embed_model, 
+                                    max_length=100, padding=True)
+        trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size)
+        valloader = DataLoader(valset, shuffle=False, batch_size=batch_size)
         train_metrics = {
             "epochs": [],
             "summary": [],
@@ -272,12 +307,14 @@ class UniXcoderTripletNet(nn.Module):
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             train_acc.reset()
             for step, batch in pbar:
+                # if intent_level_dynamic_sampling:  
                 if args.get("dynamic_negative_sampling", False):
                     batch = dynamic_negative_sampling(
                         self.embed_model, batch, 
                         model_name="unixcoder", 
                         device=device, k=1
                     )
+                self.train()
                 anchor_title = batch[0].to(device)
                 pos_snippet = batch[1].to(device)
                 neg_snippet = batch[2].to(device)
@@ -315,9 +352,12 @@ def main(args):
     print("commencing training")
     
     metrics = triplet_net.fit(exp_name=args.exp_name, epochs=args.epochs,
+                              perturbed_codes_path=args.perturbed_codes_path,
                               device_id=args.device_id, val_path=args.val_path, 
                               train_path=args.train_path, batch_size=args.batch_size,
-                              dynamic_negative_sampling=args.dynamic_negative_sampling)
+                              dynamic_negative_sampling=args.dynamic_negative_sampling,
+                              sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
+                              intent_level_dynamic_sampling=args.intent_level_dynamic_sampling)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")

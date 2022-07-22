@@ -1,1 +1,1 @@
-python -m models.UniXcoder -t -tp triples/triples_100k_train.json -vp triples/triples_100k_val.json -en UniXcoder_dyn_neg_sample_100k -d "cuda:1" -bs 48 -dns -e 3
+python -m models.UniXcoder -t -tp data/conala-mined-100k_train.json -vp data/conala-mined-100k_val.json -en UniXcoder_intent_dyn_neg_sample_100k -d "cuda:1" -bs 48 -idns -e 3 -sip "CoNaLa_top10_sim_intents.json"

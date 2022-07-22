@@ -4,21 +4,23 @@
 
 # code for creating Dataset instance for the dataloader.
 import os
+import torch
 from typing import *
 from tqdm import tqdm
 from datautils.utils import *
 from torch.utils.data import Dataset
+from transformers import RobertaTokenizer
 
 # list of available models. 
 MODEL_OPTIONS = ["codebert", "graphcodebert", "unixcoder"]
 # NL-PL pairs dataset class.
-class TextCodePairDNSDataset(Dataset):
+class DynamicTriplesDataset(Dataset):
     def __init__(self, path: str, model_name: str, 
                  sim_intents_map: Dict[str, List[str]]={}, 
                  perturbed_codes: Dict[str, List[str]]={},
-                 model=None, tokenizer=None,
+                 model=None, tokenizer=None, device="cuda:0",
                  use_AST: bool=False, **tok_args):
-        super(TextCodePairDataset, self).__init__()
+        super(DynamicTriplesDataset, self).__init__()
         assert model_name in MODEL_OPTIONS
         self.model_name = model_name
         self.model = model # pointer to model instance to find closest NL & PL examples
@@ -26,6 +28,7 @@ class TextCodePairDNSDataset(Dataset):
         self.perturbed_codes = perturbed_codes
         self.tok_args = tok_args
         self.use_AST = use_AST
+        self.device = device
         # if filename endswith jsonl:
         if path.endswith(".jsonl"):
             self.data = read_jsonl(path) # NL-PL pairs.
@@ -38,8 +41,8 @@ class TextCodePairDNSDataset(Dataset):
         for rec in self.data:
             intent = rec["intent"]
             snippet = rec["snippet"]
-            try: self.index_to_code[intent].append(snippet)
-            except KeyError: self.index_to_code[intent] = [snippet]
+            try: self.intent_to_code[intent].append(snippet)
+            except KeyError: self.intent_to_code[intent] = [snippet]
         # parser is needed for GraphCodeBERT to get the dataflow.
         if model_name == "graphcodebert":
             from datautils.parser import DFG_python
@@ -106,19 +109,23 @@ class TextCodePairDNSDataset(Dataset):
     def _retrieve_best_triplet(self, NL: str, PL: str, use_AST: bool, batch_size: int=48):
         sim_intents: List[str] = self.sim_intents_map[NL]
         codes_for_sim_intents: List[str] = []
-        for intent in sim_intents:
+        for intent, _ in sim_intents:
+            print(intent)
+            # print(codes_for_sim_intents)
+            # print(type(self.intent_to_code))
+            # print(self.intent_to_code[intent])
             codes_for_sim_intents += self.intent_to_code[intent]
         if use_AST:
             codes_for_sim_intents += self.perturbed_codes[PL] # codes from AST.
-        model.eval()
+        self.model.eval()
         with torch.no_grad():
-            enc_text = model.encode([NL], mode="text", 
-                                    batch_size=batch_size,
-                                    device_id=model.device) # 1 x hidden_size
-            enc_codes = model.encode(
+            enc_text = torch.stack(self.model.encode_emb([NL], mode="text", 
+                                                         batch_size=batch_size,
+                                                         device_id=self.device)) # 1 x hidden_size
+            enc_codes = torch.stack(self.model.encode_emb(
                 codes_for_sim_intents, mode="code", 
-                device_id=model.device, batch_size=batch_size
-            ) # num_cands x hidden_size
+                device_id=self.device, batch_size=batch_size
+            )) # num_cands x hidden_size
             scores = enc_text @ enc_codes.T # 1 x num_cands
         i: int = torch.topk(scores, k=1).indices[0]
     
@@ -153,12 +160,11 @@ class TextCodePairDNSDataset(Dataset):
             neg["input_ids"][0], neg["attention_mask"][0],
         ]
         
-    def _unixcoder_getitem(self, i: int):
-        if self.model_ptr:
+    def _unixcoder_getitem(self, anchor: str, pos: str, neg: str):
         # special tokens are added by default.
-        anchor = self.model.tokenize([anchor], **self.tok_args)[0]
-        pos = self.model.tokenize([pos], **self.tok_args)[0]
-        neg = self.model.tokenize([neg], **self.tok_args)[0]
+        anchor = self.model.embed_model.tokenize([anchor], **self.tok_args)[0]
+        pos = self.model.embed_model.tokenize([pos], **self.tok_args)[0]
+        neg = self.model.embed_model.tokenize([neg], **self.tok_args)[0]
         # print(anchor)
         return [torch.tensor(anchor), 
                 torch.tensor(pos), 

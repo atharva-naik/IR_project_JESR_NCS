@@ -21,8 +21,8 @@ torch.manual_seed(0)
 # dataset options.
 DATASETS = ["CoNaLa", "PyDocs"]#, "CodeSearchNet"]
 DATASETS_TRAIN_MAP = {
-    "CoNaLa": "data/conala-mined.jsonl",
-    "PyDocs": "external_knowledge/PyDocs_nl_pl_pairs.json",
+    "CoNaLa": "data/conala-mined-100k_train.json",
+    "PyDocs": "external_knowledge/PyDocs_nl_pl_pairs_train.json",
     # "CodeSearchNet": "data/codesearchnet.json",
 }
 # get arguments
@@ -107,4 +107,4 @@ if __name__ == "__main__":
     save_path = f"{args.target_dataset}_top{args.topk}_sim_intents.json"
     with open(save_path, "w") as f:
         json.dump(sim_intents, f)
-        
+# scripts/find_sim_intents.py -d "cuda:1" -bs 64 -tqdm -td CoNaLa

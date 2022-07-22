@@ -151,6 +151,7 @@ def dynamic_negative_sampling(model, batch: list, model_name: str="codebert", de
         for i in range(2):
             new_batch.append(batch[i].repeat(k,1))
     # don't modify model params.
+    model.eval()
     with torch.no_grad():
         if model_name == "codebert":
             # batch_size x seq_len
@@ -187,5 +188,6 @@ def dynamic_negative_sampling(model, batch: list, model_name: str="codebert", de
             new_batch[5] = batch[5].reshape(k*batch_size, seq_len)
         elif model_name == "unixcoder":
             new_batch.append(batch[2].reshape(k*batch_size, seq_len))
+    model.train()
         
     return new_batch
