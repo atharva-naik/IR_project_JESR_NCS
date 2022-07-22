@@ -46,6 +46,8 @@ def get_args():
     parser.add_argument("-e", "--epochs", type=int, default=5, help="no. of epochs")
     parser.add_argument("-dns", "--dynamic_negative_sampling", action="store_true", 
                         help="do dynamic negative sampling at batch level")
+    parser.add_argument("-idns", "--intent_level_dynamic_negative_sampling", 
+                        action="store_true", help="dynamic sampling based on similar intents")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="UniXcoder_rel_thresh/model.pt")
     return parser.parse_args()
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import os
 import json
 import pprint
@@ -7,7 +9,8 @@ import matplotlib.pyplot as plt
 
 # from matplotlib documentation:
 def heatmap(data, row_labels, col_labels, ax=None,
-            cbar_kw={}, cbarlabel="", **kwargs):
+            add_colorbar: bool=False, cbar_kw={}, 
+            cbarlabel="", **kwargs):
     """
     Create a heatmap from a numpy array and two lists of labels.
 
@@ -29,31 +32,25 @@ def heatmap(data, row_labels, col_labels, ax=None,
     **kwargs
         All other arguments are forwarded to `imshow`.
     """
-
-    if not ax:
-        ax = plt.gca()
-
+    if not ax: ax = plt.gca()
     # Plot the heatmap
     im = ax.imshow(data, **kwargs)
-
     # Create colorbar
-    cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw)
-    cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
-
+    cbar = None
+    if add_colorbar:
+        cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw)
+        cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
     # Show all ticks and label them with the respective list entries.
     ax.set_xticks(np.arange(data.shape[1]))
     ax.set_yticks(np.arange(data.shape[0]))
     ax.set_xticklabels(col_labels)
     ax.set_yticklabels(row_labels)
-
     # Let the horizontal axes labeling appear on top.
     ax.tick_params(top=True, bottom=False,
                    labeltop=True, labelbottom=False)
-
     # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=-30, ha="right",
-             rotation_mode="anchor")
-
+    plt.setp(ax.get_xticklabels(), rotation=-30, 
+             ha="right", rotation_mode="anchor")
     # Turn spines off and create white grid.
     ax.spines[:].set_visible(False)
 
@@ -95,23 +92,19 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 
     if not isinstance(data, (list, np.ndarray)):
         data = im.get_array()
-
     # Normalize the threshold to the images color range.
     if threshold is not None:
         threshold = im.norm(threshold)
     else:
         threshold = im.norm(data.max())/2.
-
     # Set default alignment to center, but allow it to be
     # overwritten by textkw.
     kw = dict(horizontalalignment="center",
               verticalalignment="center")
     kw.update(textkw)
-
     # Get the formatter in case a string is supplied
     if isinstance(valfmt, str):
         valfmt = matplotlib.ticker.StrMethodFormatter(valfmt)
-
     # Loop over the data and create a `Text` for each "pixel".
     # Change the text's color depending on the data.
     texts = []
@@ -126,36 +119,49 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 DATASET_NAMES = ["CoNaLa", "PyDocs"]
 MODELS = ["UniXcoder", "CodeBERT", "GraphCodeBERT"]
 exp_paths = {model: [] for model in MODELS}
+EXP_NAMES = ["CNL (train)", "CNL (train) DNS", "PD (train)"]
 for model in MODELS:
-    for dataset_name, split in zip(DATASET_NAMES, ["", "_external_knowledge"]):
+    for dataset_name, split in zip(["CoNaLa", "CoNaLa", "PyDocs"], ["_100k", "_dyn_neg_sample_100k", "_external_knowledge"]):
         exp_path = os.path.join("experiments", model+split)
         exp_paths[model].append((dataset_name, exp_path))
+# print(exp_paths)
 # metric names.
 METRICS = ["mrr", "ndcg", "recall@5", "recall@10"]
+TESTSET_NAMES = ["CoNaLa", "PyDocs", "Web Query", "CodeSearchNet"]
+R = len(EXP_NAMES)
+C = len(TESTSET_NAMES)
 model_metric_grids = {
-    "CodeBERT": {name: np.zeros((2,2)).tolist() for name in METRICS},
-    "UniXcoder": {name: np.zeros((2,2)).tolist() for name in METRICS},
-    "GraphCodeBERT": {name: np.zeros((2,2)).tolist() for name in METRICS},
+    "CodeBERT": {name: np.zeros((R,C)).tolist() for name in METRICS},
+    "UniXcoder": {name: np.zeros((R,C-1)).tolist() for name in METRICS},
+    "GraphCodeBERT": {name: np.zeros((R,C)).tolist() for name in METRICS},
 }
-print(exp_paths)
 for model, paths in exp_paths.items():
-    for dataset_name, exp_folder in paths:
-        ood_path = os.path.join(exp_folder, 
-                   "ood_test_metrics_l2_code.json")
+    print(paths)
+    i = 0
+    for train_dataset_name, exp_folder in paths:
+        ood_path = os.path.join(exp_folder, "ood_test_metrics_l2_code.json")
         if not os.path.exists(ood_path): continue
         ood_data = json.load(open(ood_path))
-        for i, dataset in enumerate(DATASET_NAMES):
-            datakey = {
+        for j, test_dataset in enumerate(TESTSET_NAMES):
+            if model == "UniXcoder" and test_dataset == "CodeSearchNet": continue
+            test_datakey = {
                 "CoNaLa": "CoNaLa", 
-                "PyDocs": "External Knowledge"
-            }[dataset]
-            j = DATASET_NAMES.index(dataset_name)
-            model_metric_grids[model]["mrr"][i][j] = ood_data[datakey]["mrr"]
-            model_metric_grids[model]["ndcg"][i][j] = ood_data[datakey]["ndcg"]
-            model_metric_grids[model]["recall@5"][i][j] = ood_data[datakey]["recall"]["@5"]
-            model_metric_grids[model]["recall@10"][i][j] = ood_data[datakey]["recall"]["@10"]
-
+                "Web Query": "Web Query",
+                "PyDocs": "External Knowledge",
+                "CodeSearchNet": "CodeSearchNet",
+            }[test_dataset]
+            model_metric_grids[model]["mrr"][i][j] = ood_data[test_datakey]["mrr"]
+            model_metric_grids[model]["ndcg"][i][j] = ood_data[test_datakey]["ndcg"]
+            model_metric_grids[model]["recall@5"][i][j] = ood_data[test_datakey]["recall"]["@5"]
+            model_metric_grids[model]["recall@10"][i][j] = ood_data[test_datakey]["recall"]["@10"]
+        i += 1
 pprint.pprint(model_metric_grids)
+abbreviation = {
+    "CoNaLa": "CNL",
+    "PyDocs": "PD",
+    "Web Query": "WQ",
+    "CodeSearchNet": "CSN",
+}
 for model in model_metric_grids:
     # clear previous plots.
     plt.clf()
@@ -168,12 +174,14 @@ for model in model_metric_grids:
     for k, name in enumerate(model_metric_grids[model]):
         j = k % 2
         i = k // 2
-        row_names = [f"{dataset}\n(train)" for dataset in DATASET_NAMES]
-        col_names = [f"{dataset}\n(test)" for dataset in DATASET_NAMES]
-        data = 100*np.array(model_metric_grids[model][name]).T
+        row_names = EXP_NAMES
+        if model == "UniXcoder":
+            col_names = [f"{abbreviation[dataset]} (test)" for dataset in TESTSET_NAMES[:-1]]
+        else: col_names = [f"{abbreviation[dataset]} (test)" for dataset in TESTSET_NAMES]
+        data = 100*np.array(model_metric_grids[model][name])
         im, cbar = heatmap(data, row_names, col_names, 
                            ax=axs[i, j], cmap="YlGn")
-        texts = annotate_heatmap(im, valfmt="{x:.2f}")
+        texts = annotate_heatmap(im, valfmt="{x:.2f}", fontsize=10)
         axs[i, j].set_title(name)
     fig.tight_layout()
     fig.suptitle(f'{model} OOD Generalization Metrics\n', x=0.5, y=1)

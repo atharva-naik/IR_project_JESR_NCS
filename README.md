@@ -14,6 +14,19 @@ Use the requirements.txt: ```pip install -r requirements.txt```
 If you face issues with requirements.txt then please try using our conda environment (py3.7.yml) <br>
 To install from a yml file: ```conda env create -f py3.7.yml```
 
+<!-- **Results**
+| MRR | NDCG | recall@5 | recall@10 |
+-------------------------------------
+|   58| 68.13|     66.62|      77.52|
+|60.95| 70.51|     69.88|      79.43|
+|49.64| 60.15|     54.17|      61.07|
+|50.65| 61.19|     61.58|      72.62|
+|52.97| 63.88|     62.34|      73.79|
+|52.42| 62.94|     58.82|      67.18|
+| 63.8| 73.37|     72.92|      83.33|
+| 64.2| 73.68|     74.66|      83.39|
+|49.22| 60.42|     54.83|      63.42| -->
+
 <!-- ## Triplet Generation Process
 **triplet contrastive pretraining (TCP):** <br>
 Create triplet instances from the conala_mixed.jsonl using the following method: <br>
