@@ -1,1 +1,1 @@
-python -m models.CodeBERT -t -tp triples/triples_codesearchnet_fixed_train.json -vp triples/triples_codesearchnet_fixed_val.json -en experiments/CodeBERT_codesearchnet -d "cuda:0" -bs 48
+python -m models.CodeBERT -t -tp data/conala-mined-100k_train.json -vp data/conala-mined-100k_val.json -en experiments/CodeBERT_intent_dyn_neg_sample_100k -d "cuda:0" -bs 48 -e 3 -idns -sip "CoNaLa_top10_sim_intents.json" 

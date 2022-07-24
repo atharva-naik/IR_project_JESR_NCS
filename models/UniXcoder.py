@@ -157,7 +157,7 @@ class UniXcoderTripletNet(nn.Module):
         dist_fn_deg = args.get("dist_fn_deg", 2)
         self.config["margin"] = margin
         self.config["dist_fn_deg"] = dist_fn_deg
-        print(f"loading pretrained UnixCoder embedding model from {model_path}")
+        print(f"loading pretrained UniXcoder embedding model from {model_path}")
         start = time.time()
         self.embed_model = UniXcoder(model_path, tok_path="~/unixcoder-base-tok")
         print(f"loaded embedding model in {(time.time()-start):.2f}s")
@@ -280,12 +280,8 @@ class UniXcoderTripletNet(nn.Module):
                 max_length=100, padding=True,
             )
             valset = DynamicTriplesDataset(
-                val_path, "unixcoder",
-                sim_intents_map=sim_intents_map,
-                perturbed_codes=perturbed_codes,
-                use_AST=use_AST, model=self, 
-                device=device_id,
-                max_length=100, padding=True,
+                val_path, "unixcoder", model=self, 
+                val=True, max_length=100, padding=True, 
             )
         else:
             trainset = TriplesDataset(train_path, model=self.embed_model, 
@@ -299,6 +295,7 @@ class UniXcoderTripletNet(nn.Module):
             "summary": [],
         } 
         train_acc = TripletAccuracy()
+        train_hard_neg_acc = TripletAccuracy()
         best_val_acc = 0
         for epoch_i in range(epochs):
             self.train()
@@ -306,8 +303,8 @@ class UniXcoderTripletNet(nn.Module):
             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             train_acc.reset()
-            for step, batch in pbar:
-                # if intent_level_dynamic_sampling:  
+            train_hard_neg_acc.reset()
+            for step, batch in pbar: 
                 if args.get("dynamic_negative_sampling", False):
                     batch = dynamic_negative_sampling(
                         self.embed_model, batch, 
@@ -326,7 +323,17 @@ class UniXcoderTripletNet(nn.Module):
                 # scheduler.step()  # Update learning rate schedule
                 self.zero_grad()
                 batch_losses.append(batch_loss.item())
-                pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
+                MIX_STEP = ""
+                HARD_ACC = ""
+                if hasattr(trainset, "update"):
+                    train_hard_neg_acc.update(
+                        anchor_text_emb, pos_code_emb, 
+                        neg_code_emb, batch[3].cpu(),
+                    )
+                    HARD_ACC = f" hacc: {100*train_hard_neg_acc.get():.2f}"
+                    trainset.update(train_hard_neg_acc.get())
+                    MIX_STEP = trainset.mix_step()
+                pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} {MIX_STEP}batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}{HARD_ACC}")
                 # if step == 5: break # DEBUG
             # validate current model
             val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 

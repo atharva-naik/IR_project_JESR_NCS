@@ -51,6 +51,13 @@ def get_args():
     parser.add_argument("-e", "--epochs", type=int, default=5, help="no. of epochs")
     parser.add_argument("-dns", "--dynamic_negative_sampling", action="store_true", 
                         help="do dynamic negative sampling at batch level")
+    parser.add_argument("-sip", "--sim_intents_path", type=str, default=None, 
+                        help="path to dictionary containing similar intents corresponding to a given intent")
+    parser.add_argument("-pcp", "--perturbed_codes_path", type=str, default=None, 
+                        help="path to dictionary containing AST perturbed codes corresponding to a given code")
+    parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
+    parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
+                        help="dynamic sampling based on similar intents")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     return parser.parse_args()
@@ -736,6 +743,11 @@ class CodeBERTripletNet(nn.Module):
         epochs = args.get("epochs", 5)
         do_dynamic_negative_sampling = args.get("dynamic_negative_sampling", False)
         
+        use_AST = args.get("use_AST", False)
+        sim_intents_path = args.get("sim_intents_path")
+        perturbed_codes_path = args.get("perturbed_codes_path")
+        intent_level_dynamic_sampling = args.get("intent_level_dynamic_sampling", False)
+        
         device = device_id if torch.cuda.is_available() else "cpu"
         save_path = os.path.join(exp_name, "model.pt")
         # create experiment folder.
@@ -756,14 +768,38 @@ class CodeBERTripletNet(nn.Module):
         print(f"model will be saved at {save_path}")
         print(f"moving model to {device}")
         self.embed_model.to(device)
-        trainset = TriplesDataset(train_path, tokenizer=self.tokenizer,
-                                  truncation=True, padding="max_length",
-                                  max_length=100, add_special_tokens=True,
-                                  return_tensors="pt")
-        valset = TriplesDataset(val_path, tokenizer=self.tokenizer,
-                                truncation=True, padding="max_length",
-                                max_length=100, add_special_tokens=True,
-                                return_tensors="pt")
+        if intent_level_dynamic_sampling:
+            from datautils import DynamicTriplesDataset
+            
+            assert sim_intents_path is not None, "Missing path to dictionary containing similar intents corresponding to an intent"
+            sim_intents_map = json.load(open(sim_intents_path))
+            perturbed_codes = {}
+            if use_AST:
+                assert perturbed_codes_path is not None, "Missing path to dictionary containing perturbed codes corresponding to a given code snippet"
+                perturbed_codes = json.load(open(perturbed_codes_path))
+            # creat the data loaders.
+            trainset = DynamicTriplesDataset(
+                train_path, "codebert", sim_intents_map=sim_intents_map,
+                perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
+                tokenizer=self.tokenizer, device=device_id, max_length=100, 
+                padding="max_length", return_tensors="pt", 
+                add_special_tokens=True, truncation=True,
+            )
+            valset = DynamicTriplesDataset(
+                val_path, "codebert", model=self, val=True, 
+                tokenizer=self.tokenizer, max_length=100, 
+                padding="max_length", return_tensors="pt", 
+                truncation=True, add_special_tokens=True,
+            )
+        else:
+            trainset = TriplesDataset(train_path, tokenizer=self.tokenizer,
+                                      truncation=True, padding="max_length",
+                                      max_length=100, add_special_tokens=True,
+                                      return_tensors="pt")
+            valset = TriplesDataset(val_path, tokenizer=self.tokenizer,
+                                    truncation=True, padding="max_length",
+                                    max_length=100, add_special_tokens=True,
+                                    return_tensors="pt")
         trainloader = DataLoader(trainset, shuffle=True, 
                                  batch_size=batch_size)
         valloader = DataLoader(valset, shuffle=False,
@@ -825,10 +861,13 @@ def main(args):
     triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
     print("commencing training")
     
-    metrics = triplet_net.fit(train_path=args.train_path, batch_size=args.batch_size,
-                              device_id=args.device_id, val_path=args.val_path, 
-                              exp_name=args.exp_name, epochs=args.epochs,
-                              dynamic_negative_sampling=args.dynamic_negative_sampling)
+    metrics = triplet_net.fit(exp_name=args.exp_name, epochs=args.epochs,
+                              perturbed_codes_path=args.perturbed_codes_path,
+                              device_id=args.device_id, val_path=args.val_path,
+                              train_path=args.train_path, batch_size=args.batch_size,
+                              dynamic_negative_sampling=args.dynamic_negative_sampling,
+                              sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
+                              intent_level_dynamic_sampling=args.intent_level_dynamic_sampling)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")

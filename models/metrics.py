@@ -18,11 +18,19 @@ class TripletAccuracy:
         if self.tot == 0: return 0
         else: return self.count/self.tot
         
-    def update(self, anchor, pos, neg):
-        pos = self.pdist(anchor, pos)
-        neg = self.pdist(anchor, neg)
-        self.count += torch.as_tensor((neg-pos)>self.margin).sum().item()
-        self.tot += len(pos)
+    def update(self, anchor, pos, neg, mask=None):
+        """mask can be a boolean or integer tensor."""
+        pos = self.pdist(anchor, pos).cpu()
+        neg = self.pdist(anchor, neg).cpu()
+        # print(pos, neg)
+        # print("shapes:", pos.shape, neg.shape)
+        if mask is not None:
+            self.count += (mask*torch.as_tensor((neg-pos)>self.margin)).sum().item()
+            self.tot += mask.sum().item()
+        else:
+            self.count += torch.as_tensor((neg-pos)>self.margin).sum().item()
+            self.tot += len(pos)
+
 # test metrics.
 def recall_at_k(actual, predicted, k: int=10):
     rel = 0

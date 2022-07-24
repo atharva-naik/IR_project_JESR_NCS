@@ -1,1 +1,1 @@
-python -m models.UniXcoder -too -en experiments/UniXcoder_external_knowledge -d "cuda:0" -bs 48
+python -m models.UniXcoder -too -en UniXcoder_intent_dyn_neg_sample_100k -d "cuda:0" -bs 48

@@ -13,22 +13,72 @@ from transformers import RobertaTokenizer
 
 # list of available models. 
 MODEL_OPTIONS = ["codebert", "graphcodebert", "unixcoder"]
+class MixingRate:
+    """wait for `patience` steps, before returning True in __call__"""
+    def __init__(self, start_ratio: int=50):
+        self.start_ratio = start_ratio
+        self.all_ratios = [50, 50, 25, 25, 20, 10, 10, 10, 5, 5, 4, 4, 3, 3, 2, 2, 1]
+        # [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.40, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
+        self.ctr = 0
+        self.i = self.all_ratios.index(start_ratio)
+    
+    def __str__(self):
+        return f"{self.ctr}/{self.all_ratios[self.i]}"
+    
+    def update(self):
+        self.i = min(self.i+1, len(self.all_ratios)-1)
+        self.ctr = 0
+        
+    def __call__(self):
+        state = False
+        if self.ctr == self.all_ratios[self.i]: 
+            state = True
+            self.ctr = -1
+        self.ctr += 1
+        
+        return state
+    
+# update milestone.
+class MilestoneUpdater:
+    def __init__(self, warmup_steps: int=100):
+        self.i = 0
+        self.steps = [0.05+i*0.05 for i in range(20)]
+        self.mixing_rate = MixingRate()
+        self.warmup_steps = warmup_steps
+        
+    def __str__(self):
+        return f"{self.mixing_rate}, next update at (acc >= {self.steps[self.i]})"
+        
+    def rate(self):
+        return self.mixing_rate()
+        
+    def update(self, acc: float):
+        if self.warmup_steps > 0:
+            self.warmup_steps -= 1
+            return
+        if acc >= self.steps[self.i]:
+            self.i += 1
+            self.mixing_rate.update()
+        
 # NL-PL pairs dataset class.
 class DynamicTriplesDataset(Dataset):
-    def __init__(self, path: str, model_name: str, 
+    def __init__(self, path: str, model_name: str, model=None,
                  sim_intents_map: Dict[str, List[str]]={}, 
                  perturbed_codes: Dict[str, List[str]]={},
-                 model=None, tokenizer=None, device="cuda:0",
-                 use_AST: bool=False, **tok_args):
+                 tokenizer=None, device: str="cuda:0",
+                 use_AST: bool=False, val: bool=False, 
+                 **tok_args):
         super(DynamicTriplesDataset, self).__init__()
         assert model_name in MODEL_OPTIONS
         self.model_name = model_name
+        self.milestone_updater = MilestoneUpdater()
         self.model = model # pointer to model instance to find closest NL & PL examples
         self.sim_intents_map = sim_intents_map
         self.perturbed_codes = perturbed_codes
         self.tok_args = tok_args
         self.use_AST = use_AST
         self.device = device
+        self.val = val
         # if filename endswith jsonl:
         if path.endswith(".jsonl"):
             self.data = read_jsonl(path) # NL-PL pairs.
@@ -56,6 +106,14 @@ class DynamicTriplesDataset(Dataset):
         elif isinstance(tokenizer, str):
             self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
         else: self.tokenizer = tokenizer
+        
+    def update(self, acc: float):
+        self.milestone_updater.update(acc)
+        
+    def mix_step(self):
+        if self.milestone_updater.warmup_steps > 0: 
+            return f"warmup({self.milestone_updater.warmup_steps}) {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
+        else: return f"mix: {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
         
     def __len__(self):
         return len(self.data)
@@ -123,40 +181,57 @@ class DynamicTriplesDataset(Dataset):
                 device_id=self.device, batch_size=batch_size
             )) # num_cands x hidden_size
             scores = enc_text @ enc_codes.T # 1 x num_cands
-        i: int = torch.topk(scores, k=1).indices[0]
-    
+        i: int = torch.topk(scores, k=1).indices[0].item()
+        # print(PL)
+        # print(i, codes_for_sim_intents[i])
         return NL, PL, codes_for_sim_intents[i]
+    
+    def _sample_rand_triplet(self, NL: str, PL: str):
+        codes = []
+        for intent in self.intent_to_code:
+            if intent != NL: 
+                codes += self.intent_to_code[intent]
+                
+        return NL, PL, random.choice(codes)
         
     def __getitem__(self, item: int):
         # combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
-        anchor, pos, neg = self._retrieve_best_triplet(
-            NL=self.data[item]["intent"], 
-            PL=self.data[item]["snippet"],
-            use_AST=self.use_AST,
-        )
+        if self.val or self.milestone_updater.rate() == False:
+            anchor, pos, neg = self._sample_rand_triplet(
+                NL=self.data[item]["intent"], 
+                PL=self.data[item]["snippet"],
+            )
+            hard_neg = False
+        else:
+            anchor, pos, neg = self._retrieve_best_triplet(
+                NL=self.data[item]["intent"], 
+                PL=self.data[item]["snippet"],
+                use_AST=self.use_AST,
+            )
+            hard_neg = True
         anchor = self._proc_text(anchor)
         pos = self._proc_code(pos)
         neg = self._proc_code(neg)
         if self.model_name == "codebert":
-            return self._codebert_getitem(anchor, pos, neg)
+            return self._codebert_getitem(anchor, pos, neg, hard_neg)
         elif self.model_name == "graphcodebert":
-            return self._graphcodebert_getitem(anchor, pos, neg)
+            return self._graphcodebert_getitem(anchor, pos, neg, hard_neg)
         elif self.model_name == "unixcoder":
-            return self._unixcoder_getitem(anchor, pos, neg)
+            return self._unixcoder_getitem(anchor, pos, neg, hard_neg)
         
-    def _codebert_getitem(self, anchor: str, pos: str, neg: str):
+    def _codebert_getitem(self, anchor: str, pos: str, neg: str, hard_neg: bool):
         # special tokens are added by default.
         anchor = self.tokenizer(anchor, **self.tok_args)
         pos = self.tokenizer(pos, **self.tok_args)
         neg = self.tokenizer(neg, **self.tok_args)
-            
         return [
             anchor["input_ids"][0], anchor["attention_mask"][0], 
             pos["input_ids"][0], pos["attention_mask"][0],
             neg["input_ids"][0], neg["attention_mask"][0],
+            torch.tensor(hard_neg),
         ]
         
-    def _unixcoder_getitem(self, anchor: str, pos: str, neg: str):
+    def _unixcoder_getitem(self, anchor: str, pos: str, neg: str, hard_neg: bool):
         # special tokens are added by default.
         anchor = self.model.embed_model.tokenize([anchor], **self.tok_args)[0]
         pos = self.model.embed_model.tokenize([pos], **self.tok_args)[0]
@@ -164,7 +239,8 @@ class DynamicTriplesDataset(Dataset):
         # print(anchor)
         return [torch.tensor(anchor), 
                 torch.tensor(pos), 
-                torch.tensor(neg)] 
+                torch.tensor(neg),
+                torch.tensor(hard_neg)] 
         
     def _graphcodebert_getitem(self, anchor: str, pos: Union[str, list], neg: Union[str, list]):
         args = self.tok_args
@@ -292,5 +368,6 @@ class DynamicTriplesDataset(Dataset):
                 torch.tensor(neg_code_ids),
                 torch.tensor(neg_attn_mask),
                 torch.tensor(neg_position_idx),
-                torch.tensor(nl_ids)
+                torch.tensor(nl_ids),
+                torch.tensor(hard_neg),
                )
