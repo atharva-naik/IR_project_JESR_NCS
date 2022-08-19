@@ -28,6 +28,8 @@ transformers.logging.set_verbosity_error()
 random.seed(0)
 np.random.seed(0)
 torch.manual_seed(0)
+VALID_STEPS = 501
+SHUFFLE_BATCH_DEBUG_SETTING = True
 # get arguments
 def get_args():
     parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the UniXcoder in Late Fusion configuration for Neural Code Search.")
@@ -50,6 +52,8 @@ def get_args():
                         help="path to dictionary containing similar intents corresponding to a given intent")
     parser.add_argument("-pcp", "--perturbed_codes_path", type=str, default=None, 
                         help="path to dictionary containing AST perturbed codes corresponding to a given code")
+    parser.add_argument("-p", "--p", type=int, default=2, help="the p used in mastering rate")
+    parser.add_argument("-beta", "--beta", type=float, default=0.01, help="the beta used in the von-Mises fisher sampling")
     parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
                         help="dynamic sampling based on similar intents")
@@ -104,7 +108,47 @@ class TextDataset(Dataset):
         else:
             return [text]
 
+        
+class ValRetDataset(Dataset):
+    # JUST an engineering related class to convert NL-PL pairs to retrieval setting.
+    def __init__(self, path: str):
+        super(ValRetDataset, self).__init__()
+        self.data = json.load(open(path))
+        posts = {} # query to candidate map.
+        cands = {} # unique candidates
+        tot = 0
+        for rec in self.data:
+            intent = rec["intent"]
+            snippet = rec["snippet"]
+            if snippet not in cands:
+                cands[snippet] = tot
+                tot += 1
+            try: posts[intent][snippet] = None
+            except KeyError: posts[intent] = {snippet: None}
+        self._cands = list(cands.keys())
+        self._queries = list(posts.keys())
+        self._labels = []
+        for query, candidates in posts.items():
+            self._labels.append([])
+            for cand in candidates.keys():
+                self._labels[-1].append(cands[cand])
+
+    def __len__(self):
+        return len(self.data)
     
+    def get_queries(self):
+        return self._queries
+    
+    def get_candidates(self):
+        return self._cands
+    
+    def get_labels(self):
+        return self._labels
+        
+    def __getitem__(self, i: int):
+        return self.data[i]
+        
+        
 class TriplesDataset(Dataset):
     def __init__(self, path: str, model=None, **tok_args):
         super(TriplesDataset, self).__init__()
@@ -150,6 +194,7 @@ class UniXcoderTripletNet(nn.Module):
     """
     def __init__(self, model_path: str="microsoft/unixcoder-base", **args):
         super(UniXcoderTripletNet, self).__init__()
+        intent_level_dynamic_sampling = args.get("intent_level_dynamic_sampling", False)
         self.config = {}
         self.config["model_path"] = model_path
         
@@ -168,10 +213,20 @@ class UniXcoderTripletNet(nn.Module):
         self.config["lr"] = lr
         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
         self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
-        print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
+        
+        if intent_level_dynamic_sampling:
+            self.hard_neg_loss_fn = nn.TripletMarginLoss(margin=1, p=dist_fn_deg, reduction="none")
+            self.soft_neg_loss_fn = nn.TripletMarginLoss(margin=margin, p=dist_fn_deg, reduction="none")
+            print(f"hard_neg_loss_fn = TripletMarginLoss(margin=1, p={dist_fn_deg})")
+            print(f"soft_neg_loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
+            self.config["hard_neg_loss_fn"] = f"{self.hard_neg_loss_fn}"
+            self.config["soft_neg_loss_fn"] = f"{self.soft_neg_loss_fn}"
+            
         self.loss_fn = nn.TripletMarginLoss(margin=margin, p=dist_fn_deg)
-        self.config["optimizer"] = f"{self.optimizer}"
+        print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
         self.config["loss_fn"] = f"{self.loss_fn}"
+        self.config["optimizer"] = f"{self.optimizer}"
+        
         
     def forward(self, anchor_title, pos_snippet, neg_snippet):
         _,anchor_text_emb = self.embed_model(anchor_title)
@@ -183,7 +238,7 @@ class UniXcoderTripletNet(nn.Module):
     def val(self, valloader: DataLoader, epoch_i: int=0, 
             epochs: int=0, device="cuda:0"):
         self.eval()
-        val_acc = TripletAccuracy()
+        val_acc = TripletAccuracy(margin=0)
         batch_losses = []
         pbar = tqdm(enumerate(valloader), total=len(valloader), 
                     desc=f"val: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
@@ -199,6 +254,29 @@ class UniXcoderTripletNet(nn.Module):
                 pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*val_acc.get():.2f}")
                 # if step == 5: break # DEBUG
         return val_acc.get(), np.mean(batch_losses)
+    
+    def val_ret(self, valset: Dataset, device="cuda:0"):
+        self.eval()
+        # get queries and candidates from validation set and encode them.
+        labels = valset.get_labels()
+        queries = valset.get_queries()
+        candidates = valset.get_candidates()
+        print(f"encoding {len(queries)} queries:")
+        query_mat = self.encode_emb(queries, mode="text", batch_size=48,
+                                    use_tqdm=True, device_id=device)
+        query_mat = torch.stack(query_mat)
+        print(f"encoding {len(candidates)} candidates:")
+        cand_mat = self.encode_emb(candidates, mode="code", batch_size=48,
+                                   use_tqdm=True, device_id=device)
+        # score and rank documents.
+        cand_mat = torch.stack(cand_mat)
+        scores = torch.cdist(query_mat, cand_mat, p=2)
+        doc_ranks = scores.argsort(axis=1)
+        print(labels[:10])
+        print(doc_ranks[:10])
+        recall_at_5 = recall_at_k(labels, doc_ranks.tolist(), k=5)
+        
+        return recall_at_5
         
     def encode_emb(self, text_or_snippets: List[str], mode: str="text", **args):
         """Note: our late fusion UniXcoder is a universal encoder for text and code, so the same function works for both."""
@@ -236,6 +314,9 @@ class UniXcoderTripletNet(nn.Module):
         device_id = args.get("device_id", "cuda:0")
         batch_size = args.get("batch_size", 32)
         epochs = args.get("epochs", 5)
+        beta = args.get("beta", 0.01)
+        warmup_steps = args.get("warmup_steps", 3000)
+        p = args.get("p", 2)
         
         use_AST = args.get("use_AST", False)
         sim_intents_path = args.get("sim_intents_path")
@@ -253,56 +334,71 @@ class UniXcoderTripletNet(nn.Module):
         self.config["exp_name"] = exp_name
         self.config["val_path"] = val_path
         self.config["epochs"] = epochs
+        self.config["use_AST"] = use_AST
+        self.config["intent_level_dynamic_sampling"] = intent_level_dynamic_sampling
         
-        config_path = os.path.join(exp_name, "config.json")
-        with open(config_path, "w") as f:
-            json.dump(self.config, f)
-        print(f"saved config to {config_path}")
         print(f"model will be saved at {save_path}")
         print(f"moving model to {device}")
         self.embed_model.to(device)
-        if intent_level_dynamic_sampling:
+        if intent_level_dynamic_sampling or use_AST:
             from datautils import DynamicTriplesDataset
-            
-            assert sim_intents_path is not None, "Missing path to dictionary containing similar intents corresponding to an intent"
-            sim_intents_map = json.load(open(sim_intents_path))
             perturbed_codes = {}
+            sim_intents_map = {}
+            
+            if intent_level_dynamic_sampling:
+                assert sim_intents_path is not None, "Missing path to dictionary containing similar intents corresponding to an intent"
+                sim_intents_map = json.load(open(sim_intents_path))
+            
             if use_AST:
                 assert perturbed_codes_path is not None, "Missing path to dictionary containing perturbed codes corresponding to a given code snippet"
                 perturbed_codes = json.load(open(perturbed_codes_path))
             # creat the data loaders.
             trainset = DynamicTriplesDataset(
-                train_path, "unixcoder",
-                sim_intents_map=sim_intents_map,
-                perturbed_codes=perturbed_codes,
-                use_AST=use_AST, model=self, 
-                device=device_id,
-                max_length=100, padding=True,
+                train_path, "unixcoder", device=device_id, beta=beta, warmup_steps=warmup_steps,
+                sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes,
+                use_AST=use_AST, model=self, p=p, max_length=100, padding=True,
             )
-            valset = DynamicTriplesDataset(
-                val_path, "unixcoder", model=self, 
-                val=True, max_length=100, padding=True, 
-            )
+            valset = ValRetDataset(val_path)
+            # valset = DynamicTriplesDataset(
+            #     val_path, "unixcoder", model=self, 
+            #     val=True, max_length=100, padding=True, 
+            # )
+            self.config["trainset.warmup_steps"] = trainset.warmup_steps # no. of warmup steps before commencing training.
+            self.config["trainset.epsilon"] = trainset.epsilon # related to mastering rate.
+            self.config["trainset.delta"] = trainset.soft_master_rate.delta # related to mastering rate.
+            self.config["trainset.beta"] = trainset.beta # related to hard negative sampling.
+            self.config["trainset.p"] = trainset.soft_master_rate.p # related to mastering rate.
         else:
             trainset = TriplesDataset(train_path, model=self.embed_model, 
                                       max_length=100, padding=True)
             valset = TriplesDataset(val_path, model=self.embed_model, 
                                     max_length=100, padding=True)
-        trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size)
-        valloader = DataLoader(valset, shuffle=False, batch_size=batch_size)
+        config_path = os.path.join(exp_name, "config.json")
+        with open(config_path, "w") as f:
+            json.dump(self.config, f)
+        print(f"saved config to {config_path}")
+        if SHUFFLE_BATCH_DEBUG_SETTING: #TODO: remove this. Used only for a temporary experiment.
+            from datautils import batch_shuffle_collate_fn
+            trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size,
+                                     collate_fn=batch_shuffle_collate_fn)
+            valloader = DataLoader(valset, shuffle=False, batch_size=batch_size,
+                                   collate_fn=batch_shuffle_collate_fn)
+        else:
+            trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size)
+            valloader = DataLoader(valset, shuffle=False, batch_size=batch_size)
         train_metrics = {
-            "epochs": [],
+            "log_steps": [],
             "summary": [],
         } 
-        train_acc = TripletAccuracy()
-        train_hard_neg_acc = TripletAccuracy()
+        train_soft_neg_acc = TripletAccuracy(margin=1)
+        train_hard_neg_acc = TripletAccuracy(margin=1)
         best_val_acc = 0
         for epoch_i in range(epochs):
             self.train()
             batch_losses = []
             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
-            train_acc.reset()
+            train_soft_neg_acc.reset()
             train_hard_neg_acc.reset()
             for step, batch in pbar: 
                 if args.get("dynamic_negative_sampling", False):
@@ -310,46 +406,80 @@ class UniXcoderTripletNet(nn.Module):
                         self.embed_model, batch, 
                         model_name="unixcoder", 
                         device=device, k=1
-                    )
+                    )    
                 self.train()
                 anchor_title = batch[0].to(device)
                 pos_snippet = batch[1].to(device)
                 neg_snippet = batch[2].to(device)
                 anchor_text_emb, pos_code_emb, neg_code_emb = self(anchor_title, pos_snippet, neg_snippet)
+                # if intent_level_dynamic_sampling:
+                #     b = batch[3].to(device)
+                #     embs = (anchor_text_emb, pos_code_emb, neg_code_emb)
+                #     batch_loss = (b.float()*self.hard_neg_loss_fn(*embs) + (~b).float()*self.soft_neg_loss_fn(*embs)).mean()
+                # else: batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
                 batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
                 batch_loss.backward()
                 self.optimizer.step()
-                train_acc.update(anchor_text_emb, pos_code_emb, neg_code_emb)
                 # scheduler.step()  # Update learning rate schedule
                 self.zero_grad()
                 batch_losses.append(batch_loss.item())
                 MIX_STEP = ""
                 HARD_ACC = ""
                 if hasattr(trainset, "update"):
+                    train_soft_neg_acc.update(
+                        anchor_text_emb, pos_code_emb, 
+                        neg_code_emb, ~batch[3].cpu(),
+                    )
                     train_hard_neg_acc.update(
                         anchor_text_emb, pos_code_emb, 
                         neg_code_emb, batch[3].cpu(),
                     )
                     HARD_ACC = f" hacc: {100*train_hard_neg_acc.get():.2f}"
-                    trainset.update(train_hard_neg_acc.get())
+                    trainset.update(
+                        train_soft_neg_acc.get(),
+                        train_hard_neg_acc.get(),
+                    )
                     MIX_STEP = trainset.mix_step()
-                pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} {MIX_STEP}batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}{HARD_ACC}")
+                    pbar.set_description(
+                        f"train: epoch: {epoch_i+1}/{epochs} {MIX_STEP}batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
+                    )
+                else: 
+                    train_soft_neg_acc.update(
+                        anchor_text_emb, 
+                        pos_code_emb, neg_code_emb
+                    )
+                    pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_soft_neg_acc.get():.2f}")
                 # if step == 5: break # DEBUG
-            # validate current model
-            val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
-                                         epochs=epochs, device=device)
-            if val_acc > best_val_acc:
-                print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
-                best_val_acc = val_acc
-                torch.save(self.state_dict(), save_path)
-                
-            train_metrics["epochs"].append({
-                "train_batch_losses": batch_losses, 
-                "train_loss": np.mean(batch_losses), 
-                "train_acc": 100*train_acc.get(),
-                "val_loss": val_loss,
-                "val_acc": 100*val_acc,
-            })
+                if (step+1) % VALID_STEPS == 0:
+                    # validate current model
+                    if intent_level_dynamic_sampling or use_AST:
+                        # here the val_acc is actually recall@1 per batch, and averaged over mini-batches.
+                        s = time.time()
+                        val_acc = self.val_ret(valset, device=device)
+                        print(f"validated in {time.time()-s}s")
+                        print(f"recall@5 = {100*val_acc:.3f}")
+                        val_loss = None
+                    else:
+                        val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
+                                                     epochs=epochs, device=device)
+                    # save model only after warmup is complete.
+                    if val_acc > best_val_acc and trainset.warmup_steps == 0:
+                        print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
+                        best_val_acc = val_acc
+                        torch.save(self.state_dict(), save_path)
+
+                    train_metrics["log_steps"].append({
+                        "train_batch_losses": batch_losses, 
+                        "train_loss": np.mean(batch_losses), 
+                        "train_soft_neg_acc": 100*train_soft_neg_acc.get(),
+                        "train_hard_neg_acc": 100*train_hard_neg_acc.get(),
+                        "val_loss": val_loss,
+                        "val_acc": 100*val_acc,
+                    })
+                    metrics_path = os.path.join(exp_name, "train_metrics.json")
+                    print(f"saving metrics to {metrics_path}")
+                    with open(metrics_path, "w") as f:
+                        json.dump(train_metrics, f)
         
         return train_metrics
     
@@ -363,6 +493,7 @@ def main(args):
                               device_id=args.device_id, val_path=args.val_path, 
                               train_path=args.train_path, batch_size=args.batch_size,
                               dynamic_negative_sampling=args.dynamic_negative_sampling,
+                              beta=args.beta, p=args.p, warmup_steps=args.warmup_steps,
                               sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
                               intent_level_dynamic_sampling=args.intent_level_dynamic_sampling)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")

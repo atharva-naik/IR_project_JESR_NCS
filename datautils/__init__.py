@@ -5,73 +5,126 @@
 # code for creating Dataset instance for the dataloader.
 import os
 import torch
+import numpy as np
 from typing import *
 from tqdm import tqdm
 from datautils.utils import *
+import torch.nn.functional as F
 from torch.utils.data import Dataset
 from transformers import RobertaTokenizer
 
 # list of available models. 
 MODEL_OPTIONS = ["codebert", "graphcodebert", "unixcoder"]
-class MixingRate:
-    """wait for `patience` steps, before returning True in __call__"""
-    def __init__(self, start_ratio: int=50):
-        self.start_ratio = start_ratio
-        self.all_ratios = [50, 50, 25, 25, 20, 10, 10, 10, 5, 5, 4, 4, 3, 3, 2, 2, 1]
-        # [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.40, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
-        self.ctr = 0
-        self.i = self.all_ratios.index(start_ratio)
+def batch_shuffle_collate_fn(batch):
+    import random
+    is_hard_neg_mask = []
+    # a mapping to shuffle indices of soft negatives
+    # i.e. assign positive code snippets from one triplet as negative code snippets for other triplets
+    # but only for soft negatives. Leave the hard negatives as it is.
+    shuffle_map = {}
+    anchor = [] # the anchor NL batch indices.
+    pos = [] # positive PL batch indices.
+    neg = [] # negative PL batch indices.
+    is_hard_neg_mask = []
+    for i in range(len(batch)):
+        # whether current triplet is a hard negative.
+        is_hard_neg = batch[i][3].item()
+        # populate the mapping of soft indices as an identity map first.
+        if not is_hard_neg:
+            shuffle_map[i] = i
+        is_hard_neg_mask.append(is_hard_neg)
+        anchor.append(batch[i][0])
+        pos.append(batch[i][1])
+    # determine new indices by random shuffling.
+    new_inds = random.sample(list(shuffle_map.values()), k=len(shuffle_map))
+    for old_ind, new_ind in zip(shuffle_map, new_inds):
+        shuffle_map[old_ind] = new_ind
+    # create the negative samples while modifying soft negatives using the shuffle map
+    # but leave the hard negative triplets unaffected.
+    for i in range(len(batch)):
+        is_hard_neg = batch[i][3].item()
+        if is_hard_neg: # for hard negatives don't modify triplet
+            neg.append(batch[i][2])
+        else: # for soft negative triplets use the shuffle map to get the positive code snippet from a different triplet.
+            use_ind = shuffle_map[i]
+            neg.append(batch[use_ind][1]) # '1' as we are using positive code snippet from another triplet.
+    anchor = torch.stack(anchor)
+    pos = torch.stack(pos)
+    neg = torch.stack(neg)
+    is_hard_neg_mask = torch.as_tensor(is_hard_neg_mask)
+    
+    return [anchor, pos, neg, is_hard_neg_mask]
+        
+# 1-D float buffer and mastering rate calculation.
+class MasteringRate:
+    def __init__(self, role: int=0, size: int=20, 
+                 p: float=2, delta: float=0.5):
+        self.acc_buffer = np.zeros(size)
+        self.window_size = size
+        self.delta = delta
+        self.p = p
+        self.role = role # role of 0 corresponds to soft accuracy and hard corresponds to 1
+        self.window_mean = 0
+        self.mean_size = (size+1)/2
+        
+    def __repr__(self):
+        return repr(self.acc_buffer)
     
     def __str__(self):
-        return f"{self.ctr}/{self.all_ratios[self.i]}"
-    
-    def update(self):
-        self.i = min(self.i+1, len(self.all_ratios)-1)
-        self.ctr = 0
+        return f"{self.role}:[{self.window_size}]:={self.window_mean:.3f}(p={self.p}, δ={self.delta})"
         
-    def __call__(self):
-        state = False
-        if self.ctr == self.all_ratios[self.i]: 
-            state = True
-            self.ctr = -1
-        self.ctr += 1
+    def beta(self):
+        """Calculate slope of linear regression for returns/accuracies
+        for the attention computation."""
+        t = 1+np.array(range(self.window_size))
+        M = self.mean_size + np.zeros(self.window_size)
+        NUM = (t-M)*(self.acc_buffer-self.window_mean)
+        DENOM = ((t-M)**2)
         
-        return state
-    
-# update milestone.
-class MilestoneUpdater:
-    def __init__(self, warmup_steps: int=100):
-        self.i = 0
-        self.steps = [0.05+i*0.05 for i in range(20)]
-        self.mixing_rate = MixingRate()
-        self.warmup_steps = warmup_steps
+        return NUM.sum()/DENOM.sum()
         
-    def __str__(self):
-        return f"{self.mixing_rate}, next update at (acc >= {self.steps[self.i]})"
+    def attn(self, other):
+        """calculate the attention for the task from the mastering rate.
+        `other_master_rate`: the window mean of the other master rate object."""
+        beta = self.beta()
+        beta_max = max(beta, other.beta())
+        if beta_max != 0: beta = beta/beta_max
+        if self.role == 0:
+            return (self.delta*(1-self.window_mean) + (1-self.delta)*beta)*(1-other.window_mean)
+        else:
+            return (other.window_mean**self.p)*(self.delta*(1-self.window_mean) + (1-self.delta)*beta)
         
-    def rate(self):
-        return self.mixing_rate()
-        
-    def update(self, acc: float):
-        if self.warmup_steps > 0:
-            self.warmup_steps -= 1
-            return
-        if acc >= self.steps[self.i]:
-            self.i += 1
-            self.mixing_rate.update()
+    def push_acc(self, acc: float):
+        for i in range(self.window_size-1):
+            self.acc_buffer[i] = self.acc_buffer[i+1]
+        self.acc_buffer[-1] = acc
+        self.window_mean = self.acc_buffer.mean()
         
 # NL-PL pairs dataset class.
 class DynamicTriplesDataset(Dataset):
-    def __init__(self, path: str, model_name: str, model=None,
-                 sim_intents_map: Dict[str, List[str]]={}, 
-                 perturbed_codes: Dict[str, List[str]]={},
-                 tokenizer=None, device: str="cuda:0",
-                 use_AST: bool=False, val: bool=False, 
-                 **tok_args):
+    def __init__(self, path: str, model_name: str, model=None, tokenizer=None,
+                 use_AST=False, val=False, warmup_steps=3000, beta=0.001, p=2,
+                 sim_intents_map={}, perturbed_codes={}, device="cuda:0",
+                 win_size=20, delta=0.5, epsilon=0.8, **tok_args):
         super(DynamicTriplesDataset, self).__init__()
         assert model_name in MODEL_OPTIONS
         self.model_name = model_name
-        self.milestone_updater = MilestoneUpdater()
+        self.warmup_steps = warmup_steps
+        # self.milestone_updater = MilestoneUpdater()
+        self.beta = beta
+        self.epsilon = epsilon
+        self.soft_master_rate = MasteringRate(
+            role=0, delta=delta,
+            p=p, size=win_size, 
+        )
+        self.hard_master_rate = MasteringRate(
+            role=1, delta=delta,
+            p=p, size=win_size, 
+        )
+        self.soft_neg_weight = 0.8
+        self.hard_neg_weight = 0.2
+        self.soft_acc_buffer = np.zeros(20) # buffer of fixed size 20 
+        self.hard_acc_buffer = np.zeros(20) # buffer of fixed size 20
         self.model = model # pointer to model instance to find closest NL & PL examples
         self.sim_intents_map = sim_intents_map
         self.perturbed_codes = perturbed_codes
@@ -86,11 +139,12 @@ class DynamicTriplesDataset(Dataset):
         elif path.endswith(".json"):
             self.data = json.load(open(path)) # NL-PL pairs.
         # create a mapping of NL to all associated PLs. 
-        # (all codes associated with a given intent)
         self.intent_to_code = {}
         for rec in self.data:
-            intent = rec["intent"]
-            snippet = rec["snippet"]
+            try: intent = rec["intent"]
+            except TypeError: intent = rec[0]
+            try: snippet = rec["snippet"]
+            except TypeError: snippet = rec[1]
             try: self.intent_to_code[intent].append(snippet)
             except KeyError: self.intent_to_code[intent] = [snippet]
         # parser is needed for GraphCodeBERT to get the dataflow.
@@ -107,13 +161,29 @@ class DynamicTriplesDataset(Dataset):
             self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
         else: self.tokenizer = tokenizer
         
-    def update(self, acc: float):
-        self.milestone_updater.update(acc)
+    def update(self, soft_acc: float, hard_acc: float):
+        # self.milestone_updater.update(acc)
+        self.soft_master_rate.push_acc(soft_acc)
+        self.hard_master_rate.push_acc(hard_acc)
+        if self.warmup_steps > 0: 
+            self.warmup_steps -= 1
+            return 
+        a_s = self.soft_master_rate.attn(self.hard_master_rate)
+        a_h = self.hard_master_rate.attn(self.soft_master_rate)
+        attn_dist = F.softmax(torch.as_tensor([a_s, a_h]), dim=0)
+        uniform = torch.as_tensor([0.8, 0.2])
+        weights = (1-self.epsilon)*attn_dist + self.epsilon*uniform
+        weights = weights.numpy()
+        self.soft_neg_weight = weights[0]
+        self.hard_neg_weight = 1-weights[0]
         
     def mix_step(self):
-        if self.milestone_updater.warmup_steps > 0: 
-            return f"warmup({self.milestone_updater.warmup_steps}) {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
-        else: return f"mix: {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
+        # if self.milestone_updater.warmup_steps > 0: 
+        #     return f"warmup({self.milestone_updater.warmup_steps}) {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
+        # else: return f"mix: {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
+        if self.warmup_steps > 0:
+            return f"warmup({self.warmup_steps}) "
+        else: return f"{self.soft_neg_weight:.3f}|{self.hard_neg_weight:.3f} "
         
     def __len__(self):
         return len(self.data)
@@ -164,27 +234,41 @@ class DynamicTriplesDataset(Dataset):
         
         return code_tokens, dfg
         
-    def _retrieve_best_triplet(self, NL: str, PL: str, use_AST: bool, batch_size: int=48):
-        sim_intents: List[str] = self.sim_intents_map[NL]
+    def _retrieve_best_triplet(self, NL: str, PL: str, use_AST: bool, 
+                               batch_size: int=48, stochastic=True,
+                               backup_neg: Union[str, None]=None):
         codes_for_sim_intents: List[str] = []
-        for intent, _ in sim_intents:
-            codes_for_sim_intents += self.intent_to_code[intent]
-        if use_AST:
+        if use_AST: # when using AST only use AST.
             codes_for_sim_intents += self.perturbed_codes[PL] # codes from AST.
-        self.model.eval()
-        with torch.no_grad():
-            enc_text = torch.stack(self.model.encode_emb([NL], mode="text", 
-                                                         batch_size=batch_size,
-                                                         device_id=self.device)) # 1 x hidden_size
-            enc_codes = torch.stack(self.model.encode_emb(
-                codes_for_sim_intents, mode="code", 
-                device_id=self.device, batch_size=batch_size
-            )) # num_cands x hidden_size
-            scores = enc_text @ enc_codes.T # 1 x num_cands
-        i: int = torch.topk(scores, k=1).indices[0].item()
-        # print(PL)
-        # print(i, codes_for_sim_intents[i])
-        return NL, PL, codes_for_sim_intents[i]
+        else: # TODO: add a flag for IDNS.
+            sim_intents: List[str] = self.sim_intents_map[NL]
+            for intent, _ in sim_intents:
+                codes_for_sim_intents += self.intent_to_code[intent]
+        # print("codes_for_sim_intents:", codes_for_sim_intents)
+        if len(codes_for_sim_intents) == 0: # if no pool of backup candidates is available.
+            neg = backup_neg
+        else:
+            self.model.eval()
+            if len(codes_for_sim_intents) == 1: codes_for_sim_intents += backup_neg
+            with torch.no_grad():
+                enc_text = torch.stack(self.model.encode_emb([NL], mode="text", 
+                                                             batch_size=batch_size,
+                                                             device_id=self.device)) # 1 x hidden_size
+                enc_codes = torch.stack(self.model.encode_emb(
+                    codes_for_sim_intents, mode="code", 
+                    device_id=self.device, batch_size=batch_size
+                )) # num_cands x hidden_size
+                scores = enc_text @ enc_codes.T # 1 x num_cands
+            if stochastic:
+                p = F.softmax(self.beta*scores.squeeze(), dim=0).cpu().numpy()
+                try: i: int = np.random.choice(range(len(p)), p=p)
+                except TypeError:
+                    return NL, PL, backup_neg
+            else:
+                i: int = torch.topk(scores, k=1).indices[0].item()
+            neg = codes_for_sim_intents[i]
+
+        return NL, PL, neg
     
     def _sample_rand_triplet(self, NL: str, PL: str):
         codes = []
@@ -196,19 +280,36 @@ class DynamicTriplesDataset(Dataset):
         
     def __getitem__(self, item: int):
         # combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
-        if self.val or self.milestone_updater.rate() == False:
-            anchor, pos, neg = self._sample_rand_triplet(
-                NL=self.data[item]["intent"], 
-                PL=self.data[item]["snippet"],
-            )
+        if self.val or self.warmup_steps > 0:
             hard_neg = False
         else:
+            hard_neg = np.random.choice(
+                [False, True], p=[
+                    self.soft_neg_weight, 
+                    self.hard_neg_weight,
+                ])
+        if hard_neg: # sample hard similar intent or AST based negatives.
+            # anchor, pos, neg = self._retrieve_best_triplet(
+            #     NL=self.data[item]["intent"], 
+            #     PL=self.data[item]["snippet"],
+            #     use_AST=self.use_AST,
+            # )
             anchor, pos, neg = self._retrieve_best_triplet(
-                NL=self.data[item]["intent"], 
-                PL=self.data[item]["snippet"],
-                use_AST=self.use_AST,
+                NL=self.data[item][0], PL=self.data[item][1],
+                use_AST=self.use_AST, backup_neg=self.data[item][2], # required if no AST based candidates available.
             )
-            hard_neg = True
+        elif self.val: # a soft negative but during val step. No further sampling is needed here.
+            anchor = self.data[item][0]
+            pos = self.data[item][1]
+            neg = self.data[item][2]
+        else: # sample soft random negatives, during train step.
+            # anchor, pos, neg = self._sample_rand_triplet(
+            #     NL=self.data[item]["intent"], 
+            #     PL=self.data[item]["snippet"],
+            # )
+            anchor = self.data[item][0]
+            pos = self.data[item][1]
+            neg = self.data[item][2]
         anchor = self._proc_text(anchor)
         pos = self._proc_code(pos)
         neg = self._proc_code(neg)

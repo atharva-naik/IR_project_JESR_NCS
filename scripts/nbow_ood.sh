@@ -1,0 +1,1 @@
+python -m baselines.siamese_net --enc_type nbow --exp_name experiments/nbow_siamese -ood --device_id "cuda:0" --batch_size 48

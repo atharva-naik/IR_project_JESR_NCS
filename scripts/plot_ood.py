@@ -124,6 +124,15 @@ for model in MODELS:
     for dataset_name, split in zip(["CoNaLa", "CoNaLa", "PyDocs"], ["_100k", "_dyn_neg_sample_100k", "_external_knowledge"]):
         exp_path = os.path.join("experiments", model+split)
         exp_paths[model].append((dataset_name, exp_path))
+# add the baselines.
+BASELINES = ["CNN", "RNN", "nBOW"]
+for baseline in BASELINES:
+    exp_paths[baseline] = [(
+        "CoNaLa", os.path.join(
+            "experiments", 
+            f"{baseline.lower()}_siamese",
+        ),
+    )]
 # print(exp_paths)
 # metric names.
 METRICS = ["mrr", "ndcg", "recall@5", "recall@10"]
@@ -134,6 +143,9 @@ model_metric_grids = {
     "CodeBERT": {name: np.zeros((R,C)).tolist() for name in METRICS},
     "UniXcoder": {name: np.zeros((R,C-1)).tolist() for name in METRICS},
     "GraphCodeBERT": {name: np.zeros((R,C)).tolist() for name in METRICS},
+    "CNN": {name: np.zeros((R-2,C)).tolist() for name in METRICS},
+    "RNN": {name: np.zeros((R-2,C)).tolist() for name in METRICS},
+    "nBOW": {name: np.zeros((R-2,C)).tolist() for name in METRICS},
 }
 for model, paths in exp_paths.items():
     print(paths)
@@ -174,7 +186,9 @@ for model in model_metric_grids:
     for k, name in enumerate(model_metric_grids[model]):
         j = k % 2
         i = k // 2
-        row_names = EXP_NAMES
+        if model in BASELINES: 
+            row_names = ["CNL (train)"]
+        else: row_names = EXP_NAMES
         if model == "UniXcoder":
             col_names = [f"{abbreviation[dataset]} (test)" for dataset in TESTSET_NAMES[:-1]]
         else: col_names = [f"{abbreviation[dataset]} (test)" for dataset in TESTSET_NAMES]
@@ -185,5 +199,5 @@ for model in model_metric_grids:
         axs[i, j].set_title(name)
     fig.tight_layout()
     fig.suptitle(f'{model} OOD Generalization Metrics\n', x=0.5, y=1)
-                 #va="bottom", fontsize=14)
+    # va="bottom", fontsize=14)
     plt.savefig(f"plots/{model}_ood_metrics_grid.png")

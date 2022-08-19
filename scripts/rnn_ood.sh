@@ -1,0 +1,1 @@
+python -m baselines.siamese_net -ood --enc_type RNN --exp_name experiments/rnn_siamese --device_id "cuda:0" --batch_size 128 --init_codebert

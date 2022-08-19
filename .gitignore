@@ -142,3 +142,4 @@ rel_regressor_CodeBERT
 experiments.zip
 
 experiments/GraphCodeBERT_dyn_neg_sample_100k/model-epoch3.pt
+CoNaLa_AST_neg_samples.json

@@ -15,11 +15,11 @@ from baselines.CNN import CNNEncoder
 from baselines.RNN import RNNEncoder
 from typing import Tuple, Union, List
 from baselines.nbow import NBowEncoder
+from baselines import test_ood_performance
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
 from sklearn.metrics import label_ranking_average_precision_score as MRR
-
 
 class TextDataset(Dataset):
     def __init__(self, texts: str, tokenizer: Union[str, None, RobertaTokenizer]=None, **tok_args):
@@ -246,18 +246,19 @@ def recall_at_k(actual, predicted, k: int=10):
     
 def get_args():
     parser = argparse.ArgumentParser("script to train neural bag of words model using NL-PL pairs. task is to classify as negative/positive")
-    parser.add_argument("-tp", "--train_path", type=str, default="triples/nl_code_pairs_train.json")
-    parser.add_argument("-vp", "--val_path", type=str, default="triples/nl_code_pairs_val.json")
-    parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json")
-    parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json")
-    parser.add_argument("-en", "--exp_name", type=str, default="nbow_siamese")
-    parser.add_argument("-d", "--device_id", default="cuda:0", type=str)
-    parser.add_argument("-enc", "--enc_type", type=str, default="nbow")
-    parser.add_argument("-ic", "--init_codebert", action="store_true")
-    parser.add_argument("-bs", "--batch_size", default=32, type=int)
-    parser.add_argument("-dp", "--do_predict", action="store_true")
-    parser.add_argument("-dt", "--do_train", action="store_true")
-    parser.add_argument("-e", "--epochs", default=20, type=int)
+    parser.add_argument("-tp", "--train_path", type=str, default="triples/nl_code_pairs_train.json", help="path to trainset")
+    parser.add_argument("-vp", "--val_path", type=str, default="triples/nl_code_pairs_val.json", help="path to valset")
+    parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json", help="path to candidates JSON for evaluation")
+    parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json", help="path to queries JSON for evaluation")
+    parser.add_argument("-en", "--exp_name", type=str, default="nbow_siamese", help="name to be used for the experiment folder")
+    parser.add_argument("-d", "--device_id", default="cuda:0", type=str, help="cuda device name (e.g. 'cuda:0') to be used.")
+    parser.add_argument("-enc", "--enc_type", type=str, default="nbow", help="the encoder architecture to be used: RNN, CNN, n-BOW")
+    parser.add_argument("-ic", "--init_codebert", action="store_true", help="whether to use CodeBERT embedding layer weights")
+    parser.add_argument("-ood", "--do_ood_test", action="store_true", help="do out of distribution testing across 4 datasets")
+    parser.add_argument("-bs", "--batch_size", default=32, type=int, help="batch size during training and evaluation")
+    parser.add_argument("-dp", "--do_predict", action="store_true", help="do prediction/evaluation")
+    parser.add_argument("-dt", "--do_train", action="store_true", help="do training on dataset")
+    parser.add_argument("-e", "--epochs", default=20, type=int, help="no. of training epochs")
 
     return parser.parse_args()
     
@@ -586,6 +587,27 @@ def main():
             json.dump(train_metrics, f)
     if args.do_predict:
         test_retreival(args)
+    if args.do_ood_test:
+        print("doing ood testing!")
+        tok_path = get_tok_path("codebert")
+        ckpt_path = os.path.join(args.exp_name, "model.pt")
+        print(f"loading checkpoint (state dict) from {ckpt_path}")
+        try: state_dict = torch.load(ckpt_path, map_location="cpu")
+        except Exception as e: 
+            state_dict = None; print(e)
+
+        print("creating model object")
+        model = SiameseWrapperNet(
+            device=args.device_id,
+            enc_type=args.enc_type, 
+            init_codebert=args.init_codebert,
+        )
+        if state_dict: model.load_state_dict(state_dict)
+        print(f"loading candidates from {args.candidates_path}")
+        test_ood_performance(model, query_paths=["query_and_candidates.json", "external_knowledge/queries.json", 
+                                                 "data/queries_webquery.json", "data/queries_codesearchnet.json"],
+                             cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json", 
+                                         "data/candidates_webquery.json", "data/candidates_codesearchnet.json"], args=args)
     
 if __name__ == "__main__":
     main()
