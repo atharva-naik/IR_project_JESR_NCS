@@ -5,18 +5,128 @@
 # code for creating Dataset instance for the dataloader.
 import os
 import torch
+import random
 import numpy as np
 from typing import *
 from tqdm import tqdm
 from datautils.utils import *
 import torch.nn.functional as F
-from torch.utils.data import Dataset
 from transformers import RobertaTokenizer
+from torch.utils.data import Dataset, DataLoader
 
 # list of available models. 
 MODEL_OPTIONS = ["codebert", "graphcodebert", "unixcoder"]
+#     anchor["input_ids"][0], anchor["attention_mask"][0], 
+#     pos["input_ids"][0], pos["attention_mask"][0],
+#     neg["input_ids"][0], neg["attention_mask"][0],
+#     torch.tensor(hard_neg),
+# ]
+def batch_shuffle_collate_fn_graphcodebert(batch):
+    is_hard_neg_mask = []
+    # a mapping to shuffle indices of soft negatives
+    # i.e. assign positive code snippets from one triplet as negative code snippets for other triplets
+    # but only for soft negatives. Leave the hard negatives as it is.
+    shuffle_map = {}
+    # positive PL related inputs:
+    pos_0 = [] # positive PL batch indices.
+    pos_1 = []
+    pos_2 = []
+    # negative PL related inputs.
+    neg_3 = []
+    neg_4 = []
+    neg_5 = []
+    anchor = [] # the 6th index in the batch.
+    is_hard_neg_mask = []
+    for i in range(len(batch)):
+        # whether current triplet is a hard negative.
+        is_hard_neg = batch[i][-1].item()
+        # populate the mapping of soft indices as an identity map first.
+        if not is_hard_neg:
+            shuffle_map[i] = i
+        is_hard_neg_mask.append(is_hard_neg)
+        anchor.append(batch[i][6])
+        pos_0.append(batch[i][0])
+        pos_1.append(batch[i][1])
+        pos_2.append(batch[i][2])
+    # determine new indices by random shuffling.
+    new_inds = random.sample(list(shuffle_map.values()), k=len(shuffle_map))
+    for old_ind, new_ind in zip(shuffle_map, new_inds):
+        shuffle_map[old_ind] = new_ind
+    # create the negative samples while modifying soft negatives using the shuffle map
+    # but leave the hard negative triplets unaffected.
+    for i in range(len(batch)):
+        is_hard_neg = batch[i][-1].item()
+        if is_hard_neg: # for hard negatives don't modify triplet
+            neg_3.append(batch[i][3])
+            neg_4.append(batch[i][4])
+            neg_5.append(batch[i][5])
+        else: # for soft negative triplets use the shuffle map to get the positive code snippet from a different triplet.
+            use_ind = shuffle_map[i]
+            neg_3.append(batch[use_ind][0]) 
+            neg_4.append(batch[use_ind][1])
+            neg_5.append(batch[use_ind][2])
+    
+    pos_0 = torch.stack(pos_0)
+    pos_1 = torch.stack(pos_1)
+    pos_2 = torch.stack(pos_2)
+    neg_3 = torch.stack(neg_3)
+    neg_4 = torch.stack(neg_4)
+    neg_5 = torch.stack(neg_5)
+    anchor = torch.stack(anchor)
+    is_hard_neg_mask = torch.as_tensor(is_hard_neg_mask)
+    
+    return [pos_0, pos_1, pos_2, neg_3, neg_4, neg_5, anchor, is_hard_neg_mask]
+
+def batch_shuffle_collate_fn_codebert(batch):
+    is_hard_neg_mask = []
+    # a mapping to shuffle indices of soft negatives
+    # i.e. assign positive code snippets from one triplet as negative code snippets for other triplets
+    # but only for soft negatives. Leave the hard negatives as it is.
+    shuffle_map = {}
+    anchor = [] # the anchor NL batch indices.
+    anchor_attn = []
+    pos = [] # positive PL batch indices.
+    pos_attn = []
+    neg = [] # negative PL batch indices.
+    neg_attn = []
+    is_hard_neg_mask = []
+    for i in range(len(batch)):
+        # whether current triplet is a hard negative.
+        is_hard_neg = batch[i][-1].item()
+        # populate the mapping of soft indices as an identity map first.
+        if not is_hard_neg:
+            shuffle_map[i] = i
+        is_hard_neg_mask.append(is_hard_neg)
+        anchor.append(batch[i][0])
+        anchor_attn.append(batch[i][1])
+        pos.append(batch[i][2])
+        pos_attn.append(batch[i][3])
+    # determine new indices by random shuffling.
+    new_inds = random.sample(list(shuffle_map.values()), k=len(shuffle_map))
+    for old_ind, new_ind in zip(shuffle_map, new_inds):
+        shuffle_map[old_ind] = new_ind
+    # create the negative samples while modifying soft negatives using the shuffle map
+    # but leave the hard negative triplets unaffected.
+    for i in range(len(batch)):
+        is_hard_neg = batch[i][-1].item()
+        if is_hard_neg: # for hard negatives don't modify triplet
+            neg.append(batch[i][4])
+            neg_attn.append(batch[i][5])
+        else: # for soft negative triplets use the shuffle map to get the positive code snippet from a different triplet.
+            use_ind = shuffle_map[i]
+            neg.append(batch[use_ind][2]) # '2' as we are using positive code snippet from another triplet.
+            neg_attn.append(batch[use_ind][3])
+    anchor = torch.stack(anchor)
+    pos = torch.stack(pos)
+    neg = torch.stack(neg)
+    anchor_attn = torch.stack(anchor_attn)
+    pos_attn = torch.stack(pos_attn)
+    neg_attn = torch.stack(neg_attn)
+    is_hard_neg_mask = torch.as_tensor(is_hard_neg_mask)
+    
+    return [anchor, anchor_attn, pos, pos_attn, neg, neg_attn, is_hard_neg_mask]
+
 def batch_shuffle_collate_fn(batch):
-    import random
     is_hard_neg_mask = []
     # a mapping to shuffle indices of soft negatives
     # i.e. assign positive code snippets from one triplet as negative code snippets for other triplets
@@ -55,6 +165,75 @@ def batch_shuffle_collate_fn(batch):
     
     return [anchor, pos, neg, is_hard_neg_mask]
         
+# dynamic dataloader class: has custom collating function that can use IDNS if needed.
+class DynamicDataLoader(DataLoader):
+    def __init__(self, *args, device: str="cpu", 
+                 model=None, model_name="unixcoder", **kwargs):
+        self.device = device
+        # model and model device.
+        self.model = model
+        self.model_name = model_name
+        super(DynamicDataLoader, self).__init__(
+            *args, collate_fn=self.collate_fn, **kwargs,
+        )
+        
+    def collate_fn(self, batch: List[tuple]):
+        is_hard_neg_mask = []
+        # a mapping to shuffle indices of soft negatives
+        # i.e. assign positive code snippets from one triplet as negative code snippets for other triplets
+        # but only for soft negatives. Leave the hard negatives as it is.
+        shuffle_map = {}
+        soft_neg_queries = []
+        soft_neg_cands = []
+        anchor = [] # the anchor NL batch indices.
+        pos = [] # positive PL batch indices.
+        neg = [] # negative PL batch indices.
+        is_hard_neg_mask = []
+        for i in range(len(batch)):
+            # whether current triplet is a hard negative.
+            is_hard_neg = batch[i][3].item()
+            # populate the mapping of soft indices as an identity map first.
+            if not is_hard_neg:
+                shuffle_map[i] = i
+                soft_neg_cands.append(batch[i][1])
+                soft_neg_queries.append(batch[i][0])
+            is_hard_neg_mask.append(is_hard_neg)
+            anchor.append(batch[i][0])
+            pos.append(batch[i][1])
+        # re-order the soft negatives stored in the shuffle map.
+        self.model.eval()
+        with torch.no_grad():
+            soft_neg_cands = torch.stack(soft_neg_cands)
+            soft_neg_queries = torch.stack(soft_neg_queries)
+            _, enc_intents = self.model(soft_neg_queries.to(self.device))
+            _, enc_snippets = self.model(soft_neg_cands.to(self.device))
+            # score negatives and get there ranks. No mask required because self map is also valid.
+            scores = enc_intents @ enc_snippets.T # batch_size x batch_size
+            ranks = torch.topk(scores, k=1, axis=1).indices.T.squeeze() # k x batch_size
+            # print(ranks.shape)
+        # determine new indices by random shuffling.
+        new_shuffle_map = {}
+        keys = list(shuffle_map.keys())
+        for old_ind, reorder_ind in zip(shuffle_map, ranks):
+            new_shuffle_map[old_ind] = shuffle_map[keys[reorder_ind.item()]]
+        shuffle_map = new_shuffle_map
+        # create the negative samples while modifying soft negatives using the shuffle map
+        # but leave the hard negative triplets unaffected.
+        for i in range(len(batch)):
+            is_hard_neg = batch[i][3].item()
+            if is_hard_neg: # for hard negatives don't modify triplet
+                neg.append(batch[i][2])
+            else: # for soft negative triplets use the shuffle map to get the positive code snippet from a different triplet.
+                use_ind = shuffle_map[i]
+                neg.append(batch[use_ind][1]) # '1' as we are using positive code snippet from another triplet.
+        # self.model.train()
+        anchor = torch.stack(anchor)
+        pos = torch.stack(pos)
+        neg = torch.stack(neg)
+        is_hard_neg_mask = torch.as_tensor(is_hard_neg_mask)
+
+        return [anchor, pos, neg, is_hard_neg_mask]
+    
 # 1-D float buffer and mastering rate calculation.
 class MasteringRate:
     def __init__(self, role: int=0, size: int=20, 
@@ -240,6 +419,8 @@ class DynamicTriplesDataset(Dataset):
         codes_for_sim_intents: List[str] = []
         if use_AST: # when using AST only use AST.
             codes_for_sim_intents += self.perturbed_codes[PL] # codes from AST.
+            # print(PL)
+            # print(codes_for_sim_intents)
         else: # TODO: add a flag for IDNS.
             sim_intents: List[str] = self.sim_intents_map[NL]
             for intent, _ in sim_intents:
@@ -343,7 +524,7 @@ class DynamicTriplesDataset(Dataset):
                 torch.tensor(neg),
                 torch.tensor(hard_neg)] 
         
-    def _graphcodebert_getitem(self, anchor: str, pos: Union[str, list], neg: Union[str, list]):
+    def _graphcodebert_getitem(self, anchor: str, pos: Union[str, list], neg: Union[str, list], hard_neg: bool):
         args = self.tok_args
         tokenizer = self.tokenizer
         # nl

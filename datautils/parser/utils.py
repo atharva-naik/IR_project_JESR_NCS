@@ -1,6 +1,7 @@
 import re
+import tokenize
 from io import StringIO
-import  tokenize
+
 def remove_comments_and_docstrings(source,lang):
     if lang in ['python']:
         """
@@ -11,6 +12,8 @@ def remove_comments_and_docstrings(source,lang):
         prev_toktype = tokenize.INDENT
         last_lineno = -1
         last_col = 0
+        # print("inside \x1b[34;1mremove_comments_and_docstrings:\x1b[0m", source)
+        # print("—"*30)
         for tok in tokenize.generate_tokens(io_obj.readline):
             token_type = tok[0]
             token_string = tok[1]

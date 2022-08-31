@@ -39,6 +39,7 @@ def get_args():
     parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json", help="path to candidates (to test retrieval)")
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json", help="path to queries (to test retrieval)")
     parser.add_argument("-en", "--exp_name", type=str, default="UniXcoder_rel_thresh", help="experiment name (will be used as folder name)")
+    parser.add_argument("-w", "--warmup_steps", type=int, default=3000, help="no. of warmup steps (soft negatives only during warmup)")
     parser.add_argument("-d", "--device_id", type=str, default="cpu", help="device string (GPU) for doing training/testing")
     parser.add_argument("-lr", "--lr", type=float, default=1e-5, help="learning rate for training (defaults to 1e-5)")
     parser.add_argument("-te", "--test", action="store_true", help="flag to do testing")
@@ -272,8 +273,6 @@ class UniXcoderTripletNet(nn.Module):
         cand_mat = torch.stack(cand_mat)
         scores = torch.cdist(query_mat, cand_mat, p=2)
         doc_ranks = scores.argsort(axis=1)
-        print(labels[:10])
-        print(doc_ranks[:10])
         recall_at_5 = recall_at_k(labels, doc_ranks.tolist(), k=5)
         
         return recall_at_5
@@ -310,12 +309,12 @@ class UniXcoderTripletNet(nn.Module):
         return all_embeds
 
     def fit(self, train_path: str, val_path: str, **args):
+        warmup_steps = args.get("warmup_steps", 3000)
         exp_name = args.get("exp_name", "experiment")
         device_id = args.get("device_id", "cuda:0")
         batch_size = args.get("batch_size", 32)
         epochs = args.get("epochs", 5)
         beta = args.get("beta", 0.01)
-        warmup_steps = args.get("warmup_steps", 3000)
         p = args.get("p", 2)
         
         use_AST = args.get("use_AST", False)
@@ -379,6 +378,8 @@ class UniXcoderTripletNet(nn.Module):
         print(f"saved config to {config_path}")
         if SHUFFLE_BATCH_DEBUG_SETTING: #TODO: remove this. Used only for a temporary experiment.
             from datautils import batch_shuffle_collate_fn
+            # trainloader = DynamicDataLoader(trainset, shuffle=True, batch_size=batch_size, 
+            #                                 model=self.embed_model, device=device)
             trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size,
                                      collate_fn=batch_shuffle_collate_fn)
             valloader = DataLoader(valset, shuffle=False, batch_size=batch_size,
@@ -423,8 +424,6 @@ class UniXcoderTripletNet(nn.Module):
                 # scheduler.step()  # Update learning rate schedule
                 self.zero_grad()
                 batch_losses.append(batch_loss.item())
-                MIX_STEP = ""
-                HARD_ACC = ""
                 if hasattr(trainset, "update"):
                     train_soft_neg_acc.update(
                         anchor_text_emb, pos_code_emb, 
@@ -492,8 +491,8 @@ def main(args):
                               perturbed_codes_path=args.perturbed_codes_path,
                               device_id=args.device_id, val_path=args.val_path, 
                               train_path=args.train_path, batch_size=args.batch_size,
-                              dynamic_negative_sampling=args.dynamic_negative_sampling,
                               beta=args.beta, p=args.p, warmup_steps=args.warmup_steps,
+                              dynamic_negative_sampling=args.dynamic_negative_sampling,
                               sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
                               intent_level_dynamic_sampling=args.intent_level_dynamic_sampling)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
