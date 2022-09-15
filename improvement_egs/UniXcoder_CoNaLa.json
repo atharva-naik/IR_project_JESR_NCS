@@ -1,0 +1,588 @@
+[
+    [
+        "Merging two pandas dataframes",
+        [
+            "df1.merge(df2, on='Date_Time')",
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "pd.merge(split_df, csv_df, on=['key'], suffixes=('_left', '_right'))",
+            "df['D'] = df['B']",
+            "pd.Series(list(set(s1).intersection(set(s2))))"
+        ],
+        [
+            "df1.merge(df2, on='Date_Time')",
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "df['D'] = df['B']",
+            "df['index1'] = df.index",
+            "df = df[(df['closing_price'] >= 99) & (df['closing_price'] <= 101)]"
+        ],
+        [
+            "pd.merge(split_df, csv_df, on=['key'], suffixes=('_left', '_right'))"
+        ]
+    ],
+    [
+        "How to print an entire list while not starting by the first item",
+        [
+            "print([item for item in [1, 2, 3]])",
+            "print(l[3:] + l[:3])",
+            "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]",
+            "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)",
+            "[index for index, item in enumerate(thelist) if item[0] == '332']"
+        ],
+        [
+            "[x for x in myList if x.n == 30]",
+            "[x for x in mylist if len(x) == 3]",
+            "myList.insert(0, 'wuggah')",
+            "print([item for item in [1, 2, 3]])",
+            "my_list = []"
+        ],
+        [
+            "print(l[3:] + l[:3])"
+        ]
+    ],
+    [
+        "Pandas: Delete rows based on multiple columns values",
+        [
+            "df.dropna(subset=[1])",
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])",
+            "df.groupby('A').filter(lambda x: len(x) > 1)",
+            "df.set_index(list('BC')).drop(tuples, errors='ignore').reset_index()",
+            "df['A'][(df['B'] > 50) & (df['C'] == 900)]"
+        ],
+        [
+            "df.groupby('A').filter(lambda x: len(x) > 1)",
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])",
+            "df.dropna(subset=[1])",
+            "df['A'][(df['B'] > 50) & (df['C'] == 900)]",
+            "df['D'] = df['B']"
+        ],
+        [
+            "df.set_index(list('BC')).drop(tuples, errors='ignore').reset_index()"
+        ]
+    ],
+    [
+        "Convert list of lists to list of integers",
+        [
+            "numlist = [float(x) for x in numlist]",
+            "L = [int(''.join([str(y) for y in x])) for x in L]",
+            "[int(''.join(str(d) for d in x)) for x in L]",
+            "T2 = [map(int, x) for x in T1]",
+            "nums = [int(x) for x in intstringlist]"
+        ],
+        [
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "[element for element in lst if isinstance(element, int)]",
+            "numlist = [float(x) for x in numlist]",
+            "T2 = [map(int, x) for x in T1]",
+            "nums = [int(x) for x in intstringlist]"
+        ],
+        [
+            "[int(''.join(str(d) for d in x)) for x in L]",
+            "[''.join(str(d) for d in x) for x in L]",
+            "L = [int(''.join([str(y) for y in x])) for x in L]"
+        ]
+    ],
+    [
+        "Removing an element from a list based on a predicate",
+        [
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "[element for element in lst if not isinstance(element, str)]",
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]",
+            "for i in [i for (i, x) in enumerate(testlist) if (x == 1)]:\n    pass",
+            "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)"
+        ],
+        [
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "list2 = [x for x in list1 if x != []]",
+            "list2 = [x for x in list1 if x]",
+            "for i in [i for (i, x) in enumerate(testlist) if (x == 1)]:\n    pass",
+            "[i for (i, x) in enumerate(testlist) if (x == 1)]"
+        ],
+        [
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]"
+        ]
+    ],
+    [
+        "Python match string if it does not start with X",
+        [
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]",
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')",
+            "re.findall('Test([0-9.]*[0-9]+)', text)"
+        ],
+        [
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]",
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "print(x.rpartition('-')[0])",
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]"
+        ],
+        [
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')"
+        ]
+    ],
+    [
+        "What's the fastest way to locate a list element within a list in python?",
+        [
+            "try:\n    print(testlist.index(element))\nexcept ValueError:\n    pass",
+            "print(testlist.index(element))",
+            "[index for index, item in enumerate(thelist) if item[0] == '332']",
+            "[element for element in lst if isinstance(element, int)]",
+            "len(my_list)"
+        ],
+        [
+            "try:\n    print(testlist.index(element))\nexcept ValueError:\n    pass",
+            "print(testlist.index(element))",
+            "[i for (i, x) in enumerate(testlist) if (x == 1)]",
+            "for i in [i for (i, x) in enumerate(testlist) if (x == 1)]:\n    pass",
+            "for i in (i for (i, x) in enumerate(testlist) if (x == 1)):\n    pass"
+        ],
+        [
+            "[index for index, item in enumerate(thelist) if item[0] == '332']"
+        ]
+    ],
+    [
+        "Replace a substring when it is a separate word",
+        [
+            "[word for word in mystring.split() if word.startswith('$')]",
+            "re.findall('\\\\(.+?\\\\)|\\\\w', '(zyx)bc')",
+            "re.findall('\\\\(.*?\\\\)|\\\\w', '(zyx)bc')",
+            "text = re.sub('\\\\b(\\\\w+)( \\\\1\\\\b)+', '\\\\1', text)",
+            "re.sub('\\\\bH3\\\\b', 'H1', text)"
+        ],
+        [
+            "[word for word in mystring.split() if word.startswith('$')]",
+            "print('\"{}\"'.format(word))",
+            "re.split('[ ](?=[A-Z])', input)",
+            "re.findall('\\\\(.+?\\\\)|\\\\w', '(zyx)bc')",
+            "re.split('(\\\\W+)', 'Words, words, words.')"
+        ],
+        [
+            "re.sub('\\\\bH3\\\\b', 'H1', text)"
+        ]
+    ],
+    [
+        "Coalesce values from 2 columns into a single column in a pandas dataframe",
+        [
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "df['D'] = df['B']",
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])",
+            "df.dropna(subset=[1])",
+            "df1.merge(df2, on='Date_Time')"
+        ],
+        [
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "df['D'] = df['B']",
+            "df1.merge(df2, on='Date_Time')",
+            "df.reset_index(level=0, inplace=True)",
+            "df = df[(df['closing_price'] >= 99) & (df['closing_price'] <= 101)]"
+        ],
+        [
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])"
+        ]
+    ],
+    [
+        "Find last occurrence of character",
+        [
+            "'abcd}def}'.rfind('}')",
+            "print(re.findall(\"'\\\\\\\\[0-7]{1,3}'\", str))",
+            "re.findall('\\\\(.+?\\\\)|\\\\w', '(zyx)bc')",
+            "print(re.search('>.*<', line).group(0))",
+            "print(x.rsplit('-', 1)[0])"
+        ],
+        [
+            "\"\"\"The big brown fox is brown\"\"\".count('brown')",
+            "len(s)",
+            "l.count('a')",
+            "l.count('b')",
+            "len(my_string)"
+        ],
+        [
+            "'abcd}def}'.rfind('}')"
+        ]
+    ],
+    [
+        "Ending with a for loop in python",
+        [
+            "print([item for item in [1, 2, 3]])",
+            "[y for x in data for y in (x if isinstance(x, list) else [x])]",
+            "for i in [i for (i, x) in enumerate(testlist) if (x == 1)]:\n    pass",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "for i in (i for (i, x) in enumerate(testlist) if (x == 1)):\n    pass"
+        ],
+        [
+            "\"\"\"\"\"\".join([char for char in 'it is icy' if char != 'i'])",
+            "[word for word in mystring.split() if word.startswith('$')]",
+            "type(i)",
+            "f = open('yourfile.txt', 'w')",
+            "\"\"\"\"\"\".join(['A', 'B', 'C', 'D'])"
+        ],
+        [
+            "print([item for item in [1, 2, 3]])"
+        ]
+    ],
+    [
+        "Multidimensional array in Python",
+        [
+            "matrix = [[a, b], [c, d], [e, f]]",
+            "np.array([zip(x, y) for x, y in zip(a, b)])",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)",
+            "np.array((a, b))",
+            "numpy.array(a)[0].tolist()"
+        ],
+        [
+            "numpy.array(a).reshape(-1).tolist()",
+            "numpy.array(a)[0].tolist()",
+            "x = np.asarray(x).reshape(1, -1)[(0), :]",
+            "numpy.zeros((3, 3, 3))",
+            "a[:, (np.newaxis)]"
+        ],
+        [
+            "matrix = [[a, b], [c, d], [e, f]]"
+        ]
+    ],
+    [
+        "Python regex separate space-delimited words into a list",
+        [
+            "re.split('(\\\\W+)', 'Words, words, words.')",
+            "re.split('(\\\\W+)', s)",
+            "re.split(' +', 'hello world sample text')",
+            "text.split(',')",
+            "re.split('[ ](?=[A-Z]+\\\\b)', input)"
+        ],
+        [
+            "re.split('(\\\\W+)', 'Words, words, words.')",
+            "re.split('(\\\\W+)', s)",
+            "text.split(',')",
+            "re.split('[ ](?=[A-Z])', input)",
+            "re.split('[ ](?=[A-Z]+\\\\b)', input)"
+        ],
+        [
+            "re.split(' +', 'hello world sample text')"
+        ]
+    ],
+    [
+        "Python: Best Way to Exchange Keys with Values in a Dictionary?",
+        [
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "res = dict((v, k) for k, v in a.items())",
+            "d['mynewkey'] = 'mynewvalue'",
+            "[mydict[x] for x in mykeys]",
+            "data.update(dict(a=1))"
+        ],
+        [
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "[mydict[x] for x in mykeys]",
+            "d['mynewkey'] = 'mynewvalue'",
+            "[value for key, value in list(dict1.items()) if key.startswith('EMP$$')]",
+            "my_dict.update((x, y * 2) for x, y in list(my_dict.items()))"
+        ],
+        [
+            "res = dict((v, k) for k, v in a.items())"
+        ]
+    ],
+    [
+        "creating a tmp file in python",
+        [
+            "file = open('Output.txt', 'a')",
+            "open(filename, 'w').close()",
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()",
+            "new_file = open('path/to/FILE_NAME.ext', 'w')",
+            "f = open('yourfile.txt', 'w')"
+        ],
+        [
+            "shutil.rmtree('/folder_name')",
+            "shutil.copy(srcfile, dstdir)",
+            "subprocess.call(['./test.sh'])",
+            "if (not os.path.exists(directory)):\n    os.makedirs(directory)",
+            "os.chdir('/mydir')\nfor file in glob.glob('*.txt'):\n    pass"
+        ],
+        [
+            "new_file = open('path/to/FILE_NAME.ext', 'w')"
+        ]
+    ],
+    [
+        "python, best way to convert a pandas series into a pandas dataframe",
+        [
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "pd.DataFrame(out.tolist(), columns=['out-1', 'out-2'], index=out.index)",
+            "df['index1'] = df.index",
+            "pd.DataFrame({'email': sf.index, 'list': sf.values})",
+            "df[df.columns[-1]]"
+        ],
+        [
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "df['date'].apply(lambda x: x.toordinal())",
+            "pd.DataFrame(out.tolist(), columns=['out-1', 'out-2'], index=out.index)",
+            "df[df.columns[-1]]",
+            "df['range'].replace(',', '-', inplace=True)"
+        ],
+        [
+            "pd.DataFrame({'email': sf.index, 'list': sf.values})"
+        ]
+    ],
+    [
+        "Sort a list of dicts by dict values",
+        [
+            "list_of_dicts.sort(key=operator.itemgetter('name'))",
+            "list_of_dicts.sort(key=operator.itemgetter('age'))",
+            "newlist = sorted(list_to_be_sorted, key=lambda k: k['name'])",
+            "list.sort(key=lambda item: (item['points'], item['time']))",
+            "l.sort(key=lambda x: (x['title'], x['title_url'], x['id']))"
+        ],
+        [
+            "list_of_dicts.sort(key=operator.itemgetter('name'))",
+            "sorted(d.items())",
+            "list_of_dicts.sort(key=operator.itemgetter('age'))",
+            "sorted(d)",
+            "newlist = sorted(list_to_be_sorted, key=lambda k: k['name'])"
+        ],
+        [
+            "mylist.sort(key=lambda x: x['title'])",
+            "l.sort(key=lambda x: x['title'])",
+            "l.sort(key=lambda x: (x['title'], x['title_url'], x['id']))"
+        ]
+    ],
+    [
+        "Deleting a specific line in a file (python)",
+        [
+            "with open('somefile.txt', 'a') as the_file:\n    the_file.write('Hello\\n')",
+            "[line.rstrip('\\n') for line in file]",
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()",
+            "f = open('yourfile.txt', 'w')",
+            "[x for x in myfile.splitlines() if x != '']"
+        ],
+        [
+            "[line.rstrip('\\n') for line in file]",
+            "myfile.write('\\n'.join(lines))",
+            "[x for x in myfile.splitlines() if x != '']",
+            "open('outfile', 'w').write('#test firstline\\n' + open('infile').read())",
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()"
+        ],
+        [
+            "f = open('yourfile.txt', 'w')"
+        ]
+    ],
+    [
+        "How to remove symbols from a string with Python?",
+        [
+            "re.sub('\\\\D', '', 'aas30dsa20')",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)",
+            "\"\"\"\"\"\".join([char for char in 'it is icy' if char != 'i'])",
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "re.sub('[^\\\\w]', ' ', s)"
+        ],
+        [
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "re.sub('i', '', 'it is icy')",
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)",
+            "\"\"\"\"\"\".join([char for char in 'it is icy' if char != 'i'])"
+        ],
+        [
+            "re.sub('[^\\\\w]', ' ', s)"
+        ]
+    ],
+    [
+        "Python regex for MD5 hash",
+        [
+            "re.findall('([a-fA-F\\\\d]{32})', data)",
+            "base64.b64encode(bytes('your string', 'utf-8'))",
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "print(re.findall(\"'\\\\\\\\[0-7]{1,3}'\", str))",
+            "bytes.fromhex('4a4b4c').decode('utf-8')"
+        ],
+        [
+            "base64.b64encode(bytes('your string', 'utf-8'))",
+            "'Sopet\\xc3\\xb3n'.encode('latin-1').decode('utf-8')",
+            "re.sub('[^\\\\sa-zA-Z0-9]', '', text).lower().strip()",
+            "bytes.fromhex('4a4b4c').decode('utf-8')",
+            "re.sub('\\\\bH3\\\\b', 'H1', text)"
+        ],
+        [
+            "re.findall('([a-fA-F\\\\d]{32})', data)"
+        ]
+    ],
+    [
+        "How to sort Counter by value? - python",
+        [
+            "ut.sort(key=lambda x: x.count, reverse=True)",
+            "sorted(x, key=x.get, reverse=True)",
+            "ut.sort(key=cmpfun, reverse=True)",
+            "sorted(d)",
+            "l = sorted(l, key=itemgetter('time'), reverse=True)"
+        ],
+        [
+            "Counter(l)",
+            "ut.sort(key=lambda x: x.count, reverse=True)",
+            "[k for k, v in list(Counter(mylist).items()) if v > 1]",
+            "sorted(d)",
+            "mylist.sort(key=lambda x: x['title'])"
+        ],
+        [
+            "sorted(x, key=x.get, reverse=True)",
+            "sorted(list(x.items()), key=lambda pair: pair[1], reverse=True)"
+        ]
+    ],
+    [
+        "Python concat string with list",
+        [
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)",
+            "\"\"\" \"\"\".join(list)",
+            "\"\"\"\"\"\".join(['a', 'b', 'c'])",
+            "myList = ','.join(map(str, myList))",
+            "\"\"\"\"\"\".join(['A', 'B', 'C', 'D'])"
+        ],
+        [
+            "\"\"\",\"\"\".join(l)",
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)",
+            "\"\"\"\"\"\".join(['A', 'B', 'C', 'D'])",
+            "\"\"\"\"\"\".join(['a', 'b', 'c'])",
+            "\"\"\":\"\"\".join(str(x) for x in b)"
+        ],
+        [
+            "\"\"\" \"\"\".join(list)"
+        ]
+    ],
+    [
+        "How do you read a file into a list in Python?",
+        [
+            "lst = map(int, open('filename.txt').readlines())",
+            "[line.split() for line in open('File.txt')]",
+            "data = [line.strip() for line in open('C:/name/MyDocuments/numbers', 'r')]",
+            "lol = list(csv.reader(open('text.txt', 'rb'), delimiter='\\t'))",
+            "open(path, 'r')"
+        ],
+        [
+            "[line.split() for line in open('File.txt')]",
+            "lst = map(int, open('filename.txt').readlines())",
+            "[line.rstrip('\\n') for line in file]",
+            "file.seek(0)",
+            "lol = list(csv.reader(open('text.txt', 'rb'), delimiter='\\t'))"
+        ],
+        [
+            "data = [line.strip() for line in open('C:/name/MyDocuments/numbers', 'r')]"
+        ]
+    ],
+    [
+        "Searching a list of objects in Python",
+        [
+            "lst = [Object() for i in range(100)]",
+            "lst = [Object() for _ in range(100)]",
+            "[index for index, item in enumerate(thelist) if item[0] == '332']",
+            "['it'] + ['was'] + ['annoying']",
+            "[x for x in myList if x.n == 30]"
+        ],
+        [
+            "lst = [Object() for i in range(100)]",
+            "lst = [Object() for _ in range(100)]",
+            "[i for (i, x) in enumerate(testlist) if (x == 1)]",
+            "for i in [i for (i, x) in enumerate(testlist) if (x == 1)]:\n    pass",
+            "[index for index, item in enumerate(thelist) if item[0] == '332']"
+        ],
+        [
+            "[x for x in myList if x.n == 30]"
+        ]
+    ],
+    [
+        "Python: How to write multiple strings in one line?",
+        [
+            "target.write('%r\\n%r\\n%r\\n' % (line1, line2, line3))",
+            "myfile.write('\\n'.join(lines))",
+            "print('\\n'.join('\\t'.join(str(col) for col in row) for row in tab))",
+            "line.split()",
+            "inputString.split('\\n')"
+        ],
+        [
+            "myfile.write('\\n'.join(lines))",
+            "writer.writeheader()",
+            "open('outfile', 'w').write('#test firstline\\n' + open('infile').read())",
+            "with open('somefile.txt', 'a') as the_file:\n    the_file.write('Hello\\n')",
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()"
+        ],
+        [
+            "target.write('%r\\n%r\\n%r\\n' % (line1, line2, line3))"
+        ]
+    ],
+    [
+        "How to sort this list in Python?",
+        [
+            "newlist = sorted(l, key=itemgetter('name'), reverse=True)",
+            "l = sorted(l, key=itemgetter('time'), reverse=True)",
+            "sorted(list, key=lambda x: (x[0], -x[1]))",
+            "newlist = sorted(list_to_be_sorted, key=lambda k: k['name'])",
+            "l = sorted(l, key=lambda a: a['time'], reverse=True)"
+        ],
+        [
+            "sorted(list, key=lambda x: (x[0], -x[1]))",
+            "newlist = sorted(l, key=itemgetter('name'), reverse=True)",
+            "newlist = sorted(list_to_be_sorted, key=lambda k: k['name'])",
+            "mylist.sort(key=lambda x: x['title'])",
+            "list.sort(key=lambda item: (item['points'], item['time']))"
+        ],
+        [
+            "l = sorted(l, key=itemgetter('time'), reverse=True)",
+            "l = sorted(l, key=lambda a: a['time'], reverse=True)"
+        ]
+    ],
+    [
+        "How to sort a Dataframe by the ocurrences in a column in Python (pandas)",
+        [
+            "df.sort_values(['System_num', 'Dis'])",
+            "df.groupby('prots').sum().sort('scores', ascending=False)",
+            "df.groupby(['col1', 'col2'])['col3'].nunique().reset_index()",
+            "c2.sort(key=lambda row: row[2])",
+            "c2.sort(key=lambda row: (row[2], row[1], row[0]))"
+        ],
+        [
+            "df.sort_values(['System_num', 'Dis'])",
+            "df['date'].apply(lambda x: x.toordinal())",
+            "df[df.columns[-1]]",
+            "df['index1'] = df.index",
+            "all(df.index[:-1] <= df.index[1:])"
+        ],
+        [
+            "df.groupby('prots').sum().sort('scores', ascending=False)"
+        ]
+    ],
+    [
+        "sort a list of dicts by x then by y",
+        [
+            "list_of_dicts.sort(key=operator.itemgetter('name'))",
+            "list.sort(key=lambda item: (item['points'], item['time']))",
+            "list_of_dicts.sort(key=operator.itemgetter('age'))",
+            "sorted(list(x.items()), key=lambda pair: pair[1], reverse=True)",
+            "l.sort(key=lambda x: (x['title'], x['title_url'], x['id']))"
+        ],
+        [
+            "sorted(list(x.items()), key=lambda pair: pair[1], reverse=True)",
+            "sorted(d)",
+            "list_of_dicts.sort(key=operator.itemgetter('name'))",
+            "mylist.sort(key=lambda x: x['title'])",
+            "list_of_dicts.sort(key=operator.itemgetter('age'))"
+        ],
+        [
+            "list.sort(key=lambda item: (item['points'], item['time']))"
+        ]
+    ],
+    [
+        "Python - Unicode to ASCII conversion",
+        [
+            "\"\"\"\\\\x89\\\\n\"\"\".decode('string_escape')",
+            "raw_byte_string.decode('unicode_escape')",
+            "'Sopet\\xc3\\xb3n'.encode('latin-1').decode('utf-8')",
+            "print('\\xd0\\xbf\\xd1\\x80\\xd0\\xb8'.encode('raw_unicode_escape'))",
+            "s.encode('iso-8859-15')"
+        ],
+        [
+            "raw_byte_string.decode('unicode_escape')",
+            "encoded = 'data to be encoded'.encode('ascii')",
+            "'Sopet\\xc3\\xb3n'.encode('latin-1').decode('utf-8')",
+            "print('\\xd0\\xbf\\xd1\\x80\\xd0\\xb8'.encode('raw_unicode_escape'))",
+            "d.decode('cp1251').encode('utf8')"
+        ],
+        [
+            "s.encode('iso-8859-15')"
+        ]
+    ]
+]

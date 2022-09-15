@@ -1,0 +1,757 @@
+[
+    [
+        "Format string dynamically",
+        [
+            "\"\"\"({0.goals} goals, ${0.penalties})\"\"\".format(self)",
+            "print('%*s : %*s' % (20, 'Python', 20, 'Very Good'))",
+            "\"\"\"({} goals, ${})\"\"\".format(self.goals, self.penalties)",
+            "\"\"\"({:d} goals, ${:d})\"\"\".format(self.goals, self.penalties)",
+            "print('{0:.0f}%'.format(1.0 / 3 * 100))"
+        ],
+        [
+            "elements = ['%{0}%'.format(element) for element in elements]",
+            "\"\"\" \"\"\".join([('%d@%d' % t) for t in l])",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])",
+            "\"\"\"({} goals, ${})\"\"\".format(self.goals, self.penalties)",
+            "'first string is: %s, second one is: %s' % (str1, 'geo.tif')"
+        ],
+        [
+            "print('%*s : %*s' % (20, 'Python', 20, 'Very Good'))"
+        ]
+    ],
+    [
+        "OSError: [WinError 193] %1 is not a valid Win32 application",
+        [
+            "subprocess.call(['notepad'])",
+            "os.system('powershell.exe', 'script.ps1')",
+            "os.system('gnome-terminal -e \\'bash -c \"sudo apt-get update; exec bash\"\\'')",
+            "subprocess.Popen(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat'])",
+            "subprocess.call(['python.exe', 'hello.py', 'htmlfilename.htm'])"
+        ],
+        [
+            "subprocess.call(['notepad'])",
+            "os.system('gnome-terminal -e \\'bash -c \"sudo apt-get update; exec bash\"\\'')",
+            "subprocess.Popen(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat'])",
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')",
+            "os.chdir(owd)"
+        ],
+        [
+            "subprocess.call(['python.exe', 'hello.py', 'htmlfilename.htm'])"
+        ]
+    ],
+    [
+        "Remove key from dictionary in Python returning new dictionary",
+        [
+            "{i: d[i] for i in d if i != 'c'}",
+            "del d['ele']",
+            "d['mynewkey'] = 'mynewvalue'",
+            "list(dict.keys())[-1]",
+            "(k for k, v in x.items() if v != 0)"
+        ],
+        [
+            "res = dict((v, k) for k, v in a.items())",
+            "d['mynewkey'] = 'mynewvalue'",
+            "my_dict.update({'third_key': 1})",
+            "del d['ele']",
+            "data.update(dict(a=1))"
+        ],
+        [
+            "{i: d[i] for i in d if i != 'c'}"
+        ]
+    ],
+    [
+        "Running bash script from within python",
+        [
+            "subprocess.call(['./test.sh'])",
+            "os.system('powershell.exe', 'script.ps1')",
+            "subprocess.check_output('ps -ef | grep something | wc -l', shell=True)",
+            "subprocess.call('sleep.sh', shell=True)",
+            "os.system('gnome-terminal -e \\'bash -c \"sudo apt-get update; exec bash\"\\'')"
+        ],
+        [
+            "subprocess.call(['./test.sh'])",
+            "subprocess.Popen(['background-process', 'arguments'])",
+            "os.system('powershell.exe', 'script.ps1')",
+            "subprocess.check_output('ps -ef | grep something | wc -l', shell=True)",
+            "os.system('gnome-terminal -e \\'bash -c \"sudo apt-get update; exec bash\"\\'')"
+        ],
+        [
+            "subprocess.call('sleep.sh', shell=True)"
+        ]
+    ],
+    [
+        "Append elements of a set to a list in Python",
+        [
+            "a.extend(list(b))",
+            "c.extend(a)",
+            "a.extend(b)",
+            "list2.extend(list1)",
+            "list1.extend(mylog)"
+        ],
+        [
+            "list(set(source_list))",
+            "list(set(t))",
+            "my_list.append(12)",
+            "dict(((x, l.count(x)) for x in set(l)))",
+            "list2.extend(list1)"
+        ],
+        [
+            "a.extend(b)",
+            "a.extend(list(b))"
+        ]
+    ],
+    [
+        "how to get the last part of a string before a certain character?",
+        [
+            "\"\"\".\"\"\".join(s.split('.')[::-1])",
+            "print(x.rpartition('-')[0])",
+            "'abcd}def}'.rfind('}')",
+            "len(s)",
+            "\"\"\"QH QD JC KD JS\"\"\".split()"
+        ],
+        [
+            "\"\"\".\"\"\".join(s.split('.')[::-1])",
+            "\"\"\"\"\"\".join(s.rsplit(',', 1))",
+            "print(re.findall(\"'\\\\\\\\[0-7]{1,3}'\", str))",
+            "\"\"\" \"\"\".join(my_string.split())",
+            "\"\"\"The big brown fox is brown\"\"\".count('brown')"
+        ],
+        [
+            "print(x.rpartition('-')[0])",
+            "print(x.rsplit('-', 1)[0])"
+        ]
+    ],
+    [
+        "How to filter rows in pandas by regex",
+        [
+            "df[df['ids'].str.contains('ball')]",
+            "df.loc[df[0].str.contains('(Hel|Just)')]",
+            "df[df['BoolCol'] == True].index.tolist()",
+            "df[df['BoolCol']].index.tolist()",
+            "df.b.str.contains('^f')"
+        ],
+        [
+            "df[df['ids'].str.contains('ball')]",
+            "df['A'][(df['B'] > 50) & (df['C'] == 900)]",
+            "df.loc[df[0].str.contains('(Hel|Just)')]",
+            "df.index.get_loc('bob')",
+            "df.loc[df['Letters'] == 'C', 'Letters'].values[0]"
+        ],
+        [
+            "df.b.str.contains('^f')"
+        ]
+    ],
+    [
+        "Pandas: Delete rows based on multiple columns values",
+        [
+            "df.dropna(subset=[1])",
+            "df.set_index(list('BC')).drop(tuples, errors='ignore').reset_index()",
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])",
+            "df.iloc[np.flatnonzero(df['BoolCol'])]",
+            "df[df.columns[-1]]"
+        ],
+        [
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])",
+            "df.dropna(subset=[1])",
+            "df['A'][(df['B'] > 50) & (df['C'] == 900)]",
+            "df.groupby('A').filter(lambda x: len(x) > 1)",
+            "df[df['ids'].str.contains('ball')]"
+        ],
+        [
+            "df.set_index(list('BC')).drop(tuples, errors='ignore').reset_index()"
+        ]
+    ],
+    [
+        "Removing an element from a list based on a predicate",
+        [
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "[element for element in lst if not isinstance(element, str)]",
+            "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)",
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]",
+            "(k for k, v in x.items() if v != 0)"
+        ],
+        [
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "list2 = [x for x in list1 if x]",
+            "[x for x in mylist if len(x) == 3]",
+            "list2 = [x for x in list1 if x != []]",
+            "print(testlist.index(element))"
+        ],
+        [
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]"
+        ]
+    ],
+    [
+        "python regular expression to remove repeated words",
+        [
+            "text = re.sub('\\\\b(\\\\w+)( \\\\1\\\\b)+', '\\\\1', text)",
+            "re.sub('(?!\\\\s)[\\\\W_]', '', text).lower().strip()",
+            "re.sub('\\\\bH3\\\\b', 'H1', text)",
+            "re.sub('[^\\\\w]', ' ', s)",
+            "text = re.sub('^https?:\\\\/\\\\/.*[\\\\r\\\\n]*', '', text, flags=re.MULTILINE)"
+        ],
+        [
+            "re.sub('(?!\\\\s)[\\\\W_]', '', text).lower().strip()",
+            "re.findall('(.*?)(?:\\\\[.*?\\\\]|$)', example_str)",
+            "mystring.replace(' ', '! !').split('!')",
+            "re.split('(\\\\W+)', s)",
+            "re.sub('[^\\\\w]', ' ', s)"
+        ],
+        [
+            "text = re.sub('\\\\b(\\\\w+)( \\\\1\\\\b)+', '\\\\1', text)"
+        ]
+    ],
+    [
+        "Python match string if it does not start with X",
+        [
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]",
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')",
+            "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]"
+        ],
+        [
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]",
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "re.findall('(.*?)(?:\\\\[.*?\\\\]|$)', example_str)",
+            "re.findall('(.*?)\\\\[.*?\\\\]', example_str)"
+        ],
+        [
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')"
+        ]
+    ],
+    [
+        "Parsing XML in Python with regex",
+        [
+            "print(soup.find(text='Address:').findNext('td').contents[0])",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "print(soup.find('name').string)",
+            "re.findall('src=\"js/([^\"]*\\\\bjquery\\\\b[^\"]*)\"', data)",
+            "print(re.search('>.*<', line).group(0))"
+        ],
+        [
+            "print(soup.find(text='Address:').findNext('td').contents[0])",
+            "print(soup.find('name').string)",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "soup.find_all('span', {'class': 'starGryB sp'})",
+            "re.findall('src=\"js/([^\"]*\\\\bjquery\\\\b[^\"]*)\"', data)"
+        ],
+        [
+            "print(re.search('>.*<', line).group(0))"
+        ]
+    ],
+    [
+        "How can I check if a Pandas dataframe's index is sorted",
+        [
+            "all(df.index[:-1] <= df.index[1:])",
+            "df['index1'] = df.index",
+            "df.index.get_loc('bob')",
+            "df.sort_values(['System_num', 'Dis'])",
+            "df[df['BoolCol']].index.tolist()"
+        ],
+        [
+            "df.index.get_loc('bob')",
+            "df[df['BoolCol'] == True].index.tolist()",
+            "df['index1'] = df.index",
+            "df[df['BoolCol']].index.tolist()",
+            "df.set_index(list('BC')).drop(tuples, errors='ignore').reset_index()"
+        ],
+        [
+            "all(df.index[:-1] <= df.index[1:])"
+        ]
+    ],
+    [
+        "transpose dictionary (extract all the values for one key from a list of dictionaries)",
+        [
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "[(x['x'], x['y']) for x in d]",
+            "res = dict((v, k) for k, v in a.items())"
+        ],
+        [
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "list(dict((x[0], x) for x in L).values())",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "print(dict(zip(LD[0], zip(*[list(d.values()) for d in LD]))))"
+        ],
+        [
+            "[(x['x'], x['y']) for x in d]"
+        ]
+    ],
+    [
+        "Is there a string-collapse library function in python?",
+        [
+            "\"\"\" \"\"\".join(my_string.split())",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "mystring.replace(' ', '! !').split('!')",
+            "\"\"\"\"\"\".join(s.rsplit(',', 1))",
+            "\"\"\"QH QD JC KD JS\"\"\".split()"
+        ],
+        [
+            "\"\"\"\"\"\".join(['a', 'b', 'c'])",
+            "[x[::-1] for x in b]",
+            "print('\"{}\"'.format(word))",
+            "list(map(lambda x, y: x + y, word[:-1], word[1:]))",
+            "print(l[3:] + l[:3])"
+        ],
+        [
+            "\"\"\" \"\"\".join(my_string.split())"
+        ]
+    ],
+    [
+        "Converting lists of tuples to strings Python",
+        [
+            "myList = ','.join(map(str, myList))",
+            "[''.join(str(d) for d in x) for x in L]",
+            "[int(s) for s in user.split(',')]",
+            "[int(''.join(str(d) for d in x)) for x in L]",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])"
+        ],
+        [
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)",
+            "[''.join(str(d) for d in x) for x in L]",
+            "\"\"\",\"\"\".join(l)",
+            "\"\"\":\"\"\".join(str(x) for x in b)",
+            "myList = ','.join(map(str, myList))"
+        ],
+        [
+            "\"\"\" \"\"\".join([('%d@%d' % t) for t in l])",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])"
+        ]
+    ],
+    [
+        "convert strings into integers",
+        [
+            "int('1')",
+            "nums = [int(x) for x in intstringlist]",
+            "int()",
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "L = [int(''.join([str(y) for y in x])) for x in L]"
+        ],
+        [
+            "nums = [int(x) for x in intstringlist]",
+            "L = [int(''.join([str(y) for y in x])) for x in L]",
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "numlist = [float(x) for x in numlist]",
+            "[int(''.join(str(d) for d in x)) for x in L]"
+        ],
+        [
+            "int('1')",
+            "int()",
+            "T2 = [map(int, x) for x in T1]"
+        ]
+    ],
+    [
+        "How to remove any URL within a string in Python",
+        [
+            "print(re.search('(?P<url>https?://[^\\\\s]+)', myString).group('url'))",
+            "\"\"\"Docs/src/Scripts/temp\"\"\".replace('/', '/\\x00/').split('\\x00')",
+            "text = re.sub('^https?:\\\\/\\\\/.*[\\\\r\\\\n]*', '', text, flags=re.MULTILINE)",
+            "print(x.rpartition('-')[0])",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)"
+        ],
+        [
+            "re.findall('\"(http.*?)\"', s, re.MULTILINE | re.DOTALL)",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "print(re.search('(?P<url>https?://[^\\\\s]+)', myString).group('url'))",
+            "print(re.findall('(https?://[^\\\\s]+)', myString))",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)"
+        ],
+        [
+            "text = re.sub('^https?:\\\\/\\\\/.*[\\\\r\\\\n]*', '', text, flags=re.MULTILINE)"
+        ]
+    ],
+    [
+        "Running R script from python",
+        [
+            "subprocess.call('/usr/bin/Rscript --vanilla /pathto/MyrScript.r', shell=True)",
+            "subprocess.call(['./test.sh'])",
+            "os.system('powershell.exe', 'script.ps1')",
+            "subprocess.call(['/usr/bin/Rscript', '--vanilla', '/pathto/MyrScript.r'])",
+            "subprocess.Popen(['background-process', 'arguments'])"
+        ],
+        [
+            "subprocess.Popen(['background-process', 'arguments'])",
+            "os.system('powershell.exe', 'script.ps1')",
+            "subprocess.call(['./test.sh'])",
+            "subprocess.call('sleep.sh', shell=True)",
+            "subprocess.Popen(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat'])"
+        ],
+        [
+            "subprocess.call(['/usr/bin/Rscript', '--vanilla', '/pathto/MyrScript.r'])",
+            "subprocess.call('/usr/bin/Rscript --vanilla /pathto/MyrScript.r', shell=True)"
+        ]
+    ],
+    [
+        "How do I convert tuple of tuples to list in one line (pythonic)?",
+        [
+            "tuple(l)",
+            "map(lambda a: a[0], (('aa',), ('bb',), ('cc',)))",
+            "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4)])",
+            "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e',)])",
+            "[val for pair in zip(l1, l2) for val in pair]"
+        ],
+        [
+            "tuple(l)",
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)",
+            "print([item for item in [1, 2, 3]])",
+            "list(t)",
+            "\"\"\",\"\"\".join(l)"
+        ],
+        [
+            "from functools import reduce\nreduce(lambda a, b: a + b, (('aa',), ('bb',), ('cc',)))",
+            "map(lambda a: a[0], (('aa',), ('bb',), ('cc',)))"
+        ]
+    ],
+    [
+        "Replace all quotes in a string with escaped quotes?",
+        [
+            "print('foo\\nbar'.encode('string_escape'))",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "\"\"\"\\\\a\"\"\".decode('string_escape')",
+            "print(s.encode('unicode-escape').replace('\"', '\\\\\"'))"
+        ],
+        [
+            "\"\"\"\\\\a\"\"\".decode('string_escape')",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "print('foo\\nbar'.encode('string_escape'))",
+            "raw_string.decode('string_escape')",
+            "\"\"\"obama\"\"\".replace('a', '%temp%').replace('b', 'a').replace('%temp%', 'b')"
+        ],
+        [
+            "print(s.encode('unicode-escape').replace('\"', '\\\\\"'))"
+        ]
+    ],
+    [
+        "How to reverse a dictionary in Python?",
+        [
+            "list(dict.keys())[-1]",
+            "{i: d[i] for i in d if i != 'c'}",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "del d['ele']"
+        ],
+        [
+            "dict(x[i:i + 2] for i in range(0, len(x), 2))",
+            "my_dict.update({'third_key': 1})",
+            "res = dict((v, k) for k, v in a.items())",
+            "list(dict.keys())[-1]",
+            "sorted(o.items())"
+        ],
+        [
+            "{i[1]: i[0] for i in list(myDictionary.items())}"
+        ]
+    ],
+    [
+        "How to remove symbols from a string with Python?",
+        [
+            "re.sub('\\\\D', '', 'aas30dsa20')",
+            "re.sub('[^\\\\w]', ' ', s)",
+            "mystring.replace(' ', '_')",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "re.sub('i', '', 'it is icy')"
+        ],
+        [
+            "mystring.replace(' ', '_')",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "re.sub('i', '', 'it is icy')",
+            "mystring.replace(' ', '! !').split('!')",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)"
+        ],
+        [
+            "re.sub('[^\\\\w]', ' ', s)"
+        ]
+    ],
+    [
+        "Append a NumPy array to a NumPy array",
+        [
+            "np.concatenate((A, B))",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)",
+            "numpy.array(a).reshape(-1).tolist()",
+            "np.vstack((a, b))",
+            "a[:, (np.newaxis)]"
+        ],
+        [
+            "numpy.array(a).reshape(-1).tolist()",
+            "x = np.asarray(x).reshape(1, -1)[(0), :]",
+            "numpy.zeros((3, 3, 3))",
+            "a[:, (np.newaxis)]",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)"
+        ],
+        [
+            "np.vstack((a, b))"
+        ]
+    ],
+    [
+        "numpy concatenate two arrays vertically",
+        [
+            "np.concatenate((A, B))",
+            "np.vstack((A, B))",
+            "np.vstack((a, b))",
+            "np.array((a, b))",
+            "np.array([zip(x, y) for x, y in zip(a, b)])"
+        ],
+        [
+            "np.concatenate((A, B))",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)",
+            "np.array([zip(x, y) for x, y in zip(a, b)])",
+            "np.vstack((a, b))",
+            "np.vstack((A, B))"
+        ],
+        [
+            "print(concatenate((a, b), axis=0))",
+            "print(concatenate((a, b), axis=1))",
+            "c = np.r_[(a[None, :], b[None, :])]",
+            "np.array((a, b))"
+        ]
+    ],
+    [
+        "How to delete all instances of a character in a string in python?",
+        [
+            "re.sub('[^\\\\w]', ' ', s)",
+            "re.sub('\\\\D', '', 'aas30dsa20')",
+            "re.sub('i', '', 'it is icy')",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "mystring.replace(' ', '_')"
+        ],
+        [
+            "mystring.replace(' ', '_')",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)",
+            "\"\"\"obama\"\"\".replace('a', '%temp%').replace('b', 'a').replace('%temp%', 'b')",
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "re.sub('[^\\\\w]', ' ', s)"
+        ],
+        [
+            "\"\"\"\"\"\".join([char for char in 'it is icy' if char != 'i'])",
+            "re.sub('i', '', 'it is icy')",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "\"\"\"\"\"\".join([char for char in 'it is icy' if char != 'i'])"
+        ]
+    ],
+    [
+        "Searching a list of objects in Python",
+        [
+            "lst = [Object() for _ in range(100)]",
+            "lst = [Object() for i in range(100)]",
+            "[x for x in myList if x.n == 30]",
+            "[x for x in range(len(stocks_list)) if stocks_list[x] == 'MSFT']",
+            "getattr(obj, 'attr')"
+        ],
+        [
+            "lst = [Object() for _ in range(100)]",
+            "lst = [Object() for i in range(100)]",
+            "list(t)",
+            "[x for x in range(len(stocks_list)) if stocks_list[x] == 'MSFT']",
+            "super(Derived, cls).do(a)"
+        ],
+        [
+            "[x for x in myList if x.n == 30]"
+        ]
+    ],
+    [
+        "How do I find the string between two special characters?",
+        [
+            "re.sub('\\\\bH3\\\\b', 'H1', text)",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "re.findall('\\\\b(\\\\w+)d\\\\b', s)"
+        ],
+        [
+            "\"\"\"The big brown fox is brown\"\"\".count('brown')",
+            "\"\"\"\"\"\".join(s.rsplit(',', 1))",
+            "\"\"\".\"\"\".join(s.split('.')[::-1])",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "print(re.findall(\"'\\\\\\\\[0-7]{1,3}'\", str))"
+        ],
+        [
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)"
+        ]
+    ],
+    [
+        "How to eliminate all strings from a list",
+        [
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]",
+            "\"\"\" \"\"\".join(list)",
+            "[element for element in lst if not isinstance(element, str)]",
+            "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]",
+            "[i for i, j in enumerate(myList) if 'how' in j.lower() or 'what' in j.lower()]"
+        ],
+        [
+            "list2 = [x for x in list1 if x]",
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]",
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "list2 = [x for x in list1 if x != []]",
+            "all(x == myList[0] for x in myList)"
+        ],
+        [
+            "[element for element in lst if isinstance(element, int)]",
+            "[element for element in lst if not isinstance(element, str)]"
+        ]
+    ],
+    [
+        "How do I get JSON data from RESTful service using Python?",
+        [
+            "json.loads(request.body)",
+            "json.load(urllib.request.urlopen('url'))",
+            "return HttpResponse(data, mimetype='application/json')",
+            "json_data = json.loads(unescaped)",
+            "requests.post(url, data=DATA, headers=HEADERS_DICT, auth=(username, password))"
+        ],
+        [
+            "return HttpResponse(data, mimetype='application/json')",
+            "result[0]['from_user']",
+            "d = ast.literal_eval(\"{'code1':1,'code2':1}\")",
+            "json_data = json.loads(unescaped)",
+            "app.run(debug=True)"
+        ],
+        [
+            "json.load(urllib.request.urlopen('url'))"
+        ]
+    ],
+    [
+        "Removing an item from list matching a substring - Python",
+        [
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]",
+            "[element for element in lst if not isinstance(element, str)]",
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]",
+            "[i for i, j in enumerate(myList) if 'how' in j.lower() or 'what' in j.lower()]"
+        ],
+        [
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]",
+            "list2 = [x for x in list1 if x]",
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "[re.sub('(?<!\\\\d)\\\\.(?!\\\\d)', ' ', i) for i in s]",
+            "[index for index, item in enumerate(thelist) if item[0] == '332']"
+        ],
+        [
+            "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]"
+        ]
+    ],
+    [
+        "How can I reload objects in my namespace in ipython",
+        [
+            "import imp\nimp.reload(module)",
+            "print(type(variable_name))",
+            "getattr(my_object, my_str)",
+            "getattr(obj, 'attr')",
+            "os.path.basename(os.path.dirname(os.path.realpath(__file__)))"
+        ],
+        [
+            "print(type(variable_name))",
+            "getattr(obj, 'attr')",
+            "getattr(my_object, my_str)",
+            "lst = [Object() for _ in range(100)]",
+            "lst = [Object() for i in range(100)]"
+        ],
+        [
+            "import imp\nimp.reload(module)"
+        ]
+    ],
+    [
+        "Python regex findall numbers and dots",
+        [
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]",
+            "[m.group(0) for m in re.finditer('(\\\\d)\\\\1*', s)]",
+            "re.findall('Test([\\\\d.]*\\\\d+)', text)",
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "re.findall('\\\\b(\\\\w+)d\\\\b', s)"
+        ],
+        [
+            "[m.group(0) for m in re.finditer('(\\\\d)\\\\1*', s)]",
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]",
+            "re.findall('n(?<=[^n]n)n+(?=[^n])(?i)', s)",
+            "[re.sub('(?<!\\\\d)\\\\.(?!\\\\d)', ' ', i) for i in s]",
+            "re.findall('\\\\b(\\\\w+)d\\\\b', s)"
+        ],
+        [
+            "re.findall('Test([0-9.]*[0-9]+)', text)",
+            "re.findall('Test([\\\\d.]*\\\\d+)', text)"
+        ]
+    ],
+    [
+        "How to get the index of an integer from a list if the list contains a boolean?",
+        [
+            "all(x == myList[0] for x in myList)",
+            "try:\n    print(testlist.index(element))\nexcept ValueError:\n    pass",
+            "[element for element in lst if isinstance(element, int)]",
+            "[i for (i, x) in enumerate(testlist) if (x == 1)]",
+            "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)"
+        ],
+        [
+            "try:\n    print(testlist.index(element))\nexcept ValueError:\n    pass",
+            "print(testlist.index(element))",
+            "all(x == myList[0] for x in myList)",
+            "[index for index, item in enumerate(thelist) if item[0] == '332']",
+            "[i for (i, x) in enumerate(testlist) if (x == 1)]"
+        ],
+        [
+            "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)"
+        ]
+    ],
+    [
+        "Is there a function in Python to split a string without ignoring the spaces?",
+        [
+            "\"\"\" \"\"\".join(my_string.split())",
+            "re.split(' +', 'hello world sample text')",
+            "mystring.replace(' ', '! !').split('!')",
+            "re.split('(\\\\W+)', s)",
+            "\"\"\"QH QD JC KD JS\"\"\".split()"
+        ],
+        [
+            "\"\"\" \"\"\".join(my_string.split())",
+            "s.split(' ', 4)",
+            "re.split(' +', 'hello world sample text')",
+            "inputString.split('\\n')",
+            "re.split('(\\\\W+)', s)"
+        ],
+        [
+            "mystring.replace(' ', '! !').split('!')"
+        ]
+    ],
+    [
+        "Open file in Python",
+        [
+            "f = open('yourfile.txt', 'w')",
+            "open(filename, 'w').close()",
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()",
+            "file = open('Output.txt', 'a')",
+            "open(path, 'r')"
+        ],
+        [
+            "open(filename, 'w').close()",
+            "f = open('yourfile.txt', 'w')",
+            "file.seek(0)",
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()",
+            "with open('somefile.txt', 'a') as the_file:\n    the_file.write('Hello\\n')"
+        ],
+        [
+            "open(path, 'r')"
+        ]
+    ],
+    [
+        "numpy: syntax/idiom to cast (n,) array to a (n, 1) array?",
+        [
+            "numpy.array(a).reshape(-1).tolist()",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)",
+            "a[:, (np.newaxis)]",
+            "x = np.asarray(x).reshape(1, -1)[(0), :]",
+            "numpy.array(a)[0].tolist()"
+        ],
+        [
+            "x = np.asarray(x).reshape(1, -1)[(0), :]",
+            "numpy.array(a).reshape(-1).tolist()",
+            "data.reshape(-1, j).mean(axis=1).reshape(data.shape[0], -1)",
+            "np.where(np.in1d(A, [1, 3, 4]).reshape(A.shape), A, 0)",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)"
+        ],
+        [
+            "a[:, (np.newaxis)]"
+        ]
+    ]
+]

@@ -1,0 +1,667 @@
+[
+    [
+        "This function returns a tuple of three values that give information about the exception that is currently being handled .",
+        [
+            "sys.exc_info()",
+            "traceback.print_stack(limit=None)",
+            "future.set_exception(exception)",
+            "traceback.print_stack()",
+            "logging.LogRecord(name, level, pathname, lineno, msg, args, exc_info, func=None, sinfo=None)"
+        ],
+        [
+            "future.set_exception(exception)",
+            "functools.update_wrapper(wrapper, wrapped)",
+            "bytecode.from_traceback(tb)",
+            "traceback.print_stack(limit=None)",
+            "dis.dis(x=None, depth=None)"
+        ],
+        [
+            "sys.exc_info()"
+        ]
+    ],
+    [
+        "Base protocol with methods that all protocols share.",
+        [
+            "socket.SocketType",
+            "object",
+            "bdb.dispatch_return(frame, arg)",
+            "test.support.SOCK_MAX_SIZE",
+            "asyncio.BaseProtocol"
+        ],
+        [
+            "socket.SocketType",
+            "Protocol.eof_received()",
+            "SSLSocket.server_side",
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "socket.sendmsg_afalg(msg, op, iv, assoclen)"
+        ],
+        [
+            "asyncio.BaseProtocol"
+        ]
+    ],
+    [
+        "Convert an IPv4 address from dotted-quad string format ( for example , \u2018 123.45.67.89 \u2019 ) to 32-bit packed binary format , as a bytes object four characters in length . With arguments `ip_string`.",
+        [
+            "bytearray.fromhex(string)",
+            "ipaddress.IPv4Address(address)",
+            "struct.size",
+            "array.frombytes(s)",
+            "socket.inet_aton(ip_string)"
+        ],
+        [
+            "bytearray.fromhex(string)",
+            "binary.encode(out)",
+            "struct.size",
+            "float.hex()",
+            "array.frombytes(s)"
+        ],
+        [
+            "socket.inet_aton(ip_string)"
+        ]
+    ],
+    [
+        "The name of the operating system dependent module imported.",
+        [
+            "loader.exec_module(module)",
+            "ctypes.util.find_library(name)",
+            "os.name",
+            "@importlib.util.set_loader",
+            "importlib.machinery.all_suffixes()"
+        ],
+        [
+            "importlib.machinery.all_suffixes()",
+            "ctypes.util.find_library(name)",
+            "loader.exec_module(module)",
+            "importlib.resources.read_binary(package, resource)",
+            "@importlib.util.set_loader"
+        ],
+        [
+            "os.name"
+        ]
+    ],
+    [
+        "Assert that `iter` is deallocated after iterating . With arguments `test`, `cls`.",
+        [
+            "test.support.check_free_after_iterating(test, iter, cls)",
+            "object",
+            "types.DynamicClassAttribute(fset=None)",
+            "weakref.getweakrefcount(object)",
+            "dis.dis(depth=None)"
+        ],
+        [
+            "object",
+            "print(*objects)",
+            "functools.update_wrapper(wrapper, wrapped)",
+            "collections.abc.Coroutine",
+            "dis.dis(depth=None)"
+        ],
+        [
+            "test.support.check_free_after_iterating(test, iter, cls)"
+        ]
+    ],
+    [
+        "The `year` , `month` and `day` arguments are required . With arguments `hour`, `second`.",
+        [
+            "format(value, format_spec)",
+            "date.__format__(format)",
+            "datetime.datetime(year, month, day, hour=0, second=0)",
+            "format(value)",
+            "time.__str__()"
+        ],
+        [
+            "ArgumentParser.add_argument(name or flags..., action, nargs, const, default)",
+            "OptionParser.has_option(opt_str)",
+            "format(value, format_spec)",
+            "base_http_request_handler.log_date_time_string()",
+            "json.JSONDecoder(object_hook=None, parse_int=None)"
+        ],
+        [
+            "datetime.datetime(year, month, day, hour=0, second=0)"
+        ]
+    ],
+    [
+        "Conditionally emits the specified logging `record` , depending on filters which may have been added to the handler .",
+        [
+            "logging.handlers.WatchedFileHandler(filename, mode='a', delay=False)",
+            "logging.handlers.SocketHandler(host, port)",
+            "base_http_request_handler.log_date_time_string()",
+            "queue_listener.handle(record)",
+            "logging.LogRecord(name, level, pathname, lineno, msg, args, exc_info, func=None, sinfo=None)"
+        ],
+        [
+            "logging.handlers.WatchedFileHandler(filename, mode='a', delay=False)",
+            "logging.handlers.TimedRotatingFileHandler(filename, interval=1)",
+            "logging.handlers.TimedRotatingFileHandler(filename, when='h', interval=1)",
+            "logging.handlers.TimedRotatingFileHandler(filename, when='h')",
+            "logging.handlers.SocketHandler(host, port)"
+        ],
+        [
+            "queue_listener.handle(record)"
+        ]
+    ],
+    [
+        "A dictionary mapping XHTML 1.0 entity definitions to their replacement text in ISO Latin-1.",
+        [
+            "gettext.find(domain, localedir=None)",
+            "xml.parsers.expat.model.XML_CQUANT_NONE",
+            "html.entities.entitydefs",
+            "xml.parsers.expat.ParserCreate(namespace_separator=None)",
+            "xmlparser.GetInputContext()"
+        ],
+        [
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "base64.a85encode(b, foldspaces=False, wrapcol=0)",
+            "codecs.backslashreplace_errors(exception)",
+            "xmlparser.GetInputContext()",
+            "email_message.replace_header(_name, _value)"
+        ],
+        [
+            "html.entities.entitydefs"
+        ]
+    ],
+    [
+        "This bytearray class method returns bytearray object , decoding the given `string` object .",
+        [
+            "array.frombytes(s)",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.fromhex(string)",
+            "binary.encode(out)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")"
+        ],
+        [
+            "array.frombytes(s)",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "struct.size",
+            "binary.encode(out)",
+            "binascii.b2a_qp(data, istext=True, header=False)"
+        ],
+        [
+            "bytearray.fromhex(string)"
+        ]
+    ],
+    [
+        "Returns a list of all objects tracked by the collector , excluding the list returned .",
+        [
+            "print(*objects)",
+            "gc.get_objects()",
+            "gc.get_referrers(*objs)",
+            "object",
+            "print(*objects, file=sys.stdout)"
+        ],
+        [
+            "gc.get_referrers(*objs)",
+            "print(*objects)",
+            "weakref.getweakrefcount(object)",
+            "print(*objects, file=sys.stdout)",
+            "print(*objects, end='\\n')"
+        ],
+        [
+            "gc.get_objects()"
+        ]
+    ],
+    [
+        "Tries to compile `source` , which should be a string of Python code and return a code object if source is valid Python code . In that case , the `filename` attribute of the code object will be filename , which defaults to ' < input > ' . The `symbol` argument determines whether source is compiled as a statement ( 'single ' , the default ) or as an expression ( 'eval ' ) .",
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "py_compile.compile(file, dfile=None)",
+            "doctest.run_docstring_examples(f, globs, verbose=False)",
+            "importlib.util.cache_from_source(path, debug_override=None, optimization=None)",
+            "test.support.make_legacy_pyc(source)"
+        ],
+        [
+            "py_compile.compile(file, dfile=None)",
+            "loader.exec_module(module)",
+            "__import__(name, locals=None)",
+            "importlib.util.LazyLoader(loader)",
+            "__import__(name, globals=None, locals=None)"
+        ],
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")"
+        ]
+    ],
+    [
+        "Search for all descendants ( direct children , children \u2019 s children , etc . ) With arguments `namespaceURI`, `localName`.",
+        [
+            "gc.get_referrers(*objs)",
+            "xmlparser.AttlistDeclHandler(elname, attname, type, default, required)",
+            "xmlparser.NotationDeclHandler(notationName, base, systemId, publicId)",
+            "Document.getElementsByTagNameNS(namespaceURI, localName)",
+            "PurePath.parent"
+        ],
+        [
+            "PurePath.parent",
+            "gc.get_referrers(*objs)",
+            "xmlparser.AttlistDeclHandler(elname, attname, type, default, required)",
+            "xmlparser.NotationDeclHandler(notationName, base, systemId, publicId)",
+            "Node.toxml()"
+        ],
+        [
+            "Document.getElementsByTagNameNS(namespaceURI, localName)"
+        ]
+    ],
+    [
+        "Connect to the server specified when the object was created .",
+        [
+            "base_server.server_close()",
+            "HTTPConnection.connect()",
+            "FTP.connect(port=0)",
+            "FTP.connect(host='', port=0)",
+            "FTP.connect(host='')"
+        ],
+        [
+            "base_server.server_close()",
+            "loop.start_tls(transport, protocol, sslcontext, server_side=False)",
+            "BaseHandler.unknown_open(req)",
+            "netrc.authenticators(host)",
+            "logging.handlers.SocketHandler(host, port)"
+        ],
+        [
+            "HTTPConnection.connect()"
+        ]
+    ],
+    [
+        "Socket operation on non-socket",
+        [
+            "Protocol.eof_received()",
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "SSLSocket.server_side",
+            "socket.SocketType",
+            "errno.ENOTSOCK"
+        ],
+        [
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "asyncio.open_connection(port=None)",
+            "Protocol.eof_received()",
+            "socket.SocketType",
+            "SSLSocket.server_side"
+        ],
+        [
+            "errno.ENOTSOCK"
+        ]
+    ],
+    [
+        "User id of the owner.",
+        [
+            "stat.ST_UID",
+            "email_policy.refold_source",
+            "smtp_handler.getSubject(record)",
+            "HTTPPasswordMgrWithPriorAuth.update_authenticated(self, uri, is_authenticated=False)",
+            "HTTPPasswordMgrWithPriorAuth.update_authenticated(self, uri)"
+        ],
+        [
+            "HTTPPasswordMgrWithPriorAuth.update_authenticated(self, uri)",
+            "auto.object",
+            "HTTPPasswordMgrWithPriorAuth.update_authenticated(self, uri, is_authenticated=False)",
+            "dataclasses.field(hash=None)",
+            "gc.get_objects()"
+        ],
+        [
+            "stat.ST_UID"
+        ]
+    ],
+    [
+        "A class which postpones the execution of the `loader` of a module until the module has an attribute accessed .",
+        [
+            "importlib.util.LazyLoader(loader)",
+            "__import__(name)",
+            "@importlib.util.set_loader",
+            "loader.exec_module(module)",
+            "__import__(name, globals=None, locals=None)"
+        ],
+        [
+            "__import__(name, locals=None)",
+            "__import__(name, globals=None, locals=None)",
+            "__import__(name, globals=None)",
+            "__import__(name)",
+            "loader.exec_module(module)"
+        ],
+        [
+            "importlib.util.LazyLoader(loader)"
+        ]
+    ],
+    [
+        "This method checks if there is a breakpoint in the filename and line belonging to `frame` or , at least , in the current function .",
+        [
+            "traceback.print_stack(limit=None)",
+            "ExpatError.lineno",
+            "traceback.print_stack()",
+            "sys.exc_info()",
+            "bdb.break_here(frame)"
+        ],
+        [
+            "bytecode.from_traceback(tb)",
+            "traceback.print_stack(limit=None)",
+            "trace.size",
+            "traceback.print_stack()",
+            "io_base.readlines(hint=-1)"
+        ],
+        [
+            "bdb.break_here(frame)"
+        ]
+    ],
+    [
+        "The new process has a new console, instead of inheriting its parent\u2019s console (the default).",
+        [
+            "subprocess.STARTUPINFO(hStdOutput=None)",
+            "subprocess.CREATE_NEW_CONSOLE",
+            "subprocess.CalledProcessError",
+            "profile.run(command, filename=None)",
+            "sys.getprofile()"
+        ],
+        [
+            "subprocess.STARTUPINFO(hStdOutput=None)",
+            "subprocess.CalledProcessError",
+            "shutil.get_terminal_size(lines))",
+            "profile.run(command, filename=None)",
+            "os._exit(n)"
+        ],
+        [
+            "subprocess.CREATE_NEW_CONSOLE"
+        ]
+    ],
+    [
+        "Establish a network connection and return a pair of ( reader , writer ) objects . With arguments `port`.",
+        [
+            "FTP.connect(port=0)",
+            "FTP.connect(host='', port=0)",
+            "loop.getaddrinfo(host, port, family=0)",
+            "HTTPConnection.connect()",
+            "asyncio.open_connection(port=None)"
+        ],
+        [
+            "SSLSocket.server_side",
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "multiprocessing.connection.Listener(address, family, backlog)",
+            "loop.start_tls(transport, protocol, sslcontext, server_side=False)",
+            "socket.SocketType"
+        ],
+        [
+            "asyncio.open_connection(port=None)"
+        ]
+    ],
+    [
+        "Connect to the given `host` and `port` .",
+        [
+            "FTP.connect(host='', port=0)",
+            "FTP.connect(port=0)",
+            "socket.gethostbyname(hostname)",
+            "FTP.connect(host='')",
+            "loop.getaddrinfo(host, port, family=0)"
+        ],
+        [
+            "netrc.authenticators(host)",
+            "http.client.HTTPSConnection(host, blocksize=8192)",
+            "socket.gethostbyname(hostname)",
+            "HTTPConnection.connect()",
+            "http.client.HTTP_PORT"
+        ],
+        [
+            "FTP.connect(port=0)",
+            "FTP.connect(host='', port=0)",
+            "FTP.connect(host='')",
+            "FTP.connect()"
+        ]
+    ],
+    [
+        "A wrapper for a bound socket or Windows named pipe which is \u2018 listening \u2019 for connections . `address` is the address to be used by the bound socket or named pipe of the listener object . `family` is the type of socket ( or named pipe ) to use . If the listener object uses a socket then `backlog` ( 1 by default ) is passed to the listen ( ) method of the socket once it has been bound .",
+        [
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "multiprocessing.connection.Listener(address, family, backlog)",
+            "socket.SocketType",
+            "loop.getaddrinfo(host, port, family=0)",
+            "Protocol.eof_received()"
+        ],
+        [
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "SSLSocket.server_side",
+            "Protocol.eof_received()",
+            "socket.SocketType",
+            "loop.start_tls(transport, protocol, sslcontext, server_side=False)"
+        ],
+        [
+            "multiprocessing.connection.Listener(address, family, backlog)"
+        ]
+    ],
+    [
+        "logical_invert ( ) is a logical operation .",
+        [
+            "operator.iadd(a, b)",
+            "decimal.logical_and(other)",
+            "context.logical_or(x, y)",
+            "operator.__iadd__(a, b)",
+            "decimal.logical_invert()"
+        ],
+        [
+            "operator.iadd(a, b)",
+            "operator.__iadd__(a, b)",
+            "dis.dis(x=None, depth=None)",
+            "context.logical_or(x, y)",
+            "dis.dis(depth=None)"
+        ],
+        [
+            "decimal.logical_invert()"
+        ]
+    ],
+    [
+        "TIPC related constants, matching the ones exported by the C socket API.",
+        [
+            "socket.SocketType",
+            "test.support.SOCK_MAX_SIZE",
+            "TIPC_*",
+            "loop.getaddrinfo(host, port, family=0)",
+            "termios.tcsetattr(fd, when, attributes)"
+        ],
+        [
+            "socket.SocketType",
+            "loop.getaddrinfo(host, port, family=0)",
+            "test.support.SOCK_MAX_SIZE",
+            "i_pv4_interface.network",
+            "os.SCHED_SPORADIC"
+        ],
+        [
+            "TIPC_*"
+        ]
+    ],
+    [
+        "Format the shell environment in HTML .",
+        [
+            "cgi.print_environ()",
+            "profile.run(command, filename=None)",
+            "subprocess.STARTUPINFO(hStdOutput=None)",
+            "shutil.register_archive_format(name, function)",
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")"
+        ],
+        [
+            "configparser.RawConfigParser(':'), ';'), interpolation, comment_prefixes=('#')",
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "venv.EnvBuilder(system_site_packages=False, clear=False)",
+            "configparser.ConfigParser(':'), ';'), inline_comment_prefixes=None)",
+            "getopt.error"
+        ],
+        [
+            "cgi.print_environ()"
+        ]
+    ],
+    [
+        "Token used to determine end of file.",
+        [
+            "io_base.seek(offset)",
+            "shlex.eof",
+            "file_io.mode",
+            "io_base.readlines(hint=-1)",
+            "Path.open(mode='r', buffering=-1)"
+        ],
+        [
+            "readline.remove_history_item(pos)",
+            "token.NL",
+            "Path.read_text()",
+            "io_base.readlines(hint=-1)",
+            "io_base.seek(offset)"
+        ],
+        [
+            "shlex.eof"
+        ]
+    ],
+    [
+        "Decode the Ascii85 encoded bytes-like object or ASCII string `b` and return the decoded bytes . `adobe` controls whether the input sequence is in Adobe Ascii85 format ( i.e .",
+        [
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "base64.a85decode(b, adobe=False)",
+            "base64.a85encode(b, foldspaces=False, wrapcol=0)",
+            "binary.encode(out)"
+        ],
+        [
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "binascii.b2a_qp(data, istext=True, header=False)",
+            "binary.encode(out)",
+            "bytearray.fromhex(string)"
+        ],
+        [
+            "base64.a85decode(b, adobe=False)"
+        ]
+    ],
+    [
+        "The LMTP protocol , which is very similar to ESMTP , is heavily based on the standard SMTP client . It \u2019 s common to use Unix sockets for LMTP , so our connect ( ) method must support that as well as a regular `host` : `port` server .",
+        [
+            "smtpd.SMTPChannel(server, conn, addr, decode_data=False)",
+            "SMTP.connect(port=0)",
+            "SMTP.connect(host='localhost', port=0)",
+            "smtplib.LMTP(port=LMTP_PORT)",
+            "smtplib.LMTP(host='', port=LMTP_PORT)"
+        ],
+        [
+            "SMTP.connect(port=0)",
+            "smtpd.SMTPChannel(server, conn, addr, decode_data=False)",
+            "SMTP.connect(host='localhost', port=0)",
+            "smtplib.SMTP_SSL()",
+            "SMTP.connect(host='localhost')"
+        ],
+        [
+            "smtplib.LMTP(host='')",
+            "smtplib.LMTP(host='', port=LMTP_PORT)",
+            "smtplib.LMTP(port=LMTP_PORT)"
+        ]
+    ],
+    [
+        "Return a pair ( response , date ) .",
+        [
+            "base_http_request_handler.log_date_time_string()",
+            "NNTP.date()",
+            "message.get_param(param, header='content-type')",
+            "HTTPConnection.connect()",
+            "http.client.HTTP_PORT"
+        ],
+        [
+            "base_http_request_handler.log_date_time_string()",
+            "base_http_request_handler.sys_version",
+            "message.get_param(param, header='content-type')",
+            "http.client.HTTP_PORT",
+            "HTTPConnection.connect()"
+        ],
+        [
+            "NNTP.date()"
+        ]
+    ],
+    [
+        "Start debugging with a Bdb instance from caller \u2019 s frame .",
+        [
+            "bdb.set_trace()",
+            "bdb.dispatch_return(frame, arg)",
+            "bdb.dispatch_line(frame)",
+            "bdb.break_here(frame)",
+            "bdb.user_line(frame)"
+        ],
+        [
+            "bdb.break_here(frame)",
+            "bdb.user_line(frame)",
+            "bdb.dispatch_line(frame)",
+            "bdb.dispatch_return(frame, arg)",
+            "contextlib.AsyncExitStack"
+        ],
+        [
+            "bdb.set_trace()"
+        ]
+    ],
+    [
+        "Context manager to wait until all threads created in the with statement exit . With arguments `timeout`.",
+        [
+            "loop.call_soon_threadsafe(callback, *args, context=None)",
+            "barrier.wait(timeout=None)",
+            "test.support.wait_threads_exit(timeout=60.0)",
+            "r_lock.acquire(timeout=None)",
+            "loop.run_until_complete(future)"
+        ],
+        [
+            "loop.call_soon_threadsafe(callback, *args, context=None)",
+            "scheduler.enter(delay, priority, action, argument=())",
+            "loop.run_until_complete(future)",
+            "asyncio.wait_for(aw, timeout)",
+            "async_exit_stack.push_async_exit(exit)"
+        ],
+        [
+            "test.support.wait_threads_exit(timeout=60.0)"
+        ]
+    ],
+    [
+        "Convert a mapping object or a sequence of two-element tuples , which may contain str or bytes objects , to a percent-encoded ASCII text string . When a sequence of two-element tuples is used as the `query` argument , the first element of each tuple is a key and the second is a value . The value element in itself can be a sequence and in that case , if the optional parameter `doseq` is evaluates to True , individual key=value pairs separated by ' & ' are generated for each element of the value sequence for the key . For maximum control of what is quoted , use quote and specify a value for `safe` .",
+        [
+            "quopri.decodestring(s)",
+            "json.JSONEncoder(separators=None)",
+            "json.JSONEncoder(ensure_ascii=True)",
+            "config_parser.items(raw=False)",
+            "urllib.parse.urlencode(query, doseq=False, safe='')"
+        ],
+        [
+            "format(value)",
+            "json.JSONEncoder(separators=None)",
+            "json.JSONEncoder(ensure_ascii=True)",
+            "json.JSONDecoder(object_hook=None, parse_int=None)",
+            "format(value, format_spec)"
+        ],
+        [
+            "urllib.parse.urlencode(query, doseq=False, safe='')"
+        ]
+    ],
+    [
+        "This function implements the standard .mo file search algorithm . It takes a `domain` , identical to what textdomain ( ) takes . Optional `localedir` is as in bindtextdomain ( ) .",
+        [
+            "html.entities.entitydefs",
+            "NNTP.description(group)",
+            "Path.read_text()",
+            "file_finder.path_hook(*loader_details)",
+            "gettext.find(domain, localedir=None)"
+        ],
+        [
+            "file_finder.path_hook(*loader_details)",
+            "compileall.compile_dir(dir, ddir=None)",
+            "mailcap.findmatch(caps, MIMEtype, key='view', plist=)",
+            "NNTP.description(group)",
+            "compileall.compile_path(skip_curdir=True, maxlevels=0)"
+        ],
+        [
+            "gettext.find(domain, localedir=None)"
+        ]
+    ],
+    [
+        "Return a message object structure tree from an open binary file object . This is equivalent to BytesParser ( ) .parse ( `fp` ) .",
+        [
+            "TarFile.extractfile(member)",
+            "io_base.seek(offset)",
+            "email.message_from_binary_file(fp)",
+            "gzip.decompress(data)",
+            "plistlib.loads(data, fmt=None)"
+        ],
+        [
+            "io_base.seek(offset)",
+            "TarFile.extractfile(member)",
+            "header.encode(\\t', maxlinelen=None)",
+            "gzip.decompress(data)",
+            "ZipInfo.comment"
+        ],
+        [
+            "email.message_from_binary_file(fp)"
+        ]
+    ]
+]

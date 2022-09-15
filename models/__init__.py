@@ -76,6 +76,12 @@ def test_ood_performance(triplet_net, model_name: str, query_paths: List[str],
         cand_mat = torch.stack(cand_mat)
         scores = torch.cdist(query_mat, cand_mat, p=2)
         doc_ranks = scores.argsort(axis=1)
+        doc_ranks_path = os.path.join(args.exp_name, 
+                         f"{dataset_name} Doc Ranks.json")
+        if dataset_name != "CodeSearchNet":
+            print(f"saving doc_ranks for {query_path} to {doc_ranks_path}")
+            with open(doc_ranks_path, "w") as f:
+                json.dump(doc_ranks.tolist(), f, indent=1)
         # compute recall@k for various k
         recall_at_ = []
         for i in range(1,10+1):
@@ -127,8 +133,7 @@ def test_ood_performance(triplet_net, model_name: str, query_paths: List[str],
             print(f"recall@{5*i} = {recall_at_[i-1]}")
         print("NDCG:", ndcg)
         print("MRR (LRAP):", mrr)
-    metrics_path = os.path.join(args.exp_name, 
-                   "ood_test_metrics_l2_code.json")
+    metrics_path = os.path.join(args.exp_name, "ood_test_metrics_l2_code.json")
     # write metrics to path.
     with open(metrics_path, "w") as f:
         json.dump(all_metrics, f)

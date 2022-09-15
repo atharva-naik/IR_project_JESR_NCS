@@ -1,0 +1,804 @@
+[
+    [
+        "Add `headers` and payload to `msg` : If `params` is specified , iterate its items method and use the resulting ( key , value ) pairs to set additional parameters on the Content-Type header . With arguments `<'bytes'>`, `maintype`, `subtype`.",
+        [
+            "message.get_param(param, header='content-type')",
+            "email.mime.multipart.MIMEMultipart(**_params, _subtype='mixed')",
+            "email.contentmanager.set_content(msg, <'bytes'>, maintype, subtype, params=None)",
+            "email.mime.application.MIMEApplication(_data, **_params, _subtype='octet-stream')",
+            "message.get_param(param)"
+        ],
+        [
+            "message.get_param(param, header='content-type')",
+            "message.get_param(param)",
+            "email_message.replace_header(_name, _value)",
+            "mime_version_header.minor",
+            "message.set_payload(payload, charset=None)"
+        ],
+        [
+            "email.contentmanager.set_content(msg, <'bytes'>, maintype, subtype, params=None)"
+        ]
+    ],
+    [
+        "Same as article ( ) , but sends a HEAD command . The lines returned ( or written to `file` ) will only contain the message headers , not the body .",
+        [
+            "Path.open(mode='r', buffering=-1)",
+            "NNTP.head(file=None)",
+            "cgitb.enable(logdir=None, format=\"html\")",
+            "email.contentmanager.set_content(msg, <'str'>)",
+            "email.contentmanager.set_content(msg, <'str'>, headers=None)"
+        ],
+        [
+            "cgitb.enable(logdir=None, format=\"html\")",
+            "mime_version_header.minor",
+            "email.message_from_binary_file(fp)",
+            "FTPHandler.ftp_open(req)",
+            "email_message.get_content_maintype()"
+        ],
+        [
+            "NNTP.head(file=None)"
+        ]
+    ],
+    [
+        "Returns the current date and time , formatted for logging .",
+        [
+            "logging.handlers.TimedRotatingFileHandler(filename, when='h')",
+            "base_http_request_handler.log_date_time_string()",
+            "logging.handlers.TimedRotatingFileHandler(filename, when='h', interval=1)",
+            "logging.handlers.TimedRotatingFileHandler(filename, interval=1)",
+            "date.__format__(format)"
+        ],
+        [
+            "time.replace(hour=self.hour, minute=self.minute)",
+            "date.__format__(format)",
+            "datetime.time",
+            "time.asctime(t)",
+            "time.__str__()"
+        ],
+        [
+            "base_http_request_handler.log_date_time_string()"
+        ]
+    ],
+    [
+        "Returns a list of all known themes .",
+        [
+            "style.theme_names()",
+            "os.SCHED_SPORADIC",
+            "winreg.REG_RESOURCE_REQUIREMENTS_LIST",
+            "TIPC_*",
+            "style.theme_create(themename, parent=None, settings=None)"
+        ],
+        [
+            "gettext.find(domain, localedir=None)",
+            "importlib.util.cache_from_source(path, debug_override=None, optimization=None)",
+            "TIPC_*",
+            "null_translations.add_fallback(fallback)",
+            "winreg.REG_RESOURCE_REQUIREMENTS_LIST"
+        ],
+        [
+            "style.theme_names()"
+        ]
+    ],
+    [
+        "For a time t , str ( t ) is equivalent to t.isoformat ( ) .",
+        [
+            "time.asctime(t)",
+            "date.__format__(format)",
+            "time.__str__()",
+            "date.fromtimestamp(timestamp)",
+            "datetime.time"
+        ],
+        [
+            "time.asctime(t)",
+            "datetime.time(hour=0, microsecond=0)",
+            "date.__format__(format)",
+            "datetime.time",
+            "date.fromtimestamp(timestamp)"
+        ],
+        [
+            "time.__str__()"
+        ]
+    ],
+    [
+        "Convert binary `data` to a line ( s ) of ASCII characters in quoted-printable encoding . If the optional argument `istext` is present and true , newlines are not encoded but trailing whitespace will be encoded . If the optional argument `header` is present and true , spaces will be encoded as underscores per RFC 1522 .",
+        [
+            "header.encode(\\t', maxlinelen=None)",
+            "base64.a85encode(b, foldspaces=False, wrapcol=0)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "binascii.b2a_qp(data, istext=True, header=False)"
+        ],
+        [
+            "header.encode(\\t', maxlinelen=None)",
+            "codecs.backslashreplace_errors(exception)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "json.JSONEncoder(ensure_ascii=True)",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")"
+        ],
+        [
+            "binascii.b2a_qp(data, istext=True, header=False)"
+        ]
+    ],
+    [
+        "This method is called from dispatch_line ( ) when either stop_here ( ) or break_here ( ) yields True . With arguments `frame`.",
+        [
+            "bdb.dispatch_line(frame)",
+            "bdb.break_here(frame)",
+            "bdb.user_line(frame)",
+            "traceback.print_stack(limit=None)",
+            "traceback.print_stack()"
+        ],
+        [
+            "contextlib.AsyncExitStack",
+            "bdb.dispatch_return(frame, arg)",
+            "async_exit_stack.push_async_exit(exit)",
+            "bdb.break_here(frame)",
+            "bdb.dispatch_line(frame)"
+        ],
+        [
+            "bdb.user_line(frame)"
+        ]
+    ],
+    [
+        "Return a new featureless object.",
+        [
+            "dis.dis(depth=None)",
+            "auto.object",
+            "object",
+            "dis.dis(x=None, depth=None)",
+            "types.DynamicClassAttribute(fset=None)"
+        ],
+        [
+            "TIPC_*",
+            "collections.abc.Coroutine",
+            "test.support.check_free_after_iterating(test, iter, cls)",
+            "types.DynamicClassAttribute(fset=None)",
+            "abc.ABC"
+        ],
+        [
+            "object"
+        ]
+    ],
+    [
+        "Asynchronous version of socket.getaddrinfo ( ) . With arguments `host`, `port`, `family`.",
+        [
+            "loop.getaddrinfo(host, port, family=0)",
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "socket.gethostbyname(hostname)",
+            "socket.getfqdn()",
+            "socket.getservbyname(servicename)"
+        ],
+        [
+            "asyncio.open_connection(port=None)",
+            "dispatcher.create_socket(family=socket.AF_INET)",
+            "asyncio.BaseProtocol",
+            "asyncore.dispatcher_with_send",
+            "async_exit_stack.push_async_exit(exit)"
+        ],
+        [
+            "loop.getaddrinfo(host, port, family=0)"
+        ]
+    ],
+    [
+        "Appends items from the string , interpreting the string as an array of machine values ( as if it had been read from a file using the fromfile ( ) method ) . With arguments `s`.",
+        [
+            "array.fromfile(f, n)",
+            "array.frombytes(s)",
+            "io_base.seek(offset)",
+            "plistlib.loads(data, fmt=None)",
+            "array.buffer_info()"
+        ],
+        [
+            "print(*objects, end='\\n')",
+            "print(*objects, sep=' ', end='\\n')",
+            "print(*objects, sep=' ')",
+            "print(*objects, sep=' ', file=sys.stdout)",
+            "print(*objects, end='\\n', file=sys.stdout)"
+        ],
+        [
+            "array.frombytes(s)"
+        ]
+    ],
+    [
+        "Returns the least int > = self .",
+        [
+            "fraction.__ceil__()",
+            "decimal.logical_and(other)",
+            "decimal.compare(other, context=None)",
+            "tracemalloc.DomainFilter(inclusive: bool, domain: int)",
+            "decimal.logical_invert()"
+        ],
+        [
+            "heapq.nsmallest(n, iterable)",
+            "heapq.nlargest(n, iterable)",
+            "min(iterable, key, default)",
+            "dis.dis(depth=None)",
+            "bytearray.index(sub, start, end)"
+        ],
+        [
+            "fraction.__ceil__()"
+        ]
+    ],
+    [
+        "Add `headers` and payload to `msg` : With arguments `<'str'>`.",
+        [
+            "message.set_payload(payload, charset=None)",
+            "email.mime.application.MIMEApplication(_data, **_params, _subtype='octet-stream')",
+            "message.get_param(param, header='content-type')",
+            "email.contentmanager.set_content(msg, <'str'>, headers=None)",
+            "email.contentmanager.set_content(msg, <'bytes'>, maintype, subtype, params=None)"
+        ],
+        [
+            "message.get_param(param)",
+            "message.get_param(param, header='content-type')",
+            "email.mime.application.MIMEApplication(_data, **_params, _subtype='octet-stream')",
+            "email.mime.multipart.MIMEMultipart(**_params, _subtype='mixed')",
+            "email_message.replace_header(_name, _value)"
+        ],
+        [
+            "email.contentmanager.set_content(msg, <'str'>)",
+            "email.contentmanager.set_content(msg, <'str'>, headers=None)"
+        ]
+    ],
+    [
+        "The minor version number as an integer",
+        [
+            "mime_version_header.minor",
+            "fraction.__ceil__()",
+            "float.hex()",
+            "decimal.logical_invert()",
+            "decimal.Context(Emax=None)"
+        ],
+        [
+            "decimal.sqrt()",
+            "float.hex()",
+            "decimal.logical_invert()",
+            "decimal.Context(Emax=None)",
+            "fraction.__ceil__()"
+        ],
+        [
+            "mime_version_header.minor"
+        ]
+    ],
+    [
+        "This is an alias for the builtin open ( ) function . With arguments `file`, `mode`, `buffering`.",
+        [
+            "Path.open(mode='r', buffering=-1)",
+            "sunau.openfp(file, mode)",
+            "file_io.mode",
+            "io.open(file, mode='r', buffering=-1)",
+            "doctest.testfile(filename, optionflags=0)"
+        ],
+        [
+            "shutil.register_archive_format(name, function)",
+            "sunau.openfp(file, mode)",
+            "Path.open(mode='r', buffering=-1)",
+            "copyreg.pickle(type, function)",
+            "file_io.mode"
+        ],
+        [
+            "io.open(file, mode='r', buffering=-1)"
+        ]
+    ],
+    [
+        "Wide char variant of ungetch ( ) , accepting a Unicode value . With arguments `unicode_char`.",
+        [
+            "str.isascii()",
+            "quopri.decodestring(s)",
+            "msvcrt.ungetwch(unicode_char)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")"
+        ],
+        [
+            "codecs.backslashreplace_errors(exception)",
+            "str.isascii()",
+            "str.isupper()",
+            "len(s)",
+            "struct.size"
+        ],
+        [
+            "msvcrt.ungetwch(unicode_char)"
+        ]
+    ],
+    [
+        "This function causes the cgitb module to take over the interpreter \u2019 s default handling for exceptions by setting the value of sys.excepthook . If the argument `logdir` is present , the traceback reports are written to files . If the optional argument `format` is `` html '' , the output is formatted as HTML .",
+        [
+            "cgitb.enable(logdir=None, format=\"html\")",
+            "bdb.set_trace()",
+            "traceback.print_stack()",
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "cgitb.enable()"
+        ],
+        [
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "sys.exc_info()",
+            "SystemError",
+            "traceback.print_stack()",
+            "traceback.print_stack(limit=None)"
+        ],
+        [
+            "cgitb.enable(logdir=None, format=\"html\")"
+        ]
+    ],
+    [
+        "This function causes the cgitb module to take over the interpreter \u2019 s default handling for exceptions by setting the value of sys.excepthook .",
+        [
+            "cgitb.enable()",
+            "cgitb.enable(logdir=None, format=\"html\")",
+            "bdb.set_trace()",
+            "SystemError",
+            "errno.ENODEV"
+        ],
+        [
+            "SystemError",
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "sys.exc_info()",
+            "errno.ENODEV",
+            "getopt.error"
+        ],
+        [
+            "cgitb.enable()"
+        ]
+    ],
+    [
+        "Return a fully qualified domain `name` for name .",
+        [
+            "importlib.machinery.all_suffixes()",
+            "__import__(name)",
+            "gettext.find(domain, localedir=None)",
+            "socket.getfqdn(name)",
+            "mimetypes.guess_extension(type)"
+        ],
+        [
+            "PurePath.parent",
+            "gettext.find(domain, localedir=None)",
+            "__import__(name)",
+            "winreg.REG_RESOURCE_REQUIREMENTS_LIST",
+            "importlib.machinery.all_suffixes()"
+        ],
+        [
+            "socket.getfqdn(name)",
+            "socket.getfqdn()"
+        ]
+    ],
+    [
+        "Return the length ( the number of items ) of an object . With arguments `s`.",
+        [
+            "len(s)",
+            "trace.size",
+            "struct.size",
+            "dis.dis(x=None, depth=None)",
+            "dis.dis(depth=None)"
+        ],
+        [
+            "typing.List(list)",
+            "list()",
+            "print(*objects)",
+            "abc.ABC",
+            "struct.size"
+        ],
+        [
+            "len(s)"
+        ]
+    ],
+    [
+        "This defaults to ['/cgi-bin', '/htbin'] and describes directories to treat as containing CGI scripts.",
+        [
+            "cgi.print_environ()",
+            "cgihttp_request_handler.cgi_directories",
+            "cgi.parse(environ=os.environ)",
+            "source_loader.set_data(path, data)",
+            "file_finder.path_hook(*loader_details)"
+        ],
+        [
+            "compileall.compile_path(skip_curdir=True, maxlevels=0)",
+            "venv.EnvBuilder(system_site_packages=False, clear=False)",
+            "cgitb.enable(logdir=None, format=\"html\")",
+            "compileall.compile_dir(dir, ddir=None)",
+            "getopt.error"
+        ],
+        [
+            "cgihttp_request_handler.cgi_directories"
+        ]
+    ],
+    [
+        "logical_invert ( ) is a logical operation .",
+        [
+            "decimal.logical_invert()",
+            "decimal.logical_and(other)",
+            "cmath.phase(x)",
+            "context.logical_or(x, y)",
+            "operator.iadd(a, b)"
+        ],
+        [
+            "operator.__iadd__(a, b)",
+            "cmath.phase(x)",
+            "context.logical_or(x, y)",
+            "operator.iadd(a, b)",
+            "decimal.logical_and(other)"
+        ],
+        [
+            "decimal.logical_invert()"
+        ]
+    ],
+    [
+        "The mode as given in the constructor.",
+        [
+            "file_io.mode",
+            "getopt.error",
+            "NNTP.description(group)",
+            "ossaudiodev.openmixer(device)",
+            "dis.dis(depth=None)"
+        ],
+        [
+            "dis.dis(depth=None)",
+            "dis.dis(x=None, depth=None)",
+            "types.GeneratorType",
+            "os.SCHED_SPORADIC",
+            "abc.ABC"
+        ],
+        [
+            "file_io.mode"
+        ]
+    ],
+    [
+        "Return a 2-tuple ; the first element is a string containing the command line to be executed ( which can be passed to os.system ( ) ) , and the second element is the mailcap entry for a given MIME type . `plist` can be a list containing named parameters ; the default value is simply an empty list . With arguments `caps`, `MIMEtype`.",
+        [
+            "mailcap.findmatch(caps, MIMEtype, key='view', plist=)",
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "mailcap.findmatch(caps, MIMEtype, plist=)",
+            "IMAP4.setannotation(mailbox, entry)",
+            "generator.flatten(msg, unixfrom=False)"
+        ],
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "typing.Dict(dict, MutableMappingKT, VT)",
+            "config_parser.items(raw=False)",
+            "tarfile.open(**kwargs, fileobj=None)",
+            "generator.flatten(msg, unixfrom=False)"
+        ],
+        [
+            "mailcap.findmatch(caps, MIMEtype, plist=)"
+        ]
+    ],
+    [
+        "Format the shell environment in HTML .",
+        [
+            "cgi.print_environ()",
+            "subprocess.STARTUPINFO(hStdOutput=None)",
+            "profile.run(command, filename=None)",
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "subprocess.CREATE_NEW_CONSOLE"
+        ],
+        [
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "pprint.PrettyPrinter(indent=1, compact=False)",
+            "html_diff.__init__(linejunk=None)",
+            "getopt.error",
+            "errno.ENODEV"
+        ],
+        [
+            "cgi.print_environ()"
+        ]
+    ],
+    [
+        "The character used to draw separator lines under the help-message headers.",
+        [
+            "textbox.stripspaces",
+            "readline.remove_history_item(pos)",
+            "style.theme_names()",
+            "html_diff.__init__(linejunk=None)",
+            "Cmd.ruler"
+        ],
+        [
+            "turtle.width()",
+            "print(*objects, sep=' ', end='\\n')",
+            "generator.flatten(msg, linesep=None)",
+            "turtle.pensize(width=None)",
+            "turtle.pensize()"
+        ],
+        [
+            "Cmd.ruler"
+        ]
+    ],
+    [
+        "Creates a new context . The `Emin` and `Emax` fields are integers specifying the outer limits allowable for exponents .",
+        [
+            "dis.dis(x=None, depth=None)",
+            "dis.dis(depth=None)",
+            "window.instr(y, x)",
+            "tracemalloc.DomainFilter(inclusive: bool, domain: int)",
+            "decimal.Context(Emax=None)"
+        ],
+        [
+            "dis.dis(depth=None)",
+            "dis.dis(x=None, depth=None)",
+            "cmath.phase(x)",
+            "window.instr(y, x)",
+            "tracemalloc.DomainFilter(inclusive: bool, domain: int)"
+        ],
+        [
+            "decimal.Context(Emax=None)"
+        ]
+    ],
+    [
+        "Decode the Ascii85 encoded bytes-like object or ASCII string `b` and return the decoded bytes . `adobe` controls whether the input sequence is in Adobe Ascii85 format ( i.e .",
+        [
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "base64.a85decode(b, adobe=False)",
+            "binascii.b2a_qp(data, istext=True, header=False)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "binary.encode(out)"
+        ],
+        [
+            "binary.encode(out)",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "binascii.b2a_qp(data, istext=True, header=False)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.fromhex(string)"
+        ],
+        [
+            "base64.a85decode(b, adobe=False)"
+        ]
+    ],
+    [
+        "Resets the pack buffer to the empty string .",
+        [
+            "Packer.reset()",
+            "header.encode(\\t', maxlinelen=None)",
+            "IMAP4.read(size)",
+            "shelve.DbfilenameShelf(filename, flag='c')",
+            "sunau.openfp(file, mode)"
+        ],
+        [
+            "header.encode(\\t', maxlinelen=None)",
+            "binary.encode(out)",
+            "array.buffer_info()",
+            "binascii.b2a_qp(data, istext=True, header=False)",
+            "struct.size"
+        ],
+        [
+            "Packer.reset()"
+        ]
+    ],
+    [
+        "This attribute is a flag which controls the interpretation of blanks in the window.",
+        [
+            "window.bkgdset(ch, attr)",
+            "curses.is_term_resized(nlines, ncols)",
+            "readline.remove_history_item(pos)",
+            "textbox.stripspaces",
+            "Cmd.ruler"
+        ],
+        [
+            "curses.flash()",
+            "curses.is_term_resized(nlines, ncols)",
+            "Cmd.ruler",
+            "window.bkgdset(ch, attr)",
+            "widget.identify_row(y)"
+        ],
+        [
+            "textbox.stripspaces"
+        ]
+    ],
+    [
+        "This function takes a single argument that can be passed to the exec ( ) function , and an optional file name . With arguments `command`, `filename`.",
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "profile.run(command, filename=None)",
+            "doctest.testfile(filename, optionflags=0)",
+            "py_compile.compile(file, dfile=None)",
+            "InteractiveInterpreter.showsyntaxerror(filename=None)"
+        ],
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "shutil.register_archive_format(name, function)",
+            "py_compile.compile(file, dfile=None)",
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "bdb.dispatch_line(frame)"
+        ],
+        [
+            "profile.run(command, filename=None)"
+        ]
+    ],
+    [
+        "Return a 2-tuple ; the first element is a string containing the command line to be executed ( which can be passed to os.system ( ) ) , and the second element is the mailcap entry for a given MIME type . `key` is the name of the field desired , which represents the type of activity to be performed ; the default value is \u2018 view \u2019 , since in the most common case you simply want to view the body of the MIME-typed data . `plist` can be a list containing named parameters ; the default value is simply an empty list . With arguments `caps`, `MIMEtype`.",
+        [
+            "email.contentmanager.set_content(msg, <'bytes'>, maintype, subtype, params=None)",
+            "email_message.get_content_maintype()",
+            "email.contentmanager.set_content(msg, <'str'>)",
+            "mailcap.findmatch(caps, MIMEtype, key='view', plist=)",
+            "email.contentmanager.set_content(msg, <'str'>, headers=None)"
+        ],
+        [
+            "email_message.get_content_maintype()",
+            "email.contentmanager.set_content(msg, <'str'>)",
+            "email.contentmanager.set_content(msg, <'str'>, charset='utf-8'                     cte=None)",
+            "mime_version_header.minor",
+            "email.contentmanager.set_content(msg, <'bytes'>, maintype, subtype, params=None)"
+        ],
+        [
+            "mailcap.findmatch(caps, MIMEtype, key='view', plist=)"
+        ]
+    ],
+    [
+        "All arguments except `filename` are optional , and should be specified in keyword form . Optional argument `optionflags` ( default value 0 ) takes the bitwise OR of option flags .",
+        [
+            "ArgumentParser.add_argument(name or flags..., action, nargs, const, default)",
+            "OptionParser.has_option(opt_str)",
+            "doctest.testfile(filename, optionflags=0)",
+            "config_parser.items(raw=False)",
+            "getopt.error"
+        ],
+        [
+            "OptionParser.has_option(opt_str)",
+            "ArgumentParser.add_argument(name or flags..., action, nargs, const, default)",
+            "getopt.error",
+            "config_parser.items(raw=False)",
+            "configparser.RawConfigParser(':'), ';'), interpolation, comment_prefixes=('#')"
+        ],
+        [
+            "doctest.testfile(filename, optionflags=0)"
+        ]
+    ],
+    [
+        "This function operates exactly as TemporaryFile ( ) does , except that the file is guaranteed to have a visible name in the file system ( on Unix , the directory entry is not unlinked ) . With arguments `dir`.",
+        [
+            "os.removedirs(name)",
+            "tempfile.NamedTemporaryFile(dir=None)",
+            "dir_entry.is_file()",
+            "os.fwalk()",
+            "Path.open(mode='r', buffering=-1)"
+        ],
+        [
+            "os.removedirs(name)",
+            "os.fwalk()",
+            "Path.stat()",
+            "file_io.mode",
+            "tempfile.gettempprefix()"
+        ],
+        [
+            "tempfile.NamedTemporaryFile(dir=None)"
+        ]
+    ],
+    [
+        "Try to find a library and return a pathname . `name` is the library name without any prefix like lib , suffix like .so , .dylib or version number ( this is the form used for the posix linker option -l ) .",
+        [
+            "ctypes.util.find_library(name)",
+            "importlib.resources.read_binary(package, resource)",
+            "source_file_loader.path",
+            "compileall.compile_dir(dir, ddir=None)",
+            "Path.stat()"
+        ],
+        [
+            "importlib.machinery.all_suffixes()",
+            "importlib.resources.read_binary(package, resource)",
+            "py_compile.compile(file, dfile=None)",
+            "compileall.compile_path(skip_curdir=True, maxlevels=0)",
+            "compileall.compile_dir(dir, ddir=None)"
+        ],
+        [
+            "ctypes.util.find_library(name)"
+        ]
+    ],
+    [
+        "Context manager to wait until all threads created in the with statement exit . With arguments `timeout`.",
+        [
+            "test.support.wait_threads_exit(timeout=60.0)",
+            "_thread.interrupt_main()",
+            "r_lock.acquire(timeout=None)",
+            "barrier.wait(timeout=None)",
+            "contextlib.AsyncExitStack"
+        ],
+        [
+            "loop.call_soon_threadsafe(callback, *args, context=None)",
+            "barrier.wait(timeout=None)",
+            "contextlib.AsyncExitStack",
+            "loop.run_until_complete(future)",
+            "async_exit_stack.push_async_exit(exit)"
+        ],
+        [
+            "test.support.wait_threads_exit(timeout=60.0)"
+        ]
+    ],
+    [
+        "Convert a mapping object or a sequence of two-element tuples , which may contain str or bytes objects , to a percent-encoded ASCII text string . When a sequence of two-element tuples is used as the `query` argument , the first element of each tuple is a key and the second is a value . The value element in itself can be a sequence and in that case , if the optional parameter `doseq` is evaluates to True , individual key=value pairs separated by ' & ' are generated for each element of the value sequence for the key . For maximum control of what is quoted , use quote and specify a value for `safe` .",
+        [
+            "urllib.parse.urlencode(query, doseq=False, safe='')",
+            "urllib.parse.parse_qs(qs, encoding='utf-8')",
+            "typing.Dict(dict, MutableMappingKT, VT)",
+            "json.JSONEncoder(separators=None)",
+            "element.set(key, value)"
+        ],
+        [
+            "format(value)",
+            "typing.Dict(dict, MutableMappingKT, VT)",
+            "list(d)",
+            "quopri.decodestring(s)",
+            "json.JSONEncoder(separators=None)"
+        ],
+        [
+            "urllib.parse.urlencode(query, doseq=False, safe='')"
+        ]
+    ],
+    [
+        "logical_and ( ) is a logical operation which takes two logical operands ( see Logical operands ) . With arguments `other`.",
+        [
+            "context.logical_or(x, y)",
+            "decimal.logical_and(other)",
+            "operator.iadd(a, b)",
+            "operator.__iadd__(a, b)",
+            "context.plus(x)"
+        ],
+        [
+            "dis.dis(x=None, depth=None)",
+            "operator.__iadd__(a, b)",
+            "context.logical_or(x, y)",
+            "operator.iadd(a, b)",
+            "cmath.phase(x)"
+        ],
+        [
+            "decimal.logical_and(other)"
+        ]
+    ],
+    [
+        "Encode the bytes-like object `b` using Ascii85 and return the encoded bytes . `foldspaces` is an optional flag that uses the special short sequence \u2018 y \u2019 instead of 4 consecutive spaces ( ASCII 0x20 ) as supported by \u2018 btoa \u2019 . `wrapcol` controls whether the output should have newline ( b'\\n ' ) characters added to it .",
+        [
+            "base64.a85encode(b, foldspaces=False, wrapcol=0)",
+            "header.encode(\\t', maxlinelen=None)",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "binary.encode(out)"
+        ],
+        [
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "binary.encode(out)",
+            "binascii.b2a_qp(data, istext=True, header=False)",
+            "header.encode(\\t', maxlinelen=None)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")"
+        ],
+        [
+            "base64.a85encode(b, foldspaces=False, wrapcol=0)"
+        ]
+    ],
+    [
+        "Return a message object structure tree from an open binary file object . This is equivalent to BytesParser ( ) .parse ( `fp` ) .",
+        [
+            "plistlib.loads(data, fmt=None)",
+            "io_base.seek(offset)",
+            "email.message_from_binary_file(fp)",
+            "json.JSONDecoder(object_hook=None, parse_int=None)",
+            "mimetypes.guess_extension(type)"
+        ],
+        [
+            "header.encode(\\t', maxlinelen=None)",
+            "struct.size",
+            "plistlib.loads(data, fmt=None)",
+            "ZipInfo.comment",
+            "quopri.decodestring(s)"
+        ],
+        [
+            "email.message_from_binary_file(fp)"
+        ]
+    ],
+    [
+        "Pass the barrier . If a `timeout` is provided , it is used in preference to any that was supplied to the class constructor .",
+        [
+            "barrier.wait(timeout=None)",
+            "future.set_exception(exception)",
+            "test.support.wait_threads_exit(timeout=60.0)",
+            "scheduler.enter(delay, priority, action, argument=())",
+            "loop.run_until_complete(future)"
+        ],
+        [
+            "contextlib.AsyncExitStack",
+            "future.set_exception(exception)",
+            "async_exit_stack.push_async_exit(exit)",
+            "scheduler.enter(delay, priority, action, argument=())",
+            "asyncio.Semaphore()"
+        ],
+        [
+            "barrier.wait(timeout=None)"
+        ]
+    ]
+]

@@ -1,0 +1,142 @@
+[
+    [
+        "The name of the operating system dependent module imported.",
+        [
+            "__import__(name)",
+            "loader.exec_module(module)",
+            "os.name",
+            "__import__(name, globals=None)",
+            "__import__(name, locals=None)"
+        ],
+        [
+            "@importlib.util.set_loader",
+            "loader.exec_module(module)",
+            "__import__(name)",
+            "__import__(name, globals=None, locals=None)",
+            "__import__(name, globals=None)"
+        ],
+        [
+            "os.name"
+        ]
+    ],
+    [
+        "Like decode ( ) , except that it accepts a source bytes and returns the corresponding decoded bytes . With arguments `s`.",
+        [
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "base64.a85decode(b, adobe=False)",
+            "quopri.decodestring(s)",
+            "binary.encode(out)"
+        ],
+        [
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "base64.a85decode(b, adobe=False)",
+            "array.frombytes(s)",
+            "binascii.b2a_qp(data, istext=True, header=False)"
+        ],
+        [
+            "quopri.decodestring(s)"
+        ]
+    ],
+    [
+        "This function causes the cgitb module to take over the interpreter \u2019 s default handling for exceptions by setting the value of sys.excepthook .",
+        [
+            "SystemError",
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "cgitb.enable()",
+            "sys.exc_info()",
+            "cgitb.enable(logdir=None, format=\"html\")"
+        ],
+        [
+            "bdb.set_trace()",
+            "traceback.print_stack()",
+            "bytecode.from_traceback(tb)",
+            "InteractiveInterpreter.showsyntaxerror(filename=None)",
+            "contextlib.AsyncExitStack"
+        ],
+        [
+            "cgitb.enable()"
+        ]
+    ],
+    [
+        "A constant that is likely larger than the underlying OS socket buffer size, to make writes blocking.",
+        [
+            "WriteTransport.set_write_buffer_limits(high=None, low=None)",
+            "WriteTransport.set_write_buffer_limits(high=None)",
+            "WriteTransport.set_write_buffer_limits(low=None)",
+            "BufferedProtocol.buffer_updated(nbytes)",
+            "test.support.SOCK_MAX_SIZE"
+        ],
+        [
+            "WriteTransport.set_write_buffer_limits(high=None, low=None)",
+            "WriteTransport.set_write_buffer_limits(high=None)",
+            "WriteTransport.set_write_buffer_limits(low=None)",
+            "os.GRND_NONBLOCK",
+            "BufferedProtocol.buffer_updated(nbytes)"
+        ],
+        [
+            "test.support.SOCK_MAX_SIZE"
+        ]
+    ],
+    [
+        "Returns the input data that generated the current event as a string .",
+        [
+            "kevent.udata",
+            "xmlparser.GetInputContext()",
+            "source_loader.set_data(path, data)",
+            "cgi.parse(environ=os.environ)",
+            "NNTP.date()"
+        ],
+        [
+            "kevent.udata",
+            "os.GRND_NONBLOCK",
+            "NNTP.date()",
+            "window.bkgdset(ch, attr)",
+            "bdb.dispatch_line(frame)"
+        ],
+        [
+            "xmlparser.GetInputContext()"
+        ]
+    ],
+    [
+        "Return the decoded contents of the pointed-to file as a string :",
+        [
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "io_base.seek(offset)",
+            "Path.read_text()",
+            "io_base.readlines(hint=-1)"
+        ],
+        [
+            "io_base.readlines(hint=-1)",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "gzip.decompress(data)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "io_base.seek(offset)"
+        ],
+        [
+            "Path.read_text()"
+        ]
+    ],
+    [
+        "Function not implemented",
+        [
+            "errno.ENOSYS",
+            "abc.ABC",
+            "SystemError",
+            "os.fwalk()",
+            "os._exit(n)"
+        ],
+        [
+            "bdb.dispatch_return(frame, arg)",
+            "dis.dis(x=None, depth=None)",
+            "dis.dis(depth=None)",
+            "functools.update_wrapper(wrapper, wrapped)",
+            "trace.size"
+        ],
+        [
+            "errno.ENOSYS"
+        ]
+    ]
+]

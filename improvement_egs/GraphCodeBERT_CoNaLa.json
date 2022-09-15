@@ -1,0 +1,629 @@
+[
+    [
+        "check if all elements in a list are identical",
+        [
+            "all(x == myList[0] for x in myList)",
+            "list2 = [x for x in list1 if x != []]",
+            "list2 = [x for x in list1 if x]",
+            "list(set(t))",
+            "[x for x in mylist if len(x) == 3]"
+        ],
+        [
+            "[[x, l.count(x)] for x in set(l)]",
+            "dict(((x, l.count(x)) for x in set(l)))",
+            "list(set(source_list))",
+            "[val for pair in zip(l1, l2) for val in pair]",
+            "list(set(t))"
+        ],
+        [
+            "all(x == myList[0] for x in myList)"
+        ]
+    ],
+    [
+        "Python -Remove Time from Datetime String",
+        [
+            "datetime.datetime.strptime(string_date, '%Y-%m-%d %H:%M:%S.%f')",
+            "time.strptime('30/03/09 16:31:32.123', '%d/%m/%y %H:%M:%S.%f')",
+            "datetime.datetime.fromtimestamp(s).strftime('%Y-%m-%d %H:%M:%S.%f')",
+            "datetime.datetime.now().strftime('%H:%M:%S.%f')",
+            "then = datetime.datetime.strptime(when, '%Y-%m-%d').date()"
+        ],
+        [
+            "time.strptime('30/03/09 16:31:32.123', '%d/%m/%y %H:%M:%S.%f')",
+            "datetime.datetime.fromtimestamp(s).strftime('%Y-%m-%d %H:%M:%S.%f')",
+            "time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(1347517370))",
+            "time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(1236472051807 / 1000.0))",
+            "datetime.datetime.strptime(string_date, '%Y-%m-%d %H:%M:%S.%f')"
+        ],
+        [
+            "then = datetime.datetime.strptime(when, '%Y-%m-%d').date()"
+        ]
+    ],
+    [
+        "Python: Cut off the last word of a sentence?",
+        [
+            "print(os.path.splitext(os.path.basename('hemanth.txt'))[0])",
+            "print(x.rpartition('-')[0])",
+            "print('\"{}\"'.format(word))",
+            "\"\"\" \"\"\".join(content.split(' ')[:-1])",
+            "print(x.rsplit('-', 1)[0])"
+        ],
+        [
+            "[word for word in mystring.split() if word.startswith('$')]",
+            "print('\"{}\"'.format(word))",
+            "print(os.path.splitext(os.path.basename('hemanth.txt'))[0])",
+            "re.split('(\\\\W+)', 'Words, words, words.')",
+            "re.sub('\\\\bH3\\\\b', 'H1', text)"
+        ],
+        [
+            "\"\"\" \"\"\".join(content.split(' ')[:-1])"
+        ]
+    ],
+    [
+        "Append elements of a set to a list in Python",
+        [
+            "list2.extend(list1)",
+            "a.extend(list(b))",
+            "c.extend(a)",
+            "a.extend(b)",
+            "list1.extend(mylog)"
+        ],
+        [
+            "[[x, l.count(x)] for x in set(l)]",
+            "list(set(source_list))",
+            "dict(((x, l.count(x)) for x in set(l)))",
+            "len(l)",
+            "list(set(t))"
+        ],
+        [
+            "a.extend(b)",
+            "a.extend(list(b))"
+        ]
+    ],
+    [
+        "Python match string if it does not start with X",
+        [
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)",
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')"
+        ],
+        [
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.findall('(.*?)(?:\\\\[.*?\\\\]|$)', example_str)",
+            "re.findall('Test([0-9.]*[0-9]+)', text)",
+            "print(x.rsplit('-', 1)[0])",
+            "[x.strip() for x in '2.MATCHES $$TEXT$$ STRING'.split('$$TEXT$$')]"
+        ],
+        [
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')"
+        ]
+    ],
+    [
+        "Coalesce values from 2 columns into a single column in a pandas dataframe",
+        [
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])",
+            "pd.DataFrame(out.tolist(), columns=['out-1', 'out-2'], index=out.index)",
+            "df[df.columns[-1]]",
+            "df['A'][(df['B'] > 50) & (df['C'] == 900)]"
+        ],
+        [
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "pd.DataFrame({'email': sf.index, 'list': sf.values})",
+            "pd.DataFrame(out.tolist(), columns=['out-1', 'out-2'], index=out.index)",
+            "df['index1'] = df.index",
+            "df.set_index(list('BC')).drop(tuples, errors='ignore').reset_index()"
+        ],
+        [
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])"
+        ]
+    ],
+    [
+        "Splitting a string with repeated characters into a list using regex",
+        [
+            "re.split('[ ](?=[A-Z])', input)",
+            "[m.group(0) for m in re.finditer('(\\\\d)\\\\1*', s)]",
+            "re.split('(\\\\W+)', s)",
+            "re.split('(\\\\W+)', 'Words, words, words.')",
+            "re.split('[ ](?=[A-Z]+\\\\b)', input)"
+        ],
+        [
+            "re.split('[ ](?=[A-Z])', input)",
+            "re.split('(\\\\W+)', 'Words, words, words.')",
+            "re.split('[ ](?=[A-Z]+\\\\b)', input)",
+            "re.split('(\\\\W+)', s)",
+            "re.split(' +', 'hello world sample text')"
+        ],
+        [
+            "[m.group(0) for m in re.finditer('(\\\\d)\\\\1*', s)]"
+        ]
+    ],
+    [
+        "transpose dictionary (extract all the values for one key from a list of dictionaries)",
+        [
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "[(x['x'], x['y']) for x in d]",
+            "print(dict(zip(LD[0], zip(*[list(d.values()) for d in LD]))))"
+        ],
+        [
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "[dct[k] for k in lst]",
+            "dict([('Name', 'Joe'), ('Age', 22)])",
+            "list(dict((x[0], x) for x in L).values())"
+        ],
+        [
+            "[(x['x'], x['y']) for x in d]"
+        ]
+    ],
+    [
+        "Mapping a string into a list of pairs",
+        [
+            "map(lambda a: a[0], (('aa',), ('bb',), ('cc',)))",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])",
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)",
+            "[(x + y) for x, y in zip(word, word[1:])]",
+            "list(dict((x[0], x) for x in L).values())"
+        ],
+        [
+            "print(' '.join(map(str, l)))",
+            "\"\"\"\"\"\".join(s.rsplit(',', 1))",
+            "print('\\t'.join(map(str, list)))",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])",
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)"
+        ],
+        [
+            "[(x + y) for x, y in zip(word, word[1:])]",
+            "list(map(lambda x, y: x + y, word[:-1], word[1:]))"
+        ]
+    ],
+    [
+        "Multidimensional array in Python",
+        [
+            "numpy.zeros((3, 3, 3))",
+            "matrix = [[a, b], [c, d], [e, f]]",
+            "np.column_stack(([1, 2, 3], [4, 5, 6]))",
+            "y = [[] for n in range(2)]",
+            "a[:, (np.newaxis)]"
+        ],
+        [
+            "numpy.array(a).reshape(-1).tolist()",
+            "np.column_stack(([1, 2, 3], [4, 5, 6]))",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)",
+            "x = np.asarray(x).reshape(1, -1)[(0), :]",
+            "numpy.array(a)[0].tolist()"
+        ],
+        [
+            "matrix = [[a, b], [c, d], [e, f]]"
+        ]
+    ],
+    [
+        "Copy all values in a column to a new column in a pandas dataframe",
+        [
+            "df['c'] = np.where(df['a'].isnull, df['b'], df['a'])",
+            "pd.concat([df[0].apply(pd.Series), df[1]], axis=1)",
+            "df['D'] = df['B']",
+            "pd.DataFrame(out.tolist(), columns=['out-1', 'out-2'], index=out.index)",
+            "df.dropna(subset=[1])"
+        ],
+        [
+            "pd.DataFrame({'email': sf.index, 'list': sf.values})",
+            "data.update(a=1)",
+            "df['index1'] = df.index",
+            "pd.DataFrame(out.tolist(), columns=['out-1', 'out-2'], index=out.index)",
+            "df.dropna(subset=[1])"
+        ],
+        [
+            "df['D'] = df['B']"
+        ]
+    ],
+    [
+        "How to convert a string list into an integer in python",
+        [
+            "nums = [int(x) for x in intstringlist]",
+            "L = [int(''.join([str(y) for y in x])) for x in L]",
+            "[int(s) for s in user.split(',')]",
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "user_list = [int(number) for number in user_input.split(',')]"
+        ],
+        [
+            "nums = [int(x) for x in intstringlist]",
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "L = [int(''.join([str(y) for y in x])) for x in L]",
+            "\"\"\"\"\"\".join([x for x in 'aas30dsa20' if x.isdigit()])",
+            "map(int, eval(input('Enter the unfriendly numbers: ')))"
+        ],
+        [
+            "user_list = [int(number) for number in user_input.split(',')]",
+            "[int(s) for s in user.split(',')]"
+        ]
+    ],
+    [
+        "Casting an int to a string in Python",
+        [
+            "int('1')",
+            "answer = str(round(answer, 2))",
+            "str(int(x) + 1).zfill(len(x))",
+            "'ME' + str(i)",
+            "nums = [int(x) for x in intstringlist]"
+        ],
+        [
+            "int('1')",
+            "my_float = float(my_string.replace(',', ''))",
+            "int()",
+            "struct.unpack('H', struct.pack('h', number))",
+            "\"\"\"\"\"\".join([x for x in 'aas30dsa20' if x.isdigit()])"
+        ],
+        [
+            "'ME' + str(i)"
+        ]
+    ],
+    [
+        "Prepend a line to an existing file in Python",
+        [
+            "myfile.write('\\n'.join(lines))",
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()",
+            "with open('somefile.txt', 'a') as the_file:\n    the_file.write('Hello\\n')",
+            "open('outfile', 'w').write('#test firstline\\n' + open('infile').read())",
+            "f = open('yourfile.txt', 'w')"
+        ],
+        [
+            "f = open('myfile', 'w')\nf.write('hi there\\n')\nf.close()",
+            "myfile.write('\\n'.join(lines))",
+            "with open('somefile.txt', 'a') as the_file:\n    the_file.write('Hello\\n')",
+            "print('hi there', file=f)",
+            "f = open('yourfile.txt', 'w')"
+        ],
+        [
+            "open('outfile', 'w').write('#test firstline\\n' + open('infile').read())"
+        ]
+    ],
+    [
+        "Find a specific pattern (regular expression) in a list of strings (Python)",
+        [
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]",
+            "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')",
+            "[x.strip() for x in '2.MATCHES $$TEXT$$ STRING'.split('$$TEXT$$')]",
+            "[word for word in mystring.split() if word.startswith('$')]"
+        ],
+        [
+            "re.findall('Test([0-9.]*[0-9]+)', text)",
+            "re.findall('(.*?)(?:\\\\[.*?\\\\]|$)', example_str)",
+            "[x.strip() for x in '2.MATCHES $$TEXT$$ STRING'.split('$$TEXT$$')]",
+            "re.findall('(.*?)\\\\[.*?\\\\]', example_str)",
+            "re.split('[ ](?=[A-Z])', input)"
+        ],
+        [
+            "[i for i in teststr if re.search('\\\\d+[xX]', i)]"
+        ]
+    ],
+    [
+        "How to remove any URL within a string in Python",
+        [
+            "print(re.search('(?P<url>https?://[^\\\\s]+)', myString).group('url'))",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "response = urllib.request.urlopen('http://www.example.com/')\nhtml = response.read()",
+            "re.findall('src=\"js/([^\"]*\\\\bjquery\\\\b[^\"]*)\"', data)",
+            "text = re.sub('^https?:\\\\/\\\\/.*[\\\\r\\\\n]*', '', text, flags=re.MULTILINE)"
+        ],
+        [
+            "print(re.search('(?P<url>https?://[^\\\\s]+)', myString).group('url'))",
+            "print(re.findall('(https?://[^\\\\s]+)', myString))",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "re.findall('src=\"js/([^\"]*\\\\bjquery\\\\b[^\"]*)\"', data)",
+            "re.findall('\"(http.*?)\"', s, re.MULTILINE | re.DOTALL)"
+        ],
+        [
+            "text = re.sub('^https?:\\\\/\\\\/.*[\\\\r\\\\n]*', '', text, flags=re.MULTILINE)"
+        ]
+    ],
+    [
+        "Running R script from python",
+        [
+            "subprocess.call('/usr/bin/Rscript --vanilla /pathto/MyrScript.r', shell=True)",
+            "subprocess.call(['/usr/bin/Rscript', '--vanilla', '/pathto/MyrScript.r'])",
+            "subprocess.call(['./test.sh'])",
+            "os.system('powershell.exe', 'script.ps1')",
+            "subprocess.call(['python.exe', 'hello.py', 'htmlfilename.htm'])"
+        ],
+        [
+            "subprocess.call(['./test.sh'])",
+            "subprocess.call('sleep.sh', shell=True)",
+            "subprocess.Popen(['background-process', 'arguments'])",
+            "os.system('powershell.exe', 'script.ps1')",
+            "subprocess.Popen(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat'])"
+        ],
+        [
+            "subprocess.call(['/usr/bin/Rscript', '--vanilla', '/pathto/MyrScript.r'])",
+            "subprocess.call('/usr/bin/Rscript --vanilla /pathto/MyrScript.r', shell=True)"
+        ]
+    ],
+    [
+        "creating a tmp file in python",
+        [
+            "new_file = open('path/to/FILE_NAME.ext', 'w')",
+            "shutil.copy(srcfile, dstdir)",
+            "shutil.rmtree('/folder_name')",
+            "open(filename, 'w').close()",
+            "open('filename', 'wb').write(bytes_)"
+        ],
+        [
+            "os.chdir(owd)",
+            "if (not os.path.exists(directory)):\n    os.makedirs(directory)",
+            "try:\n    os.makedirs(path)\nexcept OSError:\n    if (not os.path.isdir(path)):\n        raise",
+            "shutil.copy(srcfile, dstdir)",
+            "shutil.rmtree('/folder_name')"
+        ],
+        [
+            "new_file = open('path/to/FILE_NAME.ext', 'w')"
+        ]
+    ],
+    [
+        "Regular Expression to find brackets in a string",
+        [
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "re.findall('\\\\((.*?)\\\\)|(\\\\w)', '(zyx)bc')",
+            "re.findall('(.*?)\\\\[.*?\\\\]', example_str)",
+            "re.findall('(.*?)(?:\\\\[.*?\\\\]|$)', example_str)"
+        ],
+        [
+            "re.findall('(.*?)(?:\\\\[.*?\\\\]|$)', example_str)",
+            "re.findall('(.*?)\\\\[.*?\\\\]', example_str)",
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "re.findall('\"(http.*?)\"', s, re.MULTILINE | re.DOTALL)",
+            "re.findall('\\\\((.*?)\\\\)|(\\\\w)', '(zyx)bc')"
+        ],
+        [
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)"
+        ]
+    ],
+    [
+        "Python dictionary: Get list of values for list of keys",
+        [
+            "[mydict[x] for x in mykeys]",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "[dct[k] for k in lst]"
+        ],
+        [
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "[dct[k] for k in lst]",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "dict([('Name', 'Joe'), ('Age', 22)])"
+        ],
+        [
+            "[mydict[x] for x in mykeys]"
+        ]
+    ],
+    [
+        "How to reverse a dictionary in Python?",
+        [
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "list(dict.keys())[-1]",
+            "del d['ele']",
+            "sorted(d.items())",
+            "{i: d[i] for i in d if i != 'c'}"
+        ],
+        [
+            "sorted(d)",
+            "list(dict.keys())[-1]",
+            "sorted(o.items())",
+            "sorted(d.items())",
+            "res = dict((v, k) for k, v in a.items())"
+        ],
+        [
+            "{i[1]: i[0] for i in list(myDictionary.items())}"
+        ]
+    ],
+    [
+        "Non-ASCII characters in Matplotlib",
+        [
+            "plt.plot(x, y, label='H\\u2082O')",
+            "matplotlib.rc('font', **{'sans-serif': 'Arial', 'family': 'sans-serif'})",
+            "plt.plot(np.random.randn(100), np.random.randn(100), 'o', mfc='none')",
+            "plt.plot(x, y, label='$H_2O$')",
+            "ax.set_rlabel_position(135)"
+        ],
+        [
+            "print('\\xd0\\xbf\\xd1\\x80\\xd0\\xb8'.encode('raw_unicode_escape'))",
+            "\"\"\"\\\\a\"\"\".decode('string_escape')",
+            "\"\"\"\\\\x89\\\\n\"\"\".decode('string_escape')",
+            "raw_byte_string.decode('unicode_escape')",
+            "raw_string.decode('string_escape')"
+        ],
+        [
+            "matplotlib.rc('font', **{'sans-serif': 'Arial', 'family': 'sans-serif'})"
+        ]
+    ],
+    [
+        "printing double quotes around a variable",
+        [
+            "print(type(variable_name))",
+            "print(s.encode('unicode-escape').replace('\"', '\\\\\"'))",
+            "print('\"{}\"'.format(word))",
+            "print('foo\\nbar'.encode('string_escape'))",
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)"
+        ],
+        [
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "print(s.encode('unicode-escape').replace('\"', '\\\\\"'))",
+            "d = ast.literal_eval(\"{'code1':1,'code2':1}\")",
+            "json_data = json.loads(unescaped)",
+            "\"\"\"({0.goals} goals, ${0.penalties})\"\"\".format(self)"
+        ],
+        [
+            "print('\"{}\"'.format(word))"
+        ]
+    ],
+    [
+        "How to delete all instances of a character in a string in python?",
+        [
+            "re.sub('i', '', 'it is icy')",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)",
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "re.sub('[^\\\\w]', ' ', s)"
+        ],
+        [
+            "re.sub('[^\\\\sa-zA-Z0-9]', '', text).lower().strip()",
+            "re.sub('(?!\\\\s)[\\\\W_]', '', text).lower().strip()",
+            "mystring.replace(' ', '_')",
+            "re.sub('[^\\\\w]', ' ', s)",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)"
+        ],
+        [
+            "\"\"\"\"\"\".join([char for char in 'it is icy' if char != 'i'])",
+            "re.sub('i', '', 'it is icy')",
+            "\"\"\"it is icy\"\"\".replace('i', '')",
+            "\"\"\"\"\"\".join([char for char in 'it is icy' if char != 'i'])"
+        ]
+    ],
+    [
+        "How do I find the string between two special characters?",
+        [
+            "brackets = re.sub('[^(){}[\\\\]]', '', s)",
+            "re.sub('(?!\\\\s)[\\\\W_]', '', text).lower().strip()",
+            "re.sub('[^\\\\sa-zA-Z0-9]', '', text).lower().strip()",
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)",
+            "'abcd}def}'.rfind('}')"
+        ],
+        [
+            "'abcd}def}'.rfind('}')",
+            "re.sub('\\\\bH3\\\\b', 'H1', text)",
+            "re.findall('(.+?):(.+?)\\\\b ?', text)",
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.sub('i', '', 'it is icy')"
+        ],
+        [
+            "re.search('\\\\[(.*)\\\\]', your_string).group(1)"
+        ]
+    ],
+    [
+        "How to replace only part of the match with python re.sub",
+        [
+            "re.sub('i', '', 'it is icy')",
+            "re.sub('(\\\\_a)?\\\\.([^\\\\.]*)$', '_suff.\\\\2', 'long.file.name.jpg')",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)",
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "\"\"\"obama\"\"\".replace('a', '%temp%').replace('b', 'a').replace('%temp%', 'b')"
+        ],
+        [
+            "re.sub('i', '', 'it is icy')",
+            "re.findall('(.*?)(?:\\\\[.*?\\\\]|$)', example_str)",
+            "re.sub('\\\\bH3\\\\b', 'H1', text)",
+            "'abcd}def}'.rfind('}')",
+            "re.findall('\\\\(.*?\\\\)|\\\\w', '(zyx)bc')"
+        ],
+        [
+            "re.sub('(\\\\_a)?\\\\.([^\\\\.]*)$', '_suff.\\\\2', 'long.file.name.jpg')"
+        ]
+    ],
+    [
+        "Is there a Python Library that contains a list of all the ascii characters?",
+        [
+            "[chr(i) for i in range(127)]",
+            "len(my_string)",
+            "len(s)",
+            "print('\"{}\"'.format(word))",
+            "'Sopet\\xc3\\xb3n'.encode('latin-1').decode('utf-8')"
+        ],
+        [
+            "len(my_string)",
+            "len(s)",
+            "'ME' + str(i)",
+            "print('\"{}\"'.format(word))",
+            "int('1')"
+        ],
+        [
+            "[chr(i) for i in range(127)]"
+        ]
+    ],
+    [
+        "Python Regex - checking for a capital letter with a lowercase after",
+        [
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)",
+            "re.sub('[^\\\\sa-zA-Z0-9]', '', text).lower().strip()",
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.sub('(?!\\\\s)[\\\\W_]', '', text).lower().strip()",
+            "re.sub('[^A-Za-z0-9]+', '', mystring)"
+        ],
+        [
+            "re.findall('Test([0-9.]*[0-9]+)', text)",
+            "re.sub('(?!\\\\s)[\\\\W_]', '', text).lower().strip()",
+            "bool(re.search('ba[rzd]', 'foobarrrr'))",
+            "re.sub('[^\\\\sa-zA-Z0-9]', '', text).lower().strip()",
+            "re.findall('\\\\(.*?\\\\)|\\\\w', '(zyx)bc')"
+        ],
+        [
+            "re.sub('^[A-Z0-9]*(?![a-z])', '', string)"
+        ]
+    ],
+    [
+        "Python - Unicode to ASCII conversion",
+        [
+            "'Sopet\\xc3\\xb3n'.encode('latin-1').decode('utf-8')",
+            "d.decode('cp1251').encode('utf8')",
+            "\"\"\"\\\\x89\\\\n\"\"\".decode('string_escape')",
+            "\"\"\"\\\\a\"\"\".decode('string_escape')",
+            "s.encode('iso-8859-15')"
+        ],
+        [
+            "'Sopet\\xc3\\xb3n'.encode('latin-1').decode('utf-8')",
+            "encoded = 'data to be encoded'.encode('ascii')",
+            "print('\\xd0\\xbf\\xd1\\x80\\xd0\\xb8'.encode('raw_unicode_escape'))",
+            "d.decode('cp1251').encode('utf8')",
+            "raw_byte_string.decode('unicode_escape')"
+        ],
+        [
+            "s.encode('iso-8859-15')"
+        ]
+    ],
+    [
+        "how to create a file name with the current date & time in python?",
+        [
+            "open(filename, 'w').close()",
+            "time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(1236472051807 / 1000.0))",
+            "datetime.datetime.now().strftime('%H:%M:%S.%f')",
+            "datetime.datetime.now()",
+            "new_file = open('path/to/FILE_NAME.ext', 'w')"
+        ],
+        [
+            "time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(1347517370))",
+            "time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(1236472051807 / 1000.0))",
+            "time.strptime('30/03/09 16:31:32.123', '%d/%m/%y %H:%M:%S.%f')",
+            "if (not os.path.exists(directory)):\n    os.makedirs(directory)",
+            "try:\n    os.makedirs(path)\nexcept OSError:\n    if (not os.path.isdir(path)):\n        raise"
+        ],
+        [
+            "datetime.datetime.now()"
+        ]
+    ],
+    [
+        "Is there a function in Python to split a string without ignoring the spaces?",
+        [
+            "re.split('(\\\\W+)', s)",
+            "\"\"\"QH QD JC KD JS\"\"\".split()",
+            "re.split(' +', 'hello world sample text')",
+            "mystring.replace(' ', '! !').split('!')",
+            "\"\"\" \"\"\".join(my_string.split())"
+        ],
+        [
+            "\"\"\"QH QD JC KD JS\"\"\".split()",
+            "re.split(' +', 'hello world sample text')",
+            "s.split(' ', 4)",
+            "re.split('(\\\\W+)', s)",
+            "[x.strip() for x in '2.MATCHES $$TEXT$$ STRING'.split('$$TEXT$$')]"
+        ],
+        [
+            "mystring.replace(' ', '! !').split('!')"
+        ]
+    ]
+]

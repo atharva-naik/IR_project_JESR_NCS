@@ -1,0 +1,737 @@
+[
+    [
+        "split on any whitespace python",
+        [
+            "def split_on(s, sep=\" \"):     \"\"\"Split s by sep, unless it's inside a quote.\"\"\"     pattern = '''((?:[^%s\"']|\"[^\"]*\"|'[^']*')+)''' % sep      return [_strip_speechmarks(t) for t in re.split(pattern, s)[1::2]]",
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def strip_spaces(value, sep=None, join=True):     \"\"\"Cleans trailing whitespaces and replaces also multiple whitespaces with a single space.\"\"\"     value = value.strip()     value = [v.strip() for v in value.split(sep)]     join_sep = sep or ' '     return join_sep.join(value) if join else value",
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)",
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]"
+        ],
+        [
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def split_on(s, sep=\" \"):     \"\"\"Split s by sep, unless it's inside a quote.\"\"\"     pattern = '''((?:[^%s\"']|\"[^\"]*\"|'[^']*')+)''' % sep      return [_strip_speechmarks(t) for t in re.split(pattern, s)[1::2]]",
+            "def split_into_sentences(s):   \"\"\"Split text into list of sentences.\"\"\"   s = re.sub(r\"\\s+\", \" \", s)   s = re.sub(r\"[\\\\.\\\\?\\\\!]\", \"\\n\", s)   return s.split(\"\\n\")",
+            "def strip_spaces(value, sep=None, join=True):     \"\"\"Cleans trailing whitespaces and replaces also multiple whitespaces with a single space.\"\"\"     value = value.strip()     value = [v.strip() for v in value.split(sep)]     join_sep = sep or ' '     return join_sep.join(value) if join else value",
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]"
+        ],
+        [
+            "def normalize_value(text):     \"\"\"     This removes newlines and multiple spaces from a string.     \"\"\"     result = text.replace('\\n', ' ')     result = re.subn('[ ]{2,}', ' ', result)[0]     return result",
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)"
+        ]
+    ],
+    [
+        "check if all elements in a list are in a list of list python",
+        [
+            "def _check_elements_equal(lst):     \"\"\"     Returns true if all of the elements in the list are equal.     \"\"\"     assert isinstance(lst, list), \"Input value must be a list.\"     return not lst or lst.count(lst[0]) == len(lst)",
+            "def is_list_of_states(self, arg):         \"\"\"         A list of states example -         [('x1', 'easy'), ('x2', 'hard')]          Returns         -------         True, if arg is a list of states else False.          \"\"\"         return isinstance(arg, list) and all(isinstance(i, tuple) for i in arg)",
+            "def isin(elems, line):     \"\"\"Check if an element from a list is in a string.      :type elems: list     :type line: str      \"\"\"     found = False     for e in elems:         if e in line.lower():             found = True             break     return found",
+            "def isin(value, values):     \"\"\" Check that value is in values \"\"\"     for i, v in enumerate(value):         if v not in np.array(values)[:, i]:             return False     return True",
+            "def equal(list1, list2):     \"\"\" takes flags returns indexes of True values \"\"\"     return [item1 == item2 for item1, item2 in broadcast_zip(list1, list2)]"
+        ],
+        [
+            "def _check_elements_equal(lst):     \"\"\"     Returns true if all of the elements in the list are equal.     \"\"\"     assert isinstance(lst, list), \"Input value must be a list.\"     return not lst or lst.count(lst[0]) == len(lst)",
+            "def equal(list1, list2):     \"\"\" takes flags returns indexes of True values \"\"\"     return [item1 == item2 for item1, item2 in broadcast_zip(list1, list2)]",
+            "def isin(value, values):     \"\"\" Check that value is in values \"\"\"     for i, v in enumerate(value):         if v not in np.array(values)[:, i]:             return False     return True",
+            "def obj_in_list_always(target_list, obj):     \"\"\"     >>> l = [1,1,1]     >>> obj_in_list_always(l, 1)     True     >>> l.append(2)     >>> obj_in_list_always(l, 1)     False     \"\"\"     for item in set(target_list):         if item is not obj:             return False     return True",
+            "def isin(elems, line):     \"\"\"Check if an element from a list is in a string.      :type elems: list     :type line: str      \"\"\"     found = False     for e in elems:         if e in line.lower():             found = True             break     return found"
+        ],
+        [
+            "def valid (names):     \"\"\" Returns true iff all elements of names are valid features.     \"\"\"     if isinstance(names, str):         names = [names]         assert is_iterable_typed(names, basestring)      return all(name in __all_features for name in names)",
+            "def is_list_of_states(self, arg):         \"\"\"         A list of states example -         [('x1', 'easy'), ('x2', 'hard')]          Returns         -------         True, if arg is a list of states else False.          \"\"\"         return isinstance(arg, list) and all(isinstance(i, tuple) for i in arg)"
+        ]
+    ],
+    [
+        "remove first and last character in string python",
+        [
+            "def strip_spaces(s):     \"\"\" Strip excess spaces from a string \"\"\"     return u\" \".join([c for c in s.split(u' ') if c])",
+            "def remove_bad(string):     \"\"\"     remove problem characters from string     \"\"\"     remove = [':', ',', '(', ')', ' ', '|', ';', '\\'']     for c in remove:         string = string.replace(c, '_')     return string",
+            "def unpunctuate(s, *, char_blacklist=string.punctuation):     \"\"\" Remove punctuation from string s. \"\"\"     # remove punctuation     s = \"\".join(c for c in s if c not in char_blacklist)     # remove consecutive spaces     return \" \".join(filter(None, s.split(\" \")))",
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)",
+            "def strip_spaces(x):     \"\"\"     Strips spaces     :param x:     :return:     \"\"\"     x = x.replace(b' ', b'')     x = x.replace(b'\\t', b'')     return x"
+        ],
+        [
+            "def remove_bad(string):     \"\"\"     remove problem characters from string     \"\"\"     remove = [':', ',', '(', ')', ' ', '|', ';', '\\'']     for c in remove:         string = string.replace(c, '_')     return string",
+            "def clean(self, text):         \"\"\"Remove all unwanted characters from text.\"\"\"         return ''.join([c for c in text if c in self.alphabet])",
+            "def unpunctuate(s, *, char_blacklist=string.punctuation):     \"\"\" Remove punctuation from string s. \"\"\"     # remove punctuation     s = \"\".join(c for c in s if c not in char_blacklist)     # remove consecutive spaces     return \" \".join(filter(None, s.split(\" \")))",
+            "def strip_spaces(s):     \"\"\" Strip excess spaces from a string \"\"\"     return u\" \".join([c for c in s.split(u' ') if c])",
+            "def _remove_invalid_char(s):     \"\"\"Remove invalid and dangerous characters from a string.\"\"\"      s = ''.join([i if ord(i) >= 32 and ord(i) < 127 else '' for i in s])     s = s.translate(dict.fromkeys(map(ord, \"_%~#\\\\{}\\\":\")))     return s"
+        ],
+        [
+            "def truncate(string, index):     \"\"\"Truncate a string at index and add ...\"\"\"     if len(string) > index and index > 0:         string = string[:index - 1] + u('\u2026')     return string",
+            "def strip_spaces(x):     \"\"\"     Strips spaces     :param x:     :return:     \"\"\"     x = x.replace(b' ', b'')     x = x.replace(b'\\t', b'')     return x"
+        ]
+    ],
+    [
+        "fetch month from date object python",
+        [
+            "def get_month_start(day=None):     \"\"\"Returns the first day of the given month.\"\"\"     day = add_timezone(day or datetime.date.today())     return day.replace(day=1)",
+            "def unmarshal(self, v):         \"\"\"         Convert a date in \"2012-12-13\" format to a :class:`datetime.date` object.         \"\"\"         if not isinstance(v, date):             # 2012-12-13             v = datetime.strptime(v, \"%Y-%m-%d\").date()         return v",
+            "def biweekly(date=datetime.date.today()):     \"\"\"     Every two weeks.     \"\"\"     return datetime.date(date.year, date.month, 1 if date.day < 15 else 15)",
+            "def week_number(date):     \"\"\"     Return the Python week number of a date.     The django \\|date:\"W\" returns incompatible value     with the view implementation.     \"\"\"     week_number = date.strftime('%W')     if int(week_number) < 10:         week_number = week_number[-1]     return week_number",
+            "def str_to_date(date: str) -> datetime.datetime:     \"\"\" Convert cbr.ru API date ste to python datetime      :param date: date from API response      :return: date like datetime     :rtype: datetime     \"\"\"     date = date.split('.')     date.reverse()     y, m, d = date     return datetime.datetime(int(y), int(m), int(d))"
+        ],
+        [
+            "def get_month_start(day=None):     \"\"\"Returns the first day of the given month.\"\"\"     day = add_timezone(day or datetime.date.today())     return day.replace(day=1)",
+            "def last_midnight():     \"\"\"     return a datetime of last mid-night     \"\"\"     now = datetime.now()     return datetime(now.year, now.month, now.day)",
+            "def biweekly(date=datetime.date.today()):     \"\"\"     Every two weeks.     \"\"\"     return datetime.date(date.year, date.month, 1 if date.day < 15 else 15)",
+            "def week_number(date):     \"\"\"     Return the Python week number of a date.     The django \\|date:\"W\" returns incompatible value     with the view implementation.     \"\"\"     week_number = date.strftime('%W')     if int(week_number) < 10:         week_number = week_number[-1]     return week_number",
+            "def is_third_friday(day=None):     \"\"\" check if day is month's 3rd friday \"\"\"     day = day if day is not None else datetime.datetime.now()     defacto_friday = (day.weekday() == 4) or (         day.weekday() == 3 and day.hour() >= 17)     return defacto_friday and 14 < day.day < 22"
+        ],
+        [
+            "def QA_util_datetime_to_strdate(dt):     \"\"\"     :param dt:  pythone datetime.datetime     :return:  1999-02-01 string type     \"\"\"     strdate = \"%04d-%02d-%02d\" % (dt.year, dt.month, dt.day)     return strdate",
+            "def str_to_date(date: str) -> datetime.datetime:     \"\"\" Convert cbr.ru API date ste to python datetime      :param date: date from API response      :return: date like datetime     :rtype: datetime     \"\"\"     date = date.split('.')     date.reverse()     y, m, d = date     return datetime.datetime(int(y), int(m), int(d))"
+        ]
+    ],
+    [
+        "stackoverflow python how to read text file and print without \\n",
+        [
+            "def write_file(writer, filename):   \"\"\"Write all of lines from file using the writer.\"\"\"   for line in txt_line_iterator(filename):     writer.write(line)     writer.write(\"\\n\")",
+            "def write_text(filename: str, text: str) -> None:     \"\"\"     Writes text to a file.     \"\"\"     with open(filename, 'w') as f:  # type: TextIO         print(text, file=f)",
+            "def lint_file(in_file, out_file=None):     \"\"\"Helps remove extraneous whitespace from the lines of a file      :param file in_file: A readable file or file-like     :param file out_file: A writable file or file-like     \"\"\"     for line in in_file:         print(line.strip(), file=out_file)",
+            "def file_lines(bblfile:str) -> iter:     \"\"\"Yield lines found in given file\"\"\"     with open(bblfile) as fd:         yield from (line.rstrip() for line in fd if line.rstrip())",
+            "def iter_lines(file_like: Iterable[str]) -> Generator[str, None, None]:     \"\"\" Helper for iterating only nonempty lines without line breaks\"\"\"     for line in file_like:         line = line.rstrip('\\r\\n')         if line:             yield line"
+        ],
+        [
+            "def standard_input():     \"\"\"Generator that yields lines from standard input.\"\"\"     with click.get_text_stream(\"stdin\") as stdin:         while stdin.readable():             line = stdin.readline()             if line:                 yield line.strip().encode(\"utf-8\")",
+            "def read_stdin():     \"\"\" Read text from stdin, and print a helpful message for ttys. \"\"\"     if sys.stdin.isatty() and sys.stdout.isatty():         print('\\nReading from stdin until end of file (Ctrl + D)...')      return sys.stdin.read()",
+            "def file_lines(bblfile:str) -> iter:     \"\"\"Yield lines found in given file\"\"\"     with open(bblfile) as fd:         yield from (line.rstrip() for line in fd if line.rstrip())",
+            "def file_read(filename):     \"\"\"Read a file and close it.  Returns the file source.\"\"\"     fobj = open(filename,'r');     source = fobj.read();     fobj.close()     return source",
+            "def write_file(writer, filename):   \"\"\"Write all of lines from file using the writer.\"\"\"   for line in txt_line_iterator(filename):     writer.write(line)     writer.write(\"\\n\")"
+        ],
+        [
+            "def lint_file(in_file, out_file=None):     \"\"\"Helps remove extraneous whitespace from the lines of a file      :param file in_file: A readable file or file-like     :param file out_file: A writable file or file-like     \"\"\"     for line in in_file:         print(line.strip(), file=out_file)",
+            "def stdout_display():     \"\"\" Print results straight to stdout \"\"\"     if sys.version_info[0] == 2:         yield SmartBuffer(sys.stdout)     else:         yield SmartBuffer(sys.stdout.buffer)"
+        ]
+    ],
+    [
+        "python iterate throguh list of strings",
+        [
+            "def _str_to_list(s):     \"\"\"Converts a comma separated string to a list\"\"\"     _list = s.split(\",\")     return list(map(lambda i: i.lstrip(), _list))",
+            "def commajoin_as_strings(iterable):     \"\"\" Join the given iterable with ',' \"\"\"     return _(u',').join((six.text_type(i) for i in iterable))",
+            "def string_to_list(string, sep=\",\", filter_empty=False):     \"\"\"Transforma una string con elementos separados por `sep` en una lista.\"\"\"     return [value.strip() for value in string.split(sep)             if (not filter_empty or value)]",
+            "def split_elements(value):     \"\"\"Split a string with comma or space-separated elements into a list.\"\"\"     items = [v.strip() for v in value.split(',')]     if len(items) == 1:         items = value.split()     return items",
+            "def downcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to lower case.\"\"\"     return [ tt.lower() for tt in map(_ustr,t) ]"
+        ],
+        [
+            "def commajoin_as_strings(iterable):     \"\"\" Join the given iterable with ',' \"\"\"     return _(u',').join((six.text_type(i) for i in iterable))",
+            "def upcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to upper case.\"\"\"     return [ tt.upper() for tt in map(_ustr,t) ]",
+            "def downcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to lower case.\"\"\"     return [ tt.lower() for tt in map(_ustr,t) ]",
+            "def is_iter_non_string(obj):     \"\"\"test if object is a list or tuple\"\"\"     if isinstance(obj, list) or isinstance(obj, tuple):         return True     return False",
+            "def pairwise(iterable):     \"\"\"From itertools cookbook. [a, b, c, ...] -> (a, b), (b, c), ...\"\"\"     first, second = tee(iterable)     next(second, None)     return zip(first, second)"
+        ],
+        [
+            "def flatten_list(l):     \"\"\" Nested lists to single-level list, does not split strings\"\"\"     return list(chain.from_iterable(repeat(x,1) if isinstance(x,str) else x for x in l))",
+            "def _str_to_list(s):     \"\"\"Converts a comma separated string to a list\"\"\"     _list = s.split(\",\")     return list(map(lambda i: i.lstrip(), _list))"
+        ]
+    ],
+    [
+        "how to get index of maximum element in list in python",
+        [
+            "def MultiArgMax(x):   \"\"\"   Get tuple (actually a generator) of indices where the max value of   array x occurs. Requires that x have a max() method, as x.max()   (in the case of NumPy) is much faster than max(x).   For a simpler, faster argmax when there is only a single maximum entry,   or when knowing only the first index where the maximum occurs,   call argmax() on a NumPy array.    :param x: Any sequence that has a max() method.   :returns: Generator with the indices where the max value occurs.   \"\"\"   m = x.max()   return (i for i, v in enumerate(x) if v == m)",
+            "def index(self, item):         \"\"\" Not recommended for use on large lists due to time             complexity, but it works              -> #int list index of @item         \"\"\"         for i, x in enumerate(self.iter()):             if x == item:                 return i         return None",
+            "def get_list_index(lst, index_or_name):     \"\"\"     Return the index of an element in the list.      Args:         lst (list): The list.         index_or_name (int or str): The value of the reference element, or directly its numeric index.      Returns:         (int) The index of the element in the list.     \"\"\"     if isinstance(index_or_name, six.integer_types):         return index_or_name      return lst.index(index_or_name)",
+            "def find_index(array, x):     \"\"\"     Locate the leftmost value exactly equal to x.      :type array: list     :param array: an iterable object that support inex      :param x: a comparable value      **\u4e2d\u6587\u6587\u6863**      \u8fd4\u56de\u7b2c\u4e00\u4e2a\u503c\u7b49\u4e8ex\u7684\u5143\u7d20\u7684\u7d22\u5f15\u3002     \"\"\"     i = bisect.bisect_left(array, x)     if i != len(array) and array[i] == x:         return i     raise ValueError",
+            "def _most_common(iterable):     \"\"\"Returns the most common element in `iterable`.\"\"\"     data = Counter(iterable)     return max(data, key=data.__getitem__)"
+        ],
+        [
+            "def index(self, item):         \"\"\" Not recommended for use on large lists due to time             complexity, but it works              -> #int list index of @item         \"\"\"         for i, x in enumerate(self.iter()):             if x == item:                 return i         return None",
+            "def find_index(array, x):     \"\"\"     Locate the leftmost value exactly equal to x.      :type array: list     :param array: an iterable object that support inex      :param x: a comparable value      **\u4e2d\u6587\u6587\u6863**      \u8fd4\u56de\u7b2c\u4e00\u4e2a\u503c\u7b49\u4e8ex\u7684\u5143\u7d20\u7684\u7d22\u5f15\u3002     \"\"\"     i = bisect.bisect_left(array, x)     if i != len(array) and array[i] == x:         return i     raise ValueError",
+            "def highest(self):         \"\"\"Return the items with the higest score.          If this ScoreSet is empty, returns None.         \"\"\"         scores = self.scores()         if not scores:             return None         maxscore = max(map(score, scores))         return filter(lambda x: score(x) == maxscore, scores)",
+            "def get_list_index(lst, index_or_name):     \"\"\"     Return the index of an element in the list.      Args:         lst (list): The list.         index_or_name (int or str): The value of the reference element, or directly its numeric index.      Returns:         (int) The index of the element in the list.     \"\"\"     if isinstance(index_or_name, six.integer_types):         return index_or_name      return lst.index(index_or_name)",
+            "def _most_common(iterable):     \"\"\"Returns the most common element in `iterable`.\"\"\"     data = Counter(iterable)     return max(data, key=data.__getitem__)"
+        ],
+        [
+            "def MultiArgMax(x):   \"\"\"   Get tuple (actually a generator) of indices where the max value of   array x occurs. Requires that x have a max() method, as x.max()   (in the case of NumPy) is much faster than max(x).   For a simpler, faster argmax when there is only a single maximum entry,   or when knowing only the first index where the maximum occurs,   call argmax() on a NumPy array.    :param x: Any sequence that has a max() method.   :returns: Generator with the indices where the max value occurs.   \"\"\"   m = x.max()   return (i for i, v in enumerate(x) if v == m)",
+            "def get_longest_orf(orfs):     \"\"\"Find longest ORF from the given list of ORFs.\"\"\"     sorted_orf = sorted(orfs, key=lambda x: len(x['sequence']), reverse=True)[0]     return sorted_orf"
+        ]
+    ],
+    [
+        "get element of a matrix in python'",
+        [
+            "def get_column(self, X, column):         \"\"\"Return a column of the given matrix.          Args:             X: `numpy.ndarray` or `pandas.DataFrame`.             column: `int` or `str`.          Returns:             np.ndarray: Selected column.         \"\"\"         if isinstance(X, pd.DataFrame):             return X[column].values          return X[:, column]",
+            "def get_matrix(self):         \"\"\"  Use numpy to create a real matrix object from the data          :return: the matrix representation of the fvm         \"\"\"         return np.array([ self.get_row_list(i) for i in range(self.row_count()) ])",
+            "def Tmatrix(X):     \"\"\"     gets the orientation matrix (T) from data in X     \"\"\"     T = [[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]]     for row in X:         for k in range(3):             for l in range(3):                 T[k][l] += row[k] * row[l]     return T",
+            "def load_data(filename):     \"\"\"     :rtype : numpy matrix     \"\"\"     data = pandas.read_csv(filename, header=None, delimiter='\\t', skiprows=9)     return data.as_matrix()",
+            "def _column(arr, indexes):     \"\"\" Returns a column with given indexes from a deep array      For example, if the array is a matrix and indexes is a single int, will     return arr[:,indexes]. If the array is an order 3 tensor and indexes is a     pair of ints, will return arr[:,indexes[0],indexes[1]], etc.      \"\"\"     if arr.ndim == 2 and types.is_int(indexes):         return arr[:, indexes]     elif arr.ndim == 3 and len(indexes) == 2:         return arr[:, indexes[0], indexes[1]]     else:         raise NotImplementedError('Only supporting arrays of dimension 2 and 3 as yet.')"
+        ],
+        [
+            "def get_column(self, X, column):         \"\"\"Return a column of the given matrix.          Args:             X: `numpy.ndarray` or `pandas.DataFrame`.             column: `int` or `str`.          Returns:             np.ndarray: Selected column.         \"\"\"         if isinstance(X, pd.DataFrame):             return X[column].values          return X[:, column]",
+            "def get_inputs_from_cm(index, cm):     \"\"\"Return indices of inputs to the node with the given index.\"\"\"     return tuple(i for i in range(cm.shape[0]) if cm[i][index])",
+            "def Tmatrix(X):     \"\"\"     gets the orientation matrix (T) from data in X     \"\"\"     T = [[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]]     for row in X:         for k in range(3):             for l in range(3):                 T[k][l] += row[k] * row[l]     return T",
+            "def transpose(table):     \"\"\"     transpose matrix     \"\"\"     t = []     for i in range(0, len(table[0])):         t.append([row[i] for row in table])     return t",
+            "def iget_list_column_slice(list_, start=None, stop=None, stride=None):     \"\"\" iterator version of get_list_column \"\"\"     if isinstance(start, slice):         slice_ = start     else:         slice_ = slice(start, stop, stride)     return (row[slice_] for row in list_)"
+        ],
+        [
+            "def load_data(filename):     \"\"\"     :rtype : numpy matrix     \"\"\"     data = pandas.read_csv(filename, header=None, delimiter='\\t', skiprows=9)     return data.as_matrix()",
+            "def csv_to_matrix(csv_file_path):     \"\"\"Load a CSV file into a Python matrix of strings.      Args:         csv_file_path: Full path to a valid CSV file (e.g. c:/ladybug/test.csv)     \"\"\"     mtx = []     with open(csv_file_path) as csv_data_file:         for row in csv_data_file:             mtx.append(row.split(','))     return mtx"
+        ]
+    ],
+    [
+        "python subprocess popen non blocking",
+        [
+            "def kill_mprocess(process):     \"\"\"kill process     Args:         process - Popen object for process     \"\"\"     if process and proc_alive(process):         process.terminate()         process.communicate()     return not proc_alive(process)",
+            "def callprint(self, cmd, shell=None, lock_file=None, nofail=False, container=None):         \"\"\"         Prints the command, and then executes it, then prints the memory use and         return code of the command.          Uses python's subprocess.Popen() to execute the given command. The shell argument is simply         passed along to Popen(). You should use shell=False (default) where possible, because this enables memory         profiling. You should use shell=True if you require shell functions like redirects (>) or stars (*), but this         will prevent the script from monitoring memory use. The pipes (|) will be used to split the command into         subprocesses run within python, so the memory profiling is possible.          cmd can also be a series (a dict object) of multiple commands, which will be run in succession.          :param str | Iterable[str] cmd: Bash command(s) to be run.         :param str lock_file: a lock file name         :param bool nofail: Should the pipeline bail on a nonzero return from a process? Default: False             Nofail can be used to implement non-essential parts of the pipeline; if these processes fail,             they will not cause the pipeline to bail out.         :param bool shell: if the command should be run it its own shell, default: None (will try             to determine based on the command)         :param container: Named Docker container in which to execute.         :param container: str         \"\"\"         # The Popen shell argument works like this:         # if shell=False, then we format the command (with split()) to be a list of command and its arguments.         # Split the command to use shell=False;         # leave it together to use shell=True;          def get_mem_child_sum(proc):             try:                 # get children processes                 children = proc.children(recursive=True)                 # get RSS memory of each child proc and sum all                 mem_sum = sum([x.memory_info().rss for x in children])                 # return in gigs                 return mem_sum/1e9             except (psutil.NoSuchProcess, psutil.ZombieProcess) as e:                 print(e)                 print(\"Warning: couldn't add memory use for process: {}\".format(proc.pid))                 return 0           def display_memory(memval):             return None if memval < 0 else \"{}GB\".format(round(memval, 3))          def make_dict(command):             a, s = (command, True) if check_shell(command, shell) else (shlex.split(command), False)             return dict(args=a, stdout=subprocess.PIPE, shell=s)          if container:             cmd = \"docker exec \" + container + \" \" + cmd          param_list = [make_dict(c) for c in split_by_pipes(cmd)] \\             if check_shell_pipes(cmd) else [dict(args=cmd, stdout=None, shell=True)]          proc_name = get_proc_name(cmd)          # stop_times = []         processes = []         running_processes = []         start_time = time.time()         for i in range(len(param_list)):             running_processes.append(i)             if i == 0:                 processes.append(psutil.Popen(preexec_fn=os.setpgrp, **param_list[i]))             else:                 param_list[i][\"stdin\"] = processes[i - 1].stdout                 processes.append(psutil.Popen(preexec_fn=os.setpgrp, **param_list[i]))              self.procs[processes[-1].pid] = {                 \"proc_name\": proc_name,                 \"subproc_name\" : get_proc_name(param_list[i][\"args\"]),                 \"start_time\": start_time,                 \"container\": container,                 \"p\": processes[-1]             }          self._report_command(cmd, [x.pid for x in processes])             # Capture the subprocess output in <pre> tags to make it format nicely             # if the markdown log file is displayed as HTML.         print(\"<pre>\")          local_maxmems = [-1] * len(running_processes)         returncodes = [None] * len(running_processes)          if not self.wait:             print(\"</pre>\")             ids = [x.pid for x in processes]             print (\"Not waiting for subprocess(es): \" + str(ids))             return [0, -1]          def proc_wrapup(i):             \"\"\"             :param i: internal ID number of the subprocess             \"\"\"             returncode = processes[i].returncode             current_pid = processes[i].pid              info = \"Process {pid} returned {ret}; memory: {mem}. \".format(                 pid=current_pid,                  ret=processes[i].returncode,                 mem=display_memory(local_maxmems[i]))                          # report process profile             self._report_profile(self.procs[current_pid][\"proc_name\"], lock_file, time.time() - self.procs[current_pid][\"start_time\"], local_maxmems[i])              # Remove this as a running subprocess             del self.procs[current_pid]             running_processes.remove(i)              returncodes[i] = returncode             return info           sleeptime = .0001         info = \"\"         while running_processes:             for i in running_processes:                 local_maxmems[i] = max(local_maxmems[i], (get_mem_child_sum(processes[i])))                 self.peak_memory = max(self.peak_memory, local_maxmems[i])                 if not self._attend_process(processes[i], sleeptime):                     info += proc_wrapup(i)              # the sleeptime is extremely short at the beginning and gets longer exponentially              # (+ constant to prevent copious checks at the very beginning)             # = more precise mem tracing for short processes             sleeptime = min((sleeptime + 0.25) * 3 , 60/len(processes))          # All jobs are done, print a final closing and job info         stop_time = time.time()         info += \" Elapsed: \" + str(datetime.timedelta(seconds=self.time_elapsed(start_time))) + \".\"         info += \" Peak memory: {pipe}.\".format(pipe=display_memory(self.peak_memory))          print(\"</pre>\")         print(info)          for rc in returncodes:             if rc != 0:                 msg = \"Subprocess returned nonzero result. Check above output for details\"                 self._triage_error(SubprocessError(msg), nofail)            return [returncodes, local_maxmems]",
+            "def correspond(text):     \"\"\"Communicate with the child process without closing stdin.\"\"\"     if text:         subproc.stdin.write(text)     subproc.stdin.flush()     return get_lines()",
+            "def stop_process(self):         \"\"\"         Stops the child process.         \"\"\"         self._process.terminate()         if not self._process.waitForFinished(100):             self._process.kill()",
+            "def _shutdown(self):     \"\"\"Terminate the sub-process.\"\"\"     if self._proc:       ret = _shutdown_proc(self._proc, 3)       logging.info(\"Shutdown with return code: %s\", ret)       self._proc = None"
+        ],
+        [
+            "def kill_mprocess(process):     \"\"\"kill process     Args:         process - Popen object for process     \"\"\"     if process and proc_alive(process):         process.terminate()         process.communicate()     return not proc_alive(process)",
+            "def stop_process(self):         \"\"\"         Stops the child process.         \"\"\"         self._process.terminate()         if not self._process.waitForFinished(100):             self._process.kill()",
+            "def wait_until_exit(self):         \"\"\" Wait until thread exit              Used for testing purpose only         \"\"\"          if self._timeout is None:             raise Exception(\"Thread will never exit. Use stop or specify timeout when starting it!\")          self._thread.join()         self.stop()",
+            "def stop_process(self, process, timeout=None):         \"\"\" Initiates a graceful stop of one process \"\"\"          process[\"terminate\"] = True         if timeout is not None:             process[\"terminate_at\"] = time.time() + timeout         process[\"subprocess\"].send_signal(signal.SIGINT)",
+            "def _shutdown(self):     \"\"\"Terminate the sub-process.\"\"\"     if self._proc:       ret = _shutdown_proc(self._proc, 3)       logging.info(\"Shutdown with return code: %s\", ret)       self._proc = None"
+        ],
+        [
+            "def disown(cmd):     \"\"\"Call a system command in the background,        disown it and hide it's output.\"\"\"     subprocess.Popen(cmd,                      stdout=subprocess.DEVNULL,                      stderr=subprocess.DEVNULL)",
+            "def correspond(text):     \"\"\"Communicate with the child process without closing stdin.\"\"\"     if text:         subproc.stdin.write(text)     subproc.stdin.flush()     return get_lines()"
+        ]
+    ],
+    [
+        "python split on any whitespace",
+        [
+            "def split_on(s, sep=\" \"):     \"\"\"Split s by sep, unless it's inside a quote.\"\"\"     pattern = '''((?:[^%s\"']|\"[^\"]*\"|'[^']*')+)''' % sep      return [_strip_speechmarks(t) for t in re.split(pattern, s)[1::2]]",
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def strip_spaces(value, sep=None, join=True):     \"\"\"Cleans trailing whitespaces and replaces also multiple whitespaces with a single space.\"\"\"     value = value.strip()     value = [v.strip() for v in value.split(sep)]     join_sep = sep or ' '     return join_sep.join(value) if join else value",
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]",
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)"
+        ],
+        [
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def split_on(s, sep=\" \"):     \"\"\"Split s by sep, unless it's inside a quote.\"\"\"     pattern = '''((?:[^%s\"']|\"[^\"]*\"|'[^']*')+)''' % sep      return [_strip_speechmarks(t) for t in re.split(pattern, s)[1::2]]",
+            "def split_into_sentences(s):   \"\"\"Split text into list of sentences.\"\"\"   s = re.sub(r\"\\s+\", \" \", s)   s = re.sub(r\"[\\\\.\\\\?\\\\!]\", \"\\n\", s)   return s.split(\"\\n\")",
+            "def strip_spaces(value, sep=None, join=True):     \"\"\"Cleans trailing whitespaces and replaces also multiple whitespaces with a single space.\"\"\"     value = value.strip()     value = [v.strip() for v in value.split(sep)]     join_sep = sep or ' '     return join_sep.join(value) if join else value",
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]"
+        ],
+        [
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)",
+            "def normalize_value(text):     \"\"\"     This removes newlines and multiple spaces from a string.     \"\"\"     result = text.replace('\\n', ' ')     result = re.subn('[ ]{2,}', ' ', result)[0]     return result"
+        ]
+    ],
+    [
+        "save image in a path in python",
+        [
+            "def downloadImg(url, tofile=None):     \"\"\"     \"\"\"     r = urllib2.Request(url)     img_data = urllib2.urlopen(r).read()     img_buffer = StringIO.StringIO(img_data)     img = Image.open(img_buffer)     if FILE.make and tofile is not None:         img.save(FILE.dir + tofile)     return img",
+            "def imdecode(image_path):     \"\"\"Return BGR image read by opencv\"\"\"     import os     assert os.path.exists(image_path), image_path + ' not found'     im = cv2.imread(image_path)     return im",
+            "def read_img(path):     \"\"\" Reads image specified by path into numpy.ndarray\"\"\"     img = cv2.resize(cv2.imread(path, 0), (80, 30)).astype(np.float32) / 255     img = np.expand_dims(img.transpose(1, 0), 0)     return img",
+            "def get_cache_path(filename): \t\"\"\" get file path \"\"\" \tcwd = os.path.dirname(os.path.realpath(__file__)) \treturn os.path.join(cwd, filename)",
+            "def load_file(self, input_file):         \"\"\" Loads data array from file (result of this converter)          Tries to import, load and replace files' data.         It will overwirte previously added items with #add_file or #load_file.          :param input_file         :type str or unicode         \"\"\"         pyimg = imp.load_source('image2py_taf', input_file)         self.files = pyimg.data         self.set_template(templates.templateByName(pyimg.template))"
+        ],
+        [
+            "def downloadImg(url, tofile=None):     \"\"\"     \"\"\"     r = urllib2.Request(url)     img_data = urllib2.urlopen(r).read()     img_buffer = StringIO.StringIO(img_data)     img = Image.open(img_buffer)     if FILE.make and tofile is not None:         img.save(FILE.dir + tofile)     return img",
+            "def url_to_image(url):     \"\"\"     Fetch an image from url and convert it into a Pillow Image object     \"\"\"     r = requests.get(url)     image = StringIO(r.content)     return image",
+            "def imdecode(image_path):     \"\"\"Return BGR image read by opencv\"\"\"     import os     assert os.path.exists(image_path), image_path + ' not found'     im = cv2.imread(image_path)     return im",
+            "def read_img(path):     \"\"\" Reads image specified by path into numpy.ndarray\"\"\"     img = cv2.resize(cv2.imread(path, 0), (80, 30)).astype(np.float32) / 255     img = np.expand_dims(img.transpose(1, 0), 0)     return img",
+            "def load_file(self, input_file):         \"\"\" Loads data array from file (result of this converter)          Tries to import, load and replace files' data.         It will overwirte previously added items with #add_file or #load_file.          :param input_file         :type str or unicode         \"\"\"         pyimg = imp.load_source('image2py_taf', input_file)         self.files = pyimg.data         self.set_template(templates.templateByName(pyimg.template))"
+        ],
+        [
+            "def relative_path(path):     \"\"\"     Return the given path relative to this file.     \"\"\"     return os.path.join(os.path.dirname(__file__), path)",
+            "def get_cache_path(filename): \t\"\"\" get file path \"\"\" \tcwd = os.path.dirname(os.path.realpath(__file__)) \treturn os.path.join(cwd, filename)"
+        ]
+    ],
+    [
+        "finding the index of an element in a list python",
+        [
+            "def get_list_index(lst, index_or_name):     \"\"\"     Return the index of an element in the list.      Args:         lst (list): The list.         index_or_name (int or str): The value of the reference element, or directly its numeric index.      Returns:         (int) The index of the element in the list.     \"\"\"     if isinstance(index_or_name, six.integer_types):         return index_or_name      return lst.index(index_or_name)",
+            "def index(self, item):         \"\"\" Not recommended for use on large lists due to time             complexity, but it works              -> #int list index of @item         \"\"\"         for i, x in enumerate(self.iter()):             if x == item:                 return i         return None",
+            "def find_index(array, x):     \"\"\"     Locate the leftmost value exactly equal to x.      :type array: list     :param array: an iterable object that support inex      :param x: a comparable value      **\u4e2d\u6587\u6587\u6863**      \u8fd4\u56de\u7b2c\u4e00\u4e2a\u503c\u7b49\u4e8ex\u7684\u5143\u7d20\u7684\u7d22\u5f15\u3002     \"\"\"     i = bisect.bisect_left(array, x)     if i != len(array) and array[i] == x:         return i     raise ValueError",
+            "def binSearch(arr, val):   \"\"\"    Function for running binary search on a sorted list.    :param arr: (list) a sorted list of integers to search   :param val: (int)  a integer to search for in the sorted array   :returns: (int) the index of the element if it is found and -1 otherwise.   \"\"\"   i = bisect_left(arr, val)   if i != len(arr) and arr[i] == val:     return i   return -1",
+            "def find(self, name):         \"\"\"Return the index of the toc entry with name NAME.             Return -1 for failure.\"\"\"         for i, nm in enumerate(self.data):             if nm[-1] == name:                 return i         return -1"
+        ],
+        [
+            "def get_list_index(lst, index_or_name):     \"\"\"     Return the index of an element in the list.      Args:         lst (list): The list.         index_or_name (int or str): The value of the reference element, or directly its numeric index.      Returns:         (int) The index of the element in the list.     \"\"\"     if isinstance(index_or_name, six.integer_types):         return index_or_name      return lst.index(index_or_name)",
+            "def find_index(array, x):     \"\"\"     Locate the leftmost value exactly equal to x.      :type array: list     :param array: an iterable object that support inex      :param x: a comparable value      **\u4e2d\u6587\u6587\u6863**      \u8fd4\u56de\u7b2c\u4e00\u4e2a\u503c\u7b49\u4e8ex\u7684\u5143\u7d20\u7684\u7d22\u5f15\u3002     \"\"\"     i = bisect.bisect_left(array, x)     if i != len(array) and array[i] == x:         return i     raise ValueError",
+            "def index(self, item):         \"\"\" Not recommended for use on large lists due to time             complexity, but it works              -> #int list index of @item         \"\"\"         for i, x in enumerate(self.iter()):             if x == item:                 return i         return None",
+            "def getIndex(predicateFn: Callable[[T], bool], items: List[T]) -> int:     \"\"\"     Finds the index of an item in list, which satisfies predicate     :param predicateFn: predicate function to run on items of list     :param items: list of tuples     :return: first index for which predicate function returns True     \"\"\"     try:         return next(i for i, v in enumerate(items) if predicateFn(v))     except StopIteration:         return -1",
+            "def find_first_in_list(txt: str, str_list: [str]) -> int:  # type: ignore     \"\"\"     Returns the index of the earliest occurence of an item from a list in a string      Ex: find_first_in_list('foobar', ['bar', 'fin']) -> 3     \"\"\"     start = len(txt) + 1     for item in str_list:         if start > txt.find(item) > -1:             start = txt.find(item)     return start if len(txt) + 1 > start > -1 else -1"
+        ],
+        [
+            "def binSearch(arr, val):   \"\"\"    Function for running binary search on a sorted list.    :param arr: (list) a sorted list of integers to search   :param val: (int)  a integer to search for in the sorted array   :returns: (int) the index of the element if it is found and -1 otherwise.   \"\"\"   i = bisect_left(arr, val)   if i != len(arr) and arr[i] == val:     return i   return -1",
+            "def find_geom(geom, geoms):     \"\"\"     Returns the index of a geometry in a list of geometries avoiding     expensive equality checks of `in` operator.     \"\"\"     for i, g in enumerate(geoms):         if g is geom:             return i"
+        ]
+    ],
+    [
+        "how to put comma in number then right alignment in python",
+        [
+            "def _saferound(value, decimal_places):     \"\"\"     Rounds a float value off to the desired precision     \"\"\"     try:         f = float(value)     except ValueError:         return ''     format = '%%.%df' % decimal_places     return format % f",
+            "def add_colons(s):     \"\"\"Add colons after every second digit.      This function is used in functions to prettify serials.      >>> add_colons('teststring')     'te:st:st:ri:ng'     \"\"\"     return ':'.join([s[i:i + 2] for i in range(0, len(s), 2)])",
+            "def concat_padded(base, *args):     \"\"\"     Concatenate string and zero-padded 4 digit number     \"\"\"     ret = base     for n in args:         if is_string(n):             ret = \"%s_%s\" % (ret, n)         else:             ret = \"%s_%04i\"  % (ret, n + 1)     return ret",
+            "def round_float(f, digits, rounding=ROUND_HALF_UP):     \"\"\"     Accurate float rounding from http://stackoverflow.com/a/15398691.     \"\"\"     return Decimal(str(f)).quantize(Decimal(10) ** (-1 * digits),                                     rounding=rounding)",
+            "def format_float(value): # not used     \"\"\"Modified form of the 'g' format specifier.     \"\"\"     string = \"{:g}\".format(value).replace(\"e+\", \"e\")     string = re.sub(\"e(-?)0*(\\d+)\", r\"e\\1\\2\", string)     return string"
+        ],
+        [
+            "def column(self, i):          \"\"\"from right\"\"\"         return ''.join([str(digitat2(r,i)) for r in self])",
+            "def _numbers_units(N):     \"\"\"     >>> _numbers_units(45)     '123456789012345678901234567890123456789012345'     \"\"\"     lst = range(1, N + 1)     return \"\".join(list(map(lambda i: str(i % 10), lst)))",
+            "def print_matrix(X, decimals=1):     \"\"\"Pretty printing for numpy matrix X\"\"\"     for row in np.round(X, decimals=decimals):         print(row)",
+            "def pp(i, base=1024):     \"\"\"     Pretty-print the integer `i` as a human-readable size representation.     \"\"\"     degree = 0     pattern = \"%4d     %s\"     while i > base:         pattern = \"%7.2f %s\"         i = i / float(base)         degree += 1     scales = ['B', 'KB', 'MB', 'GB', 'TB', 'EB']     return pattern % (i, scales[degree])",
+            "def concat_padded(base, *args):     \"\"\"     Concatenate string and zero-padded 4 digit number     \"\"\"     ret = base     for n in args:         if is_string(n):             ret = \"%s_%s\" % (ret, n)         else:             ret = \"%s_%04i\"  % (ret, n + 1)     return ret"
+        ],
+        [
+            "def add_colons(s):     \"\"\"Add colons after every second digit.      This function is used in functions to prettify serials.      >>> add_colons('teststring')     'te:st:st:ri:ng'     \"\"\"     return ':'.join([s[i:i + 2] for i in range(0, len(s), 2)])",
+            "def draw_header(self, stream, header):         \"\"\"Draw header with underline\"\"\"         stream.writeln('=' * (len(header) + 4))         stream.writeln('| ' + header + ' |')         stream.writeln('=' * (len(header) + 4))         stream.writeln()"
+        ]
+    ],
+    [
+        "python not character, continue",
+        [
+            "def isAlphanum(c):     \"\"\"return true if the character is a letter, digit, underscore,            dollar sign, or non-ASCII character.     \"\"\"     return ((c >= 'a' and c <= 'z') or (c >= '0' and c <= '9') or             (c >= 'A' and c <= 'Z') or c == '_' or c == '$' or c == '\\\\' or (c is not None and ord(c) > 126));",
+            "def pause(msg=\"Press Enter to Continue...\"):     \"\"\"press to continue\"\"\"     print('\\n' + Fore.YELLOW + msg + Fore.RESET, end='')     input()",
+            "def isthaichar(ch: str) -> bool:     \"\"\"     Check if a character is Thai     \u0e40\u0e1b\u0e47\u0e19\u0e2d\u0e31\u0e01\u0e29\u0e23\u0e44\u0e17\u0e22\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48      :param str ch: input character     :return: True or False     \"\"\"     ch_val = ord(ch)     if ch_val >= 3584 and ch_val <= 3711:         return True     return False",
+            "def backward_char(self, e): # (C-b)         u\"\"\"Move back a character. \"\"\"         self.l_buffer.backward_char(self.argument_reset)         self.finalize()",
+            "def good(txt):     \"\"\"Print, emphasized 'good', the given 'txt' message\"\"\"      print(\"%s# %s%s%s\" % (PR_GOOD_CC, get_time_stamp(), txt, PR_NC))     sys.stdout.flush()"
+        ],
+        [
+            "def isAlphanum(c):     \"\"\"return true if the character is a letter, digit, underscore,            dollar sign, or non-ASCII character.     \"\"\"     return ((c >= 'a' and c <= 'z') or (c >= '0' and c <= '9') or             (c >= 'A' and c <= 'Z') or c == '_' or c == '$' or c == '\\\\' or (c is not None and ord(c) > 126));",
+            "def isthaichar(ch: str) -> bool:     \"\"\"     Check if a character is Thai     \u0e40\u0e1b\u0e47\u0e19\u0e2d\u0e31\u0e01\u0e29\u0e23\u0e44\u0e17\u0e22\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48      :param str ch: input character     :return: True or False     \"\"\"     ch_val = ord(ch)     if ch_val >= 3584 and ch_val <= 3711:         return True     return False",
+            "def return_letters_from_string(text):     \"\"\"Get letters from string only.\"\"\"     out = \"\"     for letter in text:         if letter.isalpha():             out += letter     return out",
+            "def __contains__(self, char):  # noqa: D105         \"\"\"Implement the `in` keyword, searches the sequence.         \"\"\"         return len(char) <= len(self) and char in str(self.seq) * 2",
+            "def _vars_match(self):         \"\"\"Regular expression to match playbook variable.\"\"\"         return re.compile(             r'#([A-Za-z]+)'  # match literal (#App) at beginning of String             r':([\\d]+)'  # app id (:7979)             r':([A-Za-z0-9_\\.\\-\\[\\]]+)'  # variable name (:variable_name)             r'!(StringArray|BinaryArray|KeyValueArray'  # variable type (array)             r'|TCEntityArray|TCEnhancedEntityArray'  # variable type (array)             r'|String|Binary|KeyValue|TCEntity|TCEnhancedEntity'  # variable type             r'|(?:(?!String)(?!Binary)(?!KeyValue)'  # non matching for custom             r'(?!TCEntity)(?!TCEnhancedEntity)'  # non matching for custom             r'[A-Za-z0-9_-]+))'  # variable type (custom)         )"
+        ],
+        [
+            "def backward_char(self, e): # (C-b)         u\"\"\"Move back a character. \"\"\"         self.l_buffer.backward_char(self.argument_reset)         self.finalize()",
+            "def backward_char_extend_selection(self, e): #         u\"\"\"Move back a character. \"\"\"         self.l_buffer.backward_char_extend_selection(self.argument_reset)         self.finalize()"
+        ]
+    ],
+    [
+        "nested for loop with list coprehension python",
+        [
+            "def flatten_list(x: List[Any]) -> List[Any]:     \"\"\"     Converts a list of lists into a flat list.          Args:         x: list of lists       Returns:         flat list              As per     http://stackoverflow.com/questions/952914/making-a-flat-list-out-of-list-of-lists-in-python      \"\"\"  # noqa     return [item for sublist in x for item in sublist]",
+            "def flatten_list(l):     \"\"\" Nested lists to single-level list, does not split strings\"\"\"     return list(chain.from_iterable(repeat(x,1) if isinstance(x,str) else x for x in l))",
+            "def flatten(l, types=(list, float)):     \"\"\"     Flat nested list of lists into a single list.     \"\"\"     l = [item if isinstance(item, types) else [item] for item in l]     return [item for sublist in l for item in sublist]",
+            "def ziptake(items_list, indexes_list):     \"\"\"     SeeAlso:         vt.ziptake     \"\"\"     return [take(list_, index_list)             for list_, index_list in zip(items_list, indexes_list)]",
+            "def chunks(data, size):     \"\"\"     Get chink for dict, copy as-is from https://stackoverflow.com/a/8290508/6753144     \"\"\"     it = iter(data)     for i in range(0, len(data), size):         yield {k: data[k] for k in islice(it, size)}"
+        ],
+        [
+            "def chunked(iterable, n):     \"\"\"Break an iterable into lists of a given length::          >>> list(chunked([1, 2, 3, 4, 5, 6, 7], 3))         [[1, 2, 3], [4, 5, 6], [7]]      If the length of ``iterable`` is not evenly divisible by ``n``, the last     returned list will be shorter.      This is useful for splitting up a computation on a large number of keys     into batches, to be pickled and sent off to worker processes. One example     is operations on rows in MySQL, which does not implement server-side     cursors properly and would otherwise load the entire dataset into RAM on     the client.          Taken from more_itertools      \"\"\"     return iter(functools.partial(take, n, iter(iterable)), [])",
+            "def rvalues(self):         \"\"\"          in reversed order         \"\"\"         tmp = self         while tmp is not None:             yield tmp.data             tmp = tmp.prev",
+            "def ziptake(items_list, indexes_list):     \"\"\"     SeeAlso:         vt.ziptake     \"\"\"     return [take(list_, index_list)             for list_, index_list in zip(items_list, indexes_list)]",
+            "def __iter__(self):     \"\"\"Return all elements from the list.\"\"\"     for index in range(0, self._size):       try:         yield self._list[(self._index + index) % self._size]       except IndexError:         pass",
+            "def chunks(data, size):     \"\"\"     Get chink for dict, copy as-is from https://stackoverflow.com/a/8290508/6753144     \"\"\"     it = iter(data)     for i in range(0, len(data), size):         yield {k: data[k] for k in islice(it, size)}"
+        ],
+        [
+            "def flatten_list(l):     \"\"\" Nested lists to single-level list, does not split strings\"\"\"     return list(chain.from_iterable(repeat(x,1) if isinstance(x,str) else x for x in l))",
+            "def flatten_list(x: List[Any]) -> List[Any]:     \"\"\"     Converts a list of lists into a flat list.          Args:         x: list of lists       Returns:         flat list              As per     http://stackoverflow.com/questions/952914/making-a-flat-list-out-of-list-of-lists-in-python      \"\"\"  # noqa     return [item for sublist in x for item in sublist]"
+        ]
+    ],
+    [
+        "simple file input code python",
+        [
+            "def _stdin_(p):     \"\"\"Takes input from user. Works for Python 2 and 3.\"\"\"     _v = sys.version[0]     return input(p) if _v is '3' else raw_input(p)",
+            "def file_read(filename):     \"\"\"Read a file and close it.  Returns the file source.\"\"\"     fobj = open(filename,'r');     source = fobj.read();     fobj.close()     return source",
+            "def read_stdin():     \"\"\" Read text from stdin, and print a helpful message for ttys. \"\"\"     if sys.stdin.isatty() and sys.stdout.isatty():         print('\\nReading from stdin until end of file (Ctrl + D)...')      return sys.stdin.read()",
+            "def standard_input():     \"\"\"Generator that yields lines from standard input.\"\"\"     with click.get_text_stream(\"stdin\") as stdin:         while stdin.readable():             line = stdin.readline()             if line:                 yield line.strip().encode(\"utf-8\")",
+            "def fix_header_comment(filename, timestamp):     \"\"\"Fixes the header-comment of the given file.\"\"\"     # Fix input file.     name = os.path.basename( filename )     for line in fileinput.input( filename, inplace=1, mode=\"rU\" ):         # If header-comment already contains anything for '$Id$', remove it.         line = re.sub(r'\\$Id:[^$]+\\$', r'$Id$', line.rstrip())         # Replace '$Id$' by a string containing the file's name (and a timestamp)!         line = re.sub(re.escape(r'$Id$'), r'$Id: ' + name + r' ' + timestamp.isoformat() + r' $', line.rstrip())         print(line)"
+        ],
+        [
+            "def file_read(filename):     \"\"\"Read a file and close it.  Returns the file source.\"\"\"     fobj = open(filename,'r');     source = fobj.read();     fobj.close()     return source",
+            "def file_lines(bblfile:str) -> iter:     \"\"\"Yield lines found in given file\"\"\"     with open(bblfile) as fd:         yield from (line.rstrip() for line in fd if line.rstrip())",
+            "def standard_input():     \"\"\"Generator that yields lines from standard input.\"\"\"     with click.get_text_stream(\"stdin\") as stdin:         while stdin.readable():             line = stdin.readline()             if line:                 yield line.strip().encode(\"utf-8\")",
+            "def iter_lines(file_like: Iterable[str]) -> Generator[str, None, None]:     \"\"\" Helper for iterating only nonempty lines without line breaks\"\"\"     for line in file_like:         line = line.rstrip('\\r\\n')         if line:             yield line",
+            "def write_file(writer, filename):   \"\"\"Write all of lines from file using the writer.\"\"\"   for line in txt_line_iterator(filename):     writer.write(line)     writer.write(\"\\n\")"
+        ],
+        [
+            "def _stdin_(p):     \"\"\"Takes input from user. Works for Python 2 and 3.\"\"\"     _v = sys.version[0]     return input(p) if _v is '3' else raw_input(p)",
+            "def get_input(input_func, input_str):     \"\"\"     Get input from the user given an input function and an input string     \"\"\"     val = input_func(\"Please enter your {0}: \".format(input_str))     while not val or not len(val.strip()):         val = input_func(\"You didn't enter a valid {0}, please try again: \".format(input_str))     return val"
+        ]
+    ],
+    [
+        "how to not have spaces between variables python print",
+        [
+            "def print_with_header(header, message, color, indent=0):     \"\"\"     Use one of the functions below for printing, not this one.     \"\"\"     print()     padding = ' ' * indent     print(padding + color + BOLD + header + ENDC + color + message + ENDC)",
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def sing(a, b, c=False, name='yetone'):     \"\"\"sing a song     hehe      :param a: I'm a     :param b: I'm b     :param c: I'm c     :param name: I'm name     \"\"\"     print('test0.sing: <a: {}, b: {}, c: {}> by {}'.format(a, b, c, name))",
+            "def strip_spaces(value, sep=None, join=True):     \"\"\"Cleans trailing whitespaces and replaces also multiple whitespaces with a single space.\"\"\"     value = value.strip()     value = [v.strip() for v in value.split(sep)]     join_sep = sep or ' '     return join_sep.join(value) if join else value",
+            "def format_single_space_only(text):     \"\"\"Revise consecutive empty space to single space.      Example::          \" I   feel    so  GOOD!\" => \"This is so GOOD!\"      **\u4e2d\u6587\u6587\u6863**      \u786e\u4fdd\u6587\u672c\u4e2d\u4e0d\u4f1a\u51fa\u73b0\u591a\u4f59\u8fde\u7eed1\u6b21\u7684\u7a7a\u683c\u3002     \"\"\"     return \" \".join([word for word in text.strip().split(\" \") if len(word) >= 1])"
+        ],
+        [
+            "def strip_spaces(value, sep=None, join=True):     \"\"\"Cleans trailing whitespaces and replaces also multiple whitespaces with a single space.\"\"\"     value = value.strip()     value = [v.strip() for v in value.split(sep)]     join_sep = sep or ' '     return join_sep.join(value) if join else value",
+            "def get_input(input_func, input_str):     \"\"\"     Get input from the user given an input function and an input string     \"\"\"     val = input_func(\"Please enter your {0}: \".format(input_str))     while not val or not len(val.strip()):         val = input_func(\"You didn't enter a valid {0}, please try again: \".format(input_str))     return val",
+            "def strip_spaces(s):     \"\"\" Strip excess spaces from a string \"\"\"     return u\" \".join([c for c in s.split(u' ') if c])",
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def timeit(output):     \"\"\"     If output is string, then print the string and also time used     \"\"\"     b = time.time()     yield     print output, 'time used: %.3fs' % (time.time()-b)"
+        ],
+        [
+            "def _display(self, layout):         \"\"\"launch layouts display\"\"\"         print(file=self.out)         TextWriter().format(layout, self.out)",
+            "def sing(a, b, c=False, name='yetone'):     \"\"\"sing a song     hehe      :param a: I'm a     :param b: I'm b     :param c: I'm c     :param name: I'm name     \"\"\"     print('test0.sing: <a: {}, b: {}, c: {}> by {}'.format(a, b, c, name))"
+        ]
+    ],
+    [
+        "python how to make string isdigit print out the digits",
+        [
+            "def is_valid(number):     \"\"\"determines whether the card number is valid.\"\"\"     n = str(number)     if not n.isdigit():         return False     return int(n[-1]) == get_check_digit(n[:-1])",
+            "def get_number(s, cast=int):     \"\"\"     Try to get a number out of a string, and cast it.     \"\"\"     import string     d = \"\".join(x for x in str(s) if x in string.digits)     return cast(d)",
+            "def str2int(string_with_int):     \"\"\" Collect digits from a string \"\"\"     return int(\"\".join([char for char in string_with_int if char in string.digits]) or 0)",
+            "def ishex(obj):     \"\"\"     Test if the argument is a string representing a valid hexadecimal digit.      :param obj: Object     :type  obj: any      :rtype: boolean     \"\"\"     return isinstance(obj, str) and (len(obj) == 1) and (obj in string.hexdigits)",
+            "def try_cast_int(s):     \"\"\"(str) -> int     All the digits in a given string are concatenated and converted into a single number.     \"\"\"     try:         temp = re.findall('\\d', str(s))         temp = ''.join(temp)         return int(temp)     except:         return s"
+        ],
+        [
+            "def is_valid(number):     \"\"\"determines whether the card number is valid.\"\"\"     n = str(number)     if not n.isdigit():         return False     return int(n[-1]) == get_check_digit(n[:-1])",
+            "def isAlphanum(c):     \"\"\"return true if the character is a letter, digit, underscore,            dollar sign, or non-ASCII character.     \"\"\"     return ((c >= 'a' and c <= 'z') or (c >= '0' and c <= '9') or             (c >= 'A' and c <= 'Z') or c == '_' or c == '$' or c == '\\\\' or (c is not None and ord(c) > 126));",
+            "def str2int(string_with_int):     \"\"\" Collect digits from a string \"\"\"     return int(\"\".join([char for char in string_with_int if char in string.digits]) or 0)",
+            "def get_number(s, cast=int):     \"\"\"     Try to get a number out of a string, and cast it.     \"\"\"     import string     d = \"\".join(x for x in str(s) if x in string.digits)     return cast(d)",
+            "def isthaichar(ch: str) -> bool:     \"\"\"     Check if a character is Thai     \u0e40\u0e1b\u0e47\u0e19\u0e2d\u0e31\u0e01\u0e29\u0e23\u0e44\u0e17\u0e22\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48      :param str ch: input character     :return: True or False     \"\"\"     ch_val = ord(ch)     if ch_val >= 3584 and ch_val <= 3711:         return True     return False"
+        ],
+        [
+            "def ishex(obj):     \"\"\"     Test if the argument is a string representing a valid hexadecimal digit.      :param obj: Object     :type  obj: any      :rtype: boolean     \"\"\"     return isinstance(obj, str) and (len(obj) == 1) and (obj in string.hexdigits)",
+            "def is_dec(ip):     \"\"\"Return true if the IP address is in decimal notation.\"\"\"     try:         dec = int(str(ip))     except ValueError:         return False     if dec > 4294967295 or dec < 0:         return False     return True"
+        ]
+    ],
+    [
+        "python create path folders",
+        [
+            "def go_to_parent_directory(self):         \"\"\"Go to parent directory\"\"\"         self.chdir(osp.abspath(osp.join(getcwd_or_home(), os.pardir)))",
+            "def parent_directory(self):         \"\"\"Change working directory to parent directory\"\"\"         self.chdir(os.path.join(getcwd_or_home(), os.path.pardir))",
+            "def relative_path(path):     \"\"\"     Return the given path relative to this file.     \"\"\"     return os.path.join(os.path.dirname(__file__), path)",
+            "def abspath(*path):     \"\"\"A method to determine absolute path for a given relative path to the     directory where this setup.py script is located\"\"\"     setup_dir = os.path.dirname(os.path.abspath(__file__))     return os.path.join(setup_dir, *path)",
+            "def get_cache_path(filename): \t\"\"\" get file path \"\"\" \tcwd = os.path.dirname(os.path.realpath(__file__)) \treturn os.path.join(cwd, filename)"
+        ],
+        [
+            "def relative_path(path):     \"\"\"     Return the given path relative to this file.     \"\"\"     return os.path.join(os.path.dirname(__file__), path)",
+            "def go_to_parent_directory(self):         \"\"\"Go to parent directory\"\"\"         self.chdir(osp.abspath(osp.join(getcwd_or_home(), os.pardir)))",
+            "def get_cache_path(filename): \t\"\"\" get file path \"\"\" \tcwd = os.path.dirname(os.path.realpath(__file__)) \treturn os.path.join(cwd, filename)",
+            "def parent_directory(self):         \"\"\"Change working directory to parent directory\"\"\"         self.chdir(os.path.join(getcwd_or_home(), os.path.pardir))",
+            "def examples(directory):     \"\"\"     Generate example strategies to target folder     \"\"\"     source_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), \"examples\")      try:         shutil.copytree(source_dir, os.path.join(directory, \"examples\"))     except OSError as e:         if e.errno == errno.EEXIST:             six.print_(\"Folder examples is exists.\")"
+        ],
+        [
+            "def abspath(*path):     \"\"\"A method to determine absolute path for a given relative path to the     directory where this setup.py script is located\"\"\"     setup_dir = os.path.dirname(os.path.abspath(__file__))     return os.path.join(setup_dir, *path)",
+            "def get_module_path(modname):     \"\"\"Return module *modname* base path\"\"\"     return osp.abspath(osp.dirname(sys.modules[modname].__file__))"
+        ]
+    ],
+    [
+        "time delta of one month python",
+        [
+            "def get_month_start(day=None):     \"\"\"Returns the first day of the given month.\"\"\"     day = add_timezone(day or datetime.date.today())     return day.replace(day=1)",
+            "def run_time() -> timedelta:     \"\"\"      :return:     \"\"\"      delta = start_time if start_time else datetime.utcnow()     return datetime.utcnow() - delta",
+            "def timestamp_from_dt(dt, epoch=datetime(1970, 1, 1)):     \"\"\"     Convert a datetime to a timestamp.     https://stackoverflow.com/a/8778548/141395     \"\"\"     delta = dt - epoch     # return delta.total_seconds()     return delta.seconds + delta.days * 86400",
+            "def biweekly(date=datetime.date.today()):     \"\"\"     Every two weeks.     \"\"\"     return datetime.date(date.year, date.month, 1 if date.day < 15 else 15)",
+            "def last_midnight():     \"\"\"     return a datetime of last mid-night     \"\"\"     now = datetime.now()     return datetime(now.year, now.month, now.day)"
+        ],
+        [
+            "def run_time() -> timedelta:     \"\"\"      :return:     \"\"\"      delta = start_time if start_time else datetime.utcnow()     return datetime.utcnow() - delta",
+            "def timestamp_from_dt(dt, epoch=datetime(1970, 1, 1)):     \"\"\"     Convert a datetime to a timestamp.     https://stackoverflow.com/a/8778548/141395     \"\"\"     delta = dt - epoch     # return delta.total_seconds()     return delta.seconds + delta.days * 86400",
+            "def elapsed_time_from(start_time):     \"\"\"calculate time delta from latched time and current time\"\"\"     time_then = make_time(start_time)     time_now = datetime.utcnow().replace(microsecond=0)     if time_then is None:         return     delta_t = time_now - time_then     return delta_t",
+            "def timespan(start_time):     \"\"\"Return time in milliseconds from start_time\"\"\"      timespan = datetime.datetime.now() - start_time     timespan_ms = timespan.total_seconds() * 1000     return timespan_ms",
+            "def ms_to_datetime(ms):     \"\"\"     Converts a millisecond accuracy timestamp to a datetime     \"\"\"     dt = datetime.datetime.utcfromtimestamp(ms / 1000)     return dt.replace(microsecond=(ms % 1000) * 1000).replace(tzinfo=pytz.utc)"
+        ],
+        [
+            "def last_midnight():     \"\"\"     return a datetime of last mid-night     \"\"\"     now = datetime.now()     return datetime(now.year, now.month, now.day)",
+            "def test3():     \"\"\"Test the multiprocess     \"\"\"     import time          p = MVisionProcess()     p.start()     time.sleep(5)     p.stop()"
+        ]
+    ],
+    [
+        "how to pick the top 3 values in a table python",
+        [
+            "def get_last(self, table=None):         \"\"\"Just the last entry.\"\"\"         if table is None: table = self.main_table         query = 'SELECT * FROM \"%s\" ORDER BY ROWID DESC LIMIT 1;' % table         return self.own_cursor.execute(query).fetchone()",
+            "def qth_pw(self, q):         \"\"\"         returns the qth most probable element in the dawg.         \"\"\"         return heapq.nlargest(q + 2, self._T.iteritems(),                               key=operator.itemgetter(1))[-1]",
+            "def to_list(self):         \"\"\"Convert this confusion matrix into a 2x2 plain list of values.\"\"\"         return [[int(self.table.cell_values[0][1]), int(self.table.cell_values[0][2])],                 [int(self.table.cell_values[1][1]), int(self.table.cell_values[1][2])]]",
+            "def median_high(data):     \"\"\"Return the high median of data.      When the number of data points is odd, the middle value is returned.     When it is even, the larger of the two middle values is returned.      \"\"\"     data = sorted(data)     n = len(data)     if n == 0:         raise StatisticsError(\"no median for empty data\")     return data[n // 2]",
+            "def turn(self):         \"\"\"Turn the ring for a single position.         For example, [a, b, c, d] becomes [b, c, d, a].\"\"\"         first = self._data.pop(0)         self._data.append(first)"
+        ],
+        [
+            "def get_last(self, table=None):         \"\"\"Just the last entry.\"\"\"         if table is None: table = self.main_table         query = 'SELECT * FROM \"%s\" ORDER BY ROWID DESC LIMIT 1;' % table         return self.own_cursor.execute(query).fetchone()",
+            "def column(self, i):          \"\"\"from right\"\"\"         return ''.join([str(digitat2(r,i)) for r in self])",
+            "def ziptake(items_list, indexes_list):     \"\"\"     SeeAlso:         vt.ziptake     \"\"\"     return [take(list_, index_list)             for list_, index_list in zip(items_list, indexes_list)]",
+            "def series_table_row_offset(self, series):         \"\"\"         Return the number of rows preceding the data table for *series* in         the Excel worksheet.         \"\"\"         title_and_spacer_rows = series.index * 2         data_point_rows = series.data_point_offset         return title_and_spacer_rows + data_point_rows",
+            "def getMedian(numericValues):     \"\"\"     Gets the median of a list of values     Returns a float/int     \"\"\"     theValues = sorted(numericValues)      if len(theValues) % 2 == 1:         return theValues[(len(theValues) + 1) / 2 - 1]     else:         lower = theValues[len(theValues) / 2 - 1]         upper = theValues[len(theValues) / 2]          return (float(lower + upper)) / 2"
+        ],
+        [
+            "def qth_pw(self, q):         \"\"\"         returns the qth most probable element in the dawg.         \"\"\"         return heapq.nlargest(q + 2, self._T.iteritems(),                               key=operator.itemgetter(1))[-1]",
+            "def nameTuple(s: Influence) -> Tuple[str, str]:     \"\"\" Returns a 2-tuple consisting of the top groundings of the subj and obj     of an Influence statement. \"\"\"     return top_grounding(s.subj), top_grounding(s.obj)"
+        ]
+    ],
+    [
+        "read 2 bytes data in python",
+        [
+            "def read_string(buff, byteorder='big'):     \"\"\"Read a string from a file-like object.\"\"\"     length = read_numeric(USHORT, buff, byteorder)     return buff.read(length).decode('utf-8')",
+            "def getbyteslice(self, start, end):         \"\"\"Direct access to byte data.\"\"\"         c = self._rawarray[start:end]         return c",
+            "def be_array_from_bytes(fmt, data):     \"\"\"     Reads an array from bytestring with big-endian data.     \"\"\"     arr = array.array(str(fmt), data)     return fix_byteorder(arr)",
+            "def read_bytes(fo, writer_schema=None, reader_schema=None):     \"\"\"Bytes are encoded as a long followed by that many bytes of data.\"\"\"     size = read_long(fo)     return fo.read(size)",
+            "def i2b(self, pkt, x):         \"\"\"Convert internal value to internal value\"\"\"         if type(x) is str:           x = bytes([ ord(i) for i in x ])         return x"
+        ],
+        [
+            "def read_string(buff, byteorder='big'):     \"\"\"Read a string from a file-like object.\"\"\"     length = read_numeric(USHORT, buff, byteorder)     return buff.read(length).decode('utf-8')",
+            "def getbyteslice(self, start, end):         \"\"\"Direct access to byte data.\"\"\"         c = self._rawarray[start:end]         return c",
+            "def eof(fd):     \"\"\"Determine if end-of-file is reached for file fd.\"\"\"     b = fd.read(1)     end = len(b) == 0     if not end:         curpos = fd.tell()         fd.seek(curpos - 1)     return end",
+            "def write_double(self, number):         \"\"\" Writes a double to the underlying output file as a 8-byte value. \"\"\"         buf = pack(self.byte_order + \"d\", number)         self.write(buf)",
+            "async def load_unicode(reader):     \"\"\"     Loads UTF8 string     :param reader:     :return:     \"\"\"     ivalue = await load_uvarint(reader)     fvalue = bytearray(ivalue)     await reader.areadinto(fvalue)     return str(fvalue, 'utf8')"
+        ],
+        [
+            "def read_bytes(fo, writer_schema=None, reader_schema=None):     \"\"\"Bytes are encoded as a long followed by that many bytes of data.\"\"\"     size = read_long(fo)     return fo.read(size)",
+            "def be_array_from_bytes(fmt, data):     \"\"\"     Reads an array from bytestring with big-endian data.     \"\"\"     arr = array.array(str(fmt), data)     return fix_byteorder(arr)"
+        ]
+    ],
+    [
+        "python split with any of multiple delimitrs",
+        [
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def split_on(s, sep=\" \"):     \"\"\"Split s by sep, unless it's inside a quote.\"\"\"     pattern = '''((?:[^%s\"']|\"[^\"]*\"|'[^']*')+)''' % sep      return [_strip_speechmarks(t) for t in re.split(pattern, s)[1::2]]",
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]",
+            "def split_elements(value):     \"\"\"Split a string with comma or space-separated elements into a list.\"\"\"     items = [v.strip() for v in value.split(',')]     if len(items) == 1:         items = value.split()     return items",
+            "def _split(string, splitters):     \"\"\"Splits a string into parts at multiple characters\"\"\"     part = ''     for character in string:         if character in splitters:             yield part             part = ''         else:             part += character     yield part"
+        ],
+        [
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]",
+            "def split_elements(value):     \"\"\"Split a string with comma or space-separated elements into a list.\"\"\"     items = [v.strip() for v in value.split(',')]     if len(items) == 1:         items = value.split()     return items",
+            "def _split(string, splitters):     \"\"\"Splits a string into parts at multiple characters\"\"\"     part = ''     for character in string:         if character in splitters:             yield part             part = ''         else:             part += character     yield part",
+            "def split_elements(value):     \"\"\"Split a string with comma or space-separated elements into a list.\"\"\"     l = [v.strip() for v in value.split(',')]     if len(l) == 1:         l = value.split()     return l"
+        ],
+        [
+            "def make_regex(separator):     \"\"\"Utility function to create regexp for matching escaped separators     in strings.      \"\"\"     return re.compile(r'(?:' + re.escape(separator) + r')?((?:[^' +                       re.escape(separator) + r'\\\\]|\\\\.)+)')",
+            "def split_on(s, sep=\" \"):     \"\"\"Split s by sep, unless it's inside a quote.\"\"\"     pattern = '''((?:[^%s\"']|\"[^\"]*\"|'[^']*')+)''' % sep      return [_strip_speechmarks(t) for t in re.split(pattern, s)[1::2]]"
+        ]
+    ],
+    [
+        "calculating the accuracy of a variable inside for loops python",
+        [
+            "def predictive_probability_multistate(M_c, X_L_list, X_D_list, Y, Q):     \"\"\"     Returns the predictive probability, averaged over each sample.     \"\"\"     logprobs = [float(predictive_probability(M_c, X_L, X_D, Y, Q))         for X_L, X_D in zip(X_L_list, X_D_list)]     return logmeanexp(logprobs)",
+            "def local_accuracy(X_train, y_train, X_test, y_test, attr_test, model_generator, metric, trained_model):     \"\"\" The how well do the features plus a constant base rate sum up to the model output.     \"\"\"      X_train, X_test = to_array(X_train, X_test)      # how many features to mask     assert X_train.shape[1] == X_test.shape[1]      # keep nkeep top features and re-train the model for each test explanation     yp_test = trained_model.predict(X_test)      return metric(yp_test, strip_list(attr_test).sum(1))",
+            "def _gauss(mean: int, sigma: int) -> int:         \"\"\"         Creates a variation from a base value          Args:             mean: base value             sigma: gaussian sigma          Returns: random value          \"\"\"         return int(random.gauss(mean, sigma))",
+            "def one_over_x_like(x):     \"\"\"     returns -np.Inf if x<0, -np.log(x) otherwise.     \"\"\"     if np.any(x < 0):         return -np.Inf     else:         return -np.sum(np.log(x))",
+            "def _factln(num):     # type: (int) -> float     \"\"\"     Computes logfactorial regularly for tractable numbers, uses Ramanujans approximation otherwise.     \"\"\"      if num < 20:         log_factorial = log(factorial(num))     else:         log_factorial = num * log(num) - num + log(num * (1 + 4 * num * (             1 + 2 * num))) / 6.0 + log(pi) / 2      return log_factorial"
+        ],
+        [
+            "def calc_list_average(l):     \"\"\"     Calculates the average value of a list of numbers     Returns a float     \"\"\"     total = 0.0     for value in l:         total += value     return total / len(l)",
+            "def speedtest(func, *args, **kwargs):     \"\"\" Test the speed of a function. \"\"\"     n = 100     start = time.time()     for i in range(n): func(*args,**kwargs)     end = time.time()     return (end-start)/n",
+            "def realized_pnl(self):         \"\"\"         [float] \u5e73\u4ed3\u76c8\u4e8f         \"\"\"         return sum(position.realized_pnl for position in six.itervalues(self._positions))",
+            "def unit_net_value(self):         \"\"\"         [float] \u5b9e\u65f6\u51c0\u503c         \"\"\"         if self._units == 0:             return np.nan         return self.total_value / self._units",
+            "def _gauss(mean: int, sigma: int) -> int:         \"\"\"         Creates a variation from a base value          Args:             mean: base value             sigma: gaussian sigma          Returns: random value          \"\"\"         return int(random.gauss(mean, sigma))"
+        ],
+        [
+            "def token_accuracy(labels, outputs):   \"\"\"Compute tokenwise (elementwise) accuracy.    Args:     labels: ground-truth labels, shape=(batch, seq_length)     outputs: predicted tokens, shape=(batch, seq_length)   Returns:     Two ops, one for getting the current average accuracy and another for     updating the running average estimate.   \"\"\"   weights = tf.to_float(tf.not_equal(labels, 0))   return tf.metrics.accuracy(labels, outputs, weights=weights)",
+            "def local_accuracy(X_train, y_train, X_test, y_test, attr_test, model_generator, metric, trained_model):     \"\"\" The how well do the features plus a constant base rate sum up to the model output.     \"\"\"      X_train, X_test = to_array(X_train, X_test)      # how many features to mask     assert X_train.shape[1] == X_test.shape[1]      # keep nkeep top features and re-train the model for each test explanation     yp_test = trained_model.predict(X_test)      return metric(yp_test, strip_list(attr_test).sum(1))"
+        ]
+    ],
+    [
+        "multiple returns function python print with spaces",
+        [
+            "def timeit(output):     \"\"\"     If output is string, then print the string and also time used     \"\"\"     b = time.time()     yield     print output, 'time used: %.3fs' % (time.time()-b)",
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def print_with_header(header, message, color, indent=0):     \"\"\"     Use one of the functions below for printing, not this one.     \"\"\"     print()     padding = ' ' * indent     print(padding + color + BOLD + header + ENDC + color + message + ENDC)",
+            "def __call__(self, _):         \"\"\"Print the current iteration.\"\"\"         if self.iter % self.step == 0:             print(self.fmt.format(self.iter), **self.kwargs)          self.iter += 1",
+            "def out(self, output, newline=True):         \"\"\"Outputs a string to the console (stdout).\"\"\"         click.echo(output, nl=newline)"
+        ],
+        [
+            "def timeit(output):     \"\"\"     If output is string, then print the string and also time used     \"\"\"     b = time.time()     yield     print output, 'time used: %.3fs' % (time.time()-b)",
+            "def get_input(input_func, input_str):     \"\"\"     Get input from the user given an input function and an input string     \"\"\"     val = input_func(\"Please enter your {0}: \".format(input_str))     while not val or not len(val.strip()):         val = input_func(\"You didn't enter a valid {0}, please try again: \".format(input_str))     return val",
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def speedtest(func, *args, **kwargs):     \"\"\" Test the speed of a function. \"\"\"     n = 100     start = time.time()     for i in range(n): func(*args,**kwargs)     end = time.time()     return (end-start)/n",
+            "def stdout_display():     \"\"\" Print results straight to stdout \"\"\"     if sys.version_info[0] == 2:         yield SmartBuffer(sys.stdout)     else:         yield SmartBuffer(sys.stdout.buffer)"
+        ],
+        [
+            "def indented_show(text, howmany=1):         \"\"\"Print a formatted indented text.         \"\"\"         print(StrTemplate.pad_indent(text=text, howmany=howmany))",
+            "def print_with_header(header, message, color, indent=0):     \"\"\"     Use one of the functions below for printing, not this one.     \"\"\"     print()     padding = ' ' * indent     print(padding + color + BOLD + header + ENDC + color + message + ENDC)"
+        ]
+    ],
+    [
+        "count characters length python",
+        [
+            "def display_len(text):     \"\"\"     Get the display length of a string. This can differ from the character     length if the string contains wide characters.     \"\"\"     text = unicodedata.normalize('NFD', text)     return sum(char_width(char) for char in text)",
+            "def __len__(self):         \"\"\" This will equal 124 for the V1 database. \"\"\"         length = 0         for typ, siz, _ in self.format:             length += siz         return length",
+            "def length(length):     \"\"\"Checks value for minimum length using len().\"\"\"     def min_len(value):         if not len(value) >= length:             raise ValueError(                 \"Minimum length is {0} but value is {1}\".format(length, len(value))             )         return True      return min_len",
+            "def __contains__(self, char):  # noqa: D105         \"\"\"Implement the `in` keyword, searches the sequence.         \"\"\"         return len(char) <= len(self) and char in str(self.seq) * 2",
+            "def valid_substitution(strlen, index):     \"\"\"     skip performing substitutions that are outside the bounds of the string     \"\"\"     values = index[0]     return all([strlen > i for i in values])"
+        ],
+        [
+            "def display_len(text):     \"\"\"     Get the display length of a string. This can differ from the character     length if the string contains wide characters.     \"\"\"     text = unicodedata.normalize('NFD', text)     return sum(char_width(char) for char in text)",
+            "def onscreen_len(s):     \"\"\"     Calculate the length of a unicode string on screen,     accounting for double-width characters      \"\"\"      if sys.version_info < (3, 0) and isinstance(s, str):         return len(s)      length = 0     for ch in s:         length += 2 if unicodedata.east_asian_width(ch) == 'W' else 1      return length",
+            "def isthaichar(ch: str) -> bool:     \"\"\"     Check if a character is Thai     \u0e40\u0e1b\u0e47\u0e19\u0e2d\u0e31\u0e01\u0e29\u0e23\u0e44\u0e17\u0e22\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48      :param str ch: input character     :return: True or False     \"\"\"     ch_val = ord(ch)     if ch_val >= 3584 and ch_val <= 3711:         return True     return False",
+            "def __contains__(self, char):  # noqa: D105         \"\"\"Implement the `in` keyword, searches the sequence.         \"\"\"         return len(char) <= len(self) and char in str(self.seq) * 2",
+            "def isAlphanum(c):     \"\"\"return true if the character is a letter, digit, underscore,            dollar sign, or non-ASCII character.     \"\"\"     return ((c >= 'a' and c <= 'z') or (c >= '0' and c <= '9') or             (c >= 'A' and c <= 'Z') or c == '_' or c == '$' or c == '\\\\' or (c is not None and ord(c) > 126));"
+        ],
+        [
+            "def array_dim(arr):     \"\"\"Return the size of a multidimansional array.     \"\"\"     dim = []     while True:         try:             dim.append(len(arr))             arr = arr[0]         except TypeError:             return dim",
+            "def __len__(self):         \"\"\" This will equal 124 for the V1 database. \"\"\"         length = 0         for typ, siz, _ in self.format:             length += siz         return length"
+        ]
+    ],
+    [
+        "check if an element exist python",
+        [
+            "def _check_elements_equal(lst):     \"\"\"     Returns true if all of the elements in the list are equal.     \"\"\"     assert isinstance(lst, list), \"Input value must be a list.\"     return not lst or lst.count(lst[0]) == len(lst)",
+            "def _has(self, key, exact=0):          \"\"\"Returns false if key is not found or is ambiguous\"\"\"          if not exact:             try:                 key = self.getfullkey(key)                 return 1             except KeyError:                 return 0         else:             return key in self.data",
+            "def isin(elems, line):     \"\"\"Check if an element from a list is in a string.      :type elems: list     :type line: str      \"\"\"     found = False     for e in elems:         if e in line.lower():             found = True             break     return found",
+            "def elXpath(self, xpath, dom=None):         \"\"\"check if element is present by css\"\"\"         if dom is None:             dom = self.browser         return expect(dom.is_element_present_by_xpath, args=[xpath])",
+            "def __contains__(self, item):         \"\"\"(dpid, key) in <ConfSwitchSet instance>\"\"\"         (dpid, key) = item         return dpid in self.confs and key in self.confs[dpid]"
+        ],
+        [
+            "def _check_elements_equal(lst):     \"\"\"     Returns true if all of the elements in the list are equal.     \"\"\"     assert isinstance(lst, list), \"Input value must be a list.\"     return not lst or lst.count(lst[0]) == len(lst)",
+            "def isin(elems, line):     \"\"\"Check if an element from a list is in a string.      :type elems: list     :type line: str      \"\"\"     found = False     for e in elems:         if e in line.lower():             found = True             break     return found",
+            "def isin(value, values):     \"\"\" Check that value is in values \"\"\"     for i, v in enumerate(value):         if v not in np.array(values)[:, i]:             return False     return True",
+            "def __contains__(self, item):         \"\"\"(dpid, key) in <ConfSwitchSet instance>\"\"\"         (dpid, key) = item         return dpid in self.confs and key in self.confs[dpid]",
+            "def __contains__(self, key):         \"\"\"         Invoked when determining whether a specific key is in the dictionary         using `key in d`.          The key is looked up case-insensitively.         \"\"\"         k = self._real_key(key)         return k in self._data"
+        ],
+        [
+            "def elXpath(self, xpath, dom=None):         \"\"\"check if element is present by css\"\"\"         if dom is None:             dom = self.browser         return expect(dom.is_element_present_by_xpath, args=[xpath])",
+            "def is_present(self, selector):         \"\"\"Check if an element is present in the dom or not          This method won't check if the element is displayed or not         This method won't wait until the element is visible or present         This method won't raise any exception if the element is not present          Returns:             bool: True if the element is present; False otherwise         \"\"\"         self.debug_log(\"Is present (%s)\" % selector)          element = self.find(             selector,             raise_exception=False,             wait_until_present=False,             wait_until_visible=False         )         if element:             self.debug_log(\"is present: True\")             return True         else:             self.debug_log(\"is present: False\")             return False"
+        ]
+    ],
+    [
+        "how to print list alphabetical python",
+        [
+            "def natural_sort(list_to_sort: Iterable[str]) -> List[str]:     \"\"\"     Sorts a list of strings case insensitively as well as numerically.      For example: ['a1', 'A2', 'a3', 'A11', 'a22']      To sort a list in place, don't call this method, which makes a copy. Instead, do this:      my_list.sort(key=natural_keys)      :param list_to_sort: the list being sorted     :return: the list sorted naturally     \"\"\"     return sorted(list_to_sort, key=natural_keys)",
+            "def format(self):         \"\"\"         Return a well formatted list. Basicaly, it's sort a list and remove duplicate.          :return: A sorted, without duplicate, list.         :rtype: list         \"\"\"          try:             return sorted(list(set(self.main_list)), key=str.lower)          except TypeError:  # pragma: no cover             return self.main_list",
+            "def printdict(adict):     \"\"\"printdict\"\"\"     dlist = list(adict.keys())     dlist.sort()     for i in range(0, len(dlist)):         print(dlist[i], adict[dlist[i]])",
+            "def __repr__(self):         \"\"\"         Basic string representation of the order.         \"\"\"         list_repr = \"<MarketOrderList: \\n\"          for order_list in [olist.orders for olist in self._orders.values()]:             for order in order_list:                 list_repr += repr(order)          return list_repr",
+            "def list_to_str(list, separator=','):     \"\"\"     >>> list = [0, 0, 7]     >>> list_to_str(list)     '0,0,7'     \"\"\"     list = [str(x) for x in list]     return separator.join(list)"
+        ],
+        [
+            "def natural_sort(list_to_sort: Iterable[str]) -> List[str]:     \"\"\"     Sorts a list of strings case insensitively as well as numerically.      For example: ['a1', 'A2', 'a3', 'A11', 'a22']      To sort a list in place, don't call this method, which makes a copy. Instead, do this:      my_list.sort(key=natural_keys)      :param list_to_sort: the list being sorted     :return: the list sorted naturally     \"\"\"     return sorted(list_to_sort, key=natural_keys)",
+            "def format(self):         \"\"\"         Return a well formatted list. Basicaly, it's sort a list and remove duplicate.          :return: A sorted, without duplicate, list.         :rtype: list         \"\"\"          try:             return sorted(list(set(self.main_list)), key=str.lower)          except TypeError:  # pragma: no cover             return self.main_list",
+            "def list_to_str(list, separator=','):     \"\"\"     >>> list = [0, 0, 7]     >>> list_to_str(list)     '0,0,7'     \"\"\"     list = [str(x) for x in list]     return separator.join(list)",
+            "def printdict(adict):     \"\"\"printdict\"\"\"     dlist = list(adict.keys())     dlist.sort()     for i in range(0, len(dlist)):         print(dlist[i], adict[dlist[i]])",
+            "def csort(objs, key):     \"\"\"Order-preserving sorting function.\"\"\"     idxs = dict((obj, i) for (i, obj) in enumerate(objs))     return sorted(objs, key=lambda obj: (key(obj), idxs[obj]))"
+        ],
+        [
+            "def __repr__(self):         \"\"\"         Basic string representation of the order.         \"\"\"         list_repr = \"<MarketOrderList: \\n\"          for order_list in [olist.orders for olist in self._orders.values()]:             for order in order_list:                 list_repr += repr(order)          return list_repr",
+            "def _tuple_repr(data):     \"\"\"Return a repr() for a list/tuple\"\"\"     if len(data) == 1:         return \"(%s,)\" % rpr(data[0])     else:         return \"(%s)\" % \", \".join([rpr(x) for x in data])"
+        ]
+    ],
+    [
+        "python input function two integers",
+        [
+            "def get_input(input_func, input_str):     \"\"\"     Get input from the user given an input function and an input string     \"\"\"     val = input_func(\"Please enter your {0}: \".format(input_str))     while not val or not len(val.strip()):         val = input_func(\"You didn't enter a valid {0}, please try again: \".format(input_str))     return val",
+            "def log_gen() -> Iterator[int]:     \"\"\"Logarithmic generator.     \"\"\"     y = 1     while True:         adder = max(1, math.pow(10, int(math.log10(y))))         yield int(y)         y = y + int(adder)",
+            "def minus(*args):     \"\"\"Also, converts either to ints or to floats.\"\"\"     if len(args) == 1:         return -to_numeric(args[0])     return to_numeric(args[0]) - to_numeric(args[1])",
+            "def IntGreaterThanZero(n):     \"\"\"If *n* is an integer > 0, returns it, otherwise an error.\"\"\"     try:         n = int(n)     except:         raise ValueError(\"%s is not an integer\" % n)     if n <= 0:         raise ValueError(\"%d is not > 0\" % n)     else:         return n",
+            "def _gauss(mean: int, sigma: int) -> int:         \"\"\"         Creates a variation from a base value          Args:             mean: base value             sigma: gaussian sigma          Returns: random value          \"\"\"         return int(random.gauss(mean, sigma))"
+        ],
+        [
+            "def get_input(input_func, input_str):     \"\"\"     Get input from the user given an input function and an input string     \"\"\"     val = input_func(\"Please enter your {0}: \".format(input_str))     while not val or not len(val.strip()):         val = input_func(\"You didn't enter a valid {0}, please try again: \".format(input_str))     return val",
+            "def IntGreaterThanZero(n):     \"\"\"If *n* is an integer > 0, returns it, otherwise an error.\"\"\"     try:         n = int(n)     except:         raise ValueError(\"%s is not an integer\" % n)     if n <= 0:         raise ValueError(\"%d is not > 0\" % n)     else:         return n",
+            "def valuesToInts(values):     \"\"\"     Iterable of values to ints (nonvalid = None)     \"\"\"     res = []     append = res.append     for d in values:         if isinstance(d, int):             append(d)         else:             append(valToInt(d))     return res",
+            "def main():     \"\"\"Ideally we shouldn't lose the first second of events\"\"\"     time.sleep(1)     with Input() as input_generator:         for e in input_generator:             print(repr(e))",
+            "def log_gen() -> Iterator[int]:     \"\"\"Logarithmic generator.     \"\"\"     y = 1     while True:         adder = max(1, math.pow(10, int(math.log10(y))))         yield int(y)         y = y + int(adder)"
+        ],
+        [
+            "def minus(*args):     \"\"\"Also, converts either to ints or to floats.\"\"\"     if len(args) == 1:         return -to_numeric(args[0])     return to_numeric(args[0]) - to_numeric(args[1])",
+            "def divide(x: LispNumber, y: LispNumber) -> LispNumber:     \"\"\"Division reducer. If both arguments are integers, return a Fraction.     Otherwise, return the true division of x and y.\"\"\"     if isinstance(x, int) and isinstance(y, int):         return Fraction(x, y)     return x / y"
+        ]
+    ],
+    [
+        "python directory tree print",
+        [
+            "def get_files(dir_name):     \"\"\"Simple directory walker\"\"\"     return [(os.path.join('.', d), [os.path.join(d, f) for f in files]) for d, _, files in os.walk(dir_name)]",
+            "def listfolder(p):     \"\"\"     generator of list folder in the path.     folders only     \"\"\"     for entry in scandir.scandir(p):         if entry.is_dir():             yield entry.name",
+            "def get_subdirs(parent_path):   \"\"\"Return a list of (name, path) tuples of direct subdirectories of      parent_path, where each tuple corresponds to one subdirectory. Files     in the parent_path are excluded from the output.     \"\"\"   entries = os.listdir(parent_path)   subdirs = [(entry, os.path.join(parent_path, entry))              for entry in entries              if os.path.isdir(entry)]   return subdirs",
+            "def isdir(s):     \"\"\"Return true if the pathname refers to an existing directory.\"\"\"     try:         st = os.stat(s)     except os.error:         return False     return stat.S_ISDIR(st.st_mode)",
+            "def print_tree(self, indent=2):         \"\"\" print_tree: prints out structure of tree             Args: indent (int): What level of indentation at which to start printing             Returns: None         \"\"\"         config.LOGGER.info(\"{indent}{data}\".format(indent=\"   \" * indent, data=str(self)))         for child in self.children:             child.print_tree(indent + 1)"
+        ],
+        [
+            "def get_files(dir_name):     \"\"\"Simple directory walker\"\"\"     return [(os.path.join('.', d), [os.path.join(d, f) for f in files]) for d, _, files in os.walk(dir_name)]",
+            "def listfolder(p):     \"\"\"     generator of list folder in the path.     folders only     \"\"\"     for entry in scandir.scandir(p):         if entry.is_dir():             yield entry.name",
+            "def get_subdirs(parent_path):   \"\"\"Return a list of (name, path) tuples of direct subdirectories of      parent_path, where each tuple corresponds to one subdirectory. Files     in the parent_path are excluded from the output.     \"\"\"   entries = os.listdir(parent_path)   subdirs = [(entry, os.path.join(parent_path, entry))              for entry in entries              if os.path.isdir(entry)]   return subdirs",
+            "def get_all_files(folder):     \"\"\"     Generator that loops through all absolute paths of the files within folder      Parameters     ----------     folder: str     Root folder start point for recursive search.      Yields     ------     fpath: str     Absolute path of one file in the folders     \"\"\"     for path, dirlist, filelist in os.walk(folder):         for fn in filelist:             yield op.join(path, fn)",
+            "def walk_tree(root):     \"\"\"Pre-order depth-first\"\"\"     yield root      for child in root.children:         for el in walk_tree(child):             yield el"
+        ],
+        [
+            "def print_tree(self, indent=2):         \"\"\" print_tree: prints out structure of tree             Args: indent (int): What level of indentation at which to start printing             Returns: None         \"\"\"         config.LOGGER.info(\"{indent}{data}\".format(indent=\"   \" * indent, data=str(self)))         for child in self.children:             child.print_tree(indent + 1)",
+            "def print_item_with_children(ac, classes, level):     \"\"\" Print the given item and all children items \"\"\"     print_row(ac.id, ac.name, f\"{ac.allocation:,.2f}\", level)     print_children_recursively(classes, ac, level + 1)"
+        ]
+    ],
+    [
+        "python replace a list in matrix with another list",
+        [
+            "def _fill_array_from_list(the_list, the_array):         \"\"\"Fill an `array` from a `list`\"\"\"         for i, val in enumerate(the_list):             the_array[i] = val         return the_array",
+            "def transpose(table):     \"\"\"     transpose matrix     \"\"\"     t = []     for i in range(0, len(table[0])):         t.append([row[i] for row in table])     return t",
+            "def A(*a):     \"\"\"convert iterable object into numpy array\"\"\"     return np.array(a[0]) if len(a)==1 else [np.array(o) for o in a]",
+            "def list_to_csv(my_list, csv_file):     \"\"\"     Save a matrix (list of lists) to a file as a CSV      .. code:: python          my_list = [[\"Name\", \"Location\"],                    [\"Chris\", \"South Pole\"],                    [\"Harry\", \"Depth of Winter\"],                    [\"Bob\", \"Skull\"]]          reusables.list_to_csv(my_list, \"example.csv\")      example.csv      .. code:: csv          \"Name\",\"Location\"         \"Chris\",\"South Pole\"         \"Harry\",\"Depth of Winter\"         \"Bob\",\"Skull\"      :param my_list: list of lists to save to CSV     :param csv_file: File to save data to     \"\"\"     if PY3:         csv_handler = open(csv_file, 'w', newline='')     else:         csv_handler = open(csv_file, 'wb')      try:         writer = csv.writer(csv_handler, delimiter=',', quoting=csv.QUOTE_ALL)         writer.writerows(my_list)     finally:         csv_handler.close()",
+            "def Tmatrix(X):     \"\"\"     gets the orientation matrix (T) from data in X     \"\"\"     T = [[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]]     for row in X:         for k in range(3):             for l in range(3):                 T[k][l] += row[k] * row[l]     return T"
+        ],
+        [
+            "def transpose(table):     \"\"\"     transpose matrix     \"\"\"     t = []     for i in range(0, len(table[0])):         t.append([row[i] for row in table])     return t",
+            "def A(*a):     \"\"\"convert iterable object into numpy array\"\"\"     return np.array(a[0]) if len(a)==1 else [np.array(o) for o in a]",
+            "def equal(list1, list2):     \"\"\" takes flags returns indexes of True values \"\"\"     return [item1 == item2 for item1, item2 in broadcast_zip(list1, list2)]",
+            "def _fill_array_from_list(the_list, the_array):         \"\"\"Fill an `array` from a `list`\"\"\"         for i, val in enumerate(the_list):             the_array[i] = val         return the_array",
+            "def ziptake(items_list, indexes_list):     \"\"\"     SeeAlso:         vt.ziptake     \"\"\"     return [take(list_, index_list)             for list_, index_list in zip(items_list, indexes_list)]"
+        ],
+        [
+            "def Tmatrix(X):     \"\"\"     gets the orientation matrix (T) from data in X     \"\"\"     T = [[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]]     for row in X:         for k in range(3):             for l in range(3):                 T[k][l] += row[k] * row[l]     return T",
+            "def transform(foci, mat):     \"\"\" Convert coordinates from one space to another using provided     transformation matrix. \"\"\"     t = linalg.pinv(mat)     foci = np.hstack((foci, np.ones((foci.shape[0], 1))))     return np.dot(foci, t)[:, 0:3]"
+        ]
+    ],
+    [
+        "python add object to dict repeatly",
+        [
+            "def __iter__(self):         \"\"\"class iterator which yields a key/value pair\"\"\"         if self._json_dict is None:             self.__init()         for k,v in self._json_dict.items():             yield (k,v)",
+            "def _zeep_to_dict(cls, obj):         \"\"\"Convert a zeep object to a dictionary.\"\"\"         res = serialize_object(obj)         res = cls._get_non_empty_dict(res)         return res",
+            "def append(self, item):         \"\"\" append item and print it to stdout \"\"\"         print(item)         super(MyList, self).append(item)",
+            "def addValue(self, _, value):     \"\"\"Adds a value from the given source.\"\"\"     self.total += self._dataFormat.getValue(value)",
+            "def list_of_lists_to_dict(l):     \"\"\" Convert list of key,value lists to dict      [['id', 1], ['id', 2], ['id', 3], ['foo': 4]]     {'id': [1, 2, 3], 'foo': [4]}     \"\"\"     d = {}     for key, val in l:         d.setdefault(key, []).append(val)     return d"
+        ],
+        [
+            "def printdict(adict):     \"\"\"printdict\"\"\"     dlist = list(adict.keys())     dlist.sort()     for i in range(0, len(dlist)):         print(dlist[i], adict[dlist[i]])",
+            "def extend(a: dict, b: dict) -> dict:     \"\"\"Merge two dicts and return a new dict. Much like subclassing works.\"\"\"     res = a.copy()     res.update(b)     return res",
+            "def list_of_lists_to_dict(l):     \"\"\" Convert list of key,value lists to dict      [['id', 1], ['id', 2], ['id', 3], ['foo': 4]]     {'id': [1, 2, 3], 'foo': [4]}     \"\"\"     d = {}     for key, val in l:         d.setdefault(key, []).append(val)     return d",
+            "def dict_merge(set1, set2):     \"\"\"Joins two dictionaries.\"\"\"     return dict(list(set1.items()) + list(set2.items()))",
+            "def union(self, other):         \"\"\"produce a 'union' of this dict and another (at the key level).          values in the second dict take precedence over that of the first\"\"\"         x = SetLikeDict(**self)         x.update(other)         return x"
+        ],
+        [
+            "def as_dictionary(self):         \"\"\"         Convert this object to a dictionary with formatting appropriate for a PIF.          :returns: Dictionary with the content of this object formatted for a PIF.         \"\"\"         return {to_camel_case(i): Serializable._convert_to_dictionary(self.__dict__[i])                 for i in self.__dict__ if self.__dict__[i] is not None}",
+            "def _zeep_to_dict(cls, obj):         \"\"\"Convert a zeep object to a dictionary.\"\"\"         res = serialize_object(obj)         res = cls._get_non_empty_dict(res)         return res"
+        ]
+    ],
+    [
+        "print python in one line",
+        [
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def pause(msg=\"Press Enter to Continue...\"):     \"\"\"press to continue\"\"\"     print('\\n' + Fore.YELLOW + msg + Fore.RESET, end='')     input()",
+            "def out(self, output, newline=True):         \"\"\"Outputs a string to the console (stdout).\"\"\"         click.echo(output, nl=newline)",
+            "def _stdin_(p):     \"\"\"Takes input from user. Works for Python 2 and 3.\"\"\"     _v = sys.version[0]     return input(p) if _v is '3' else raw_input(p)",
+            "def good(txt):     \"\"\"Print, emphasized 'good', the given 'txt' message\"\"\"      print(\"%s# %s%s%s\" % (PR_GOOD_CC, get_time_stamp(), txt, PR_NC))     sys.stdout.flush()"
+        ],
+        [
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def flushed_print(*args, **kwargs):     \"\"\"     Use to replace print(*args, flush=True) that doesn't exist for python<3.3     \"\"\"     print(*args, **kwargs)     file = kwargs.get('file', sys.stdout)     file.flush() if file is not None else sys.stdout.flush()",
+            "def _stdin_(p):     \"\"\"Takes input from user. Works for Python 2 and 3.\"\"\"     _v = sys.version[0]     return input(p) if _v is '3' else raw_input(p)",
+            "def stdout_display():     \"\"\" Print results straight to stdout \"\"\"     if sys.version_info[0] == 2:         yield SmartBuffer(sys.stdout)     else:         yield SmartBuffer(sys.stdout.buffer)",
+            "def pause(msg=\"Press Enter to Continue...\"):     \"\"\"press to continue\"\"\"     print('\\n' + Fore.YELLOW + msg + Fore.RESET, end='')     input()"
+        ],
+        [
+            "def out(self, output, newline=True):         \"\"\"Outputs a string to the console (stdout).\"\"\"         click.echo(output, nl=newline)",
+            "def _display(self, layout):         \"\"\"launch layouts display\"\"\"         print(file=self.out)         TextWriter().format(layout, self.out)"
+        ]
+    ],
+    [
+        "python check viarable type",
+        [
+            "def hard_equals(a, b):     \"\"\"Implements the '===' operator.\"\"\"     if type(a) != type(b):         return False     return a == b",
+            "def isstring(value):     \"\"\"Report whether the given value is a byte or unicode string.\"\"\"     classes = (str, bytes) if pyutils.PY3 else basestring  # noqa: F821     return isinstance(value, classes)",
+            "def is_all_field_none(self):         \"\"\"         :rtype: bool         \"\"\"          if self._type_ is not None:             return False          if self._value is not None:             return False          if self._name is not None:             return False          return True",
+            "def isreal(obj):     \"\"\"     Test if the argument is a real number (float or integer).      :param obj: Object     :type  obj: any      :rtype: boolean     \"\"\"     return (         (obj is not None)         and (not isinstance(obj, bool))         and isinstance(obj, (int, float))     )",
+            "def _find_base_type(data_type):     \"\"\"Find the Nani's base type for a given data type.      This is useful when Nani's data types were subclassed and the original type     is required.     \"\"\"     bases = type(data_type).__mro__     for base in bases:         if base in _ALL:             return base      return None"
+        ],
+        [
+            "def _find_base_type(data_type):     \"\"\"Find the Nani's base type for a given data type.      This is useful when Nani's data types were subclassed and the original type     is required.     \"\"\"     bases = type(data_type).__mro__     for base in bases:         if base in _ALL:             return base      return None",
+            "def hard_equals(a, b):     \"\"\"Implements the '===' operator.\"\"\"     if type(a) != type(b):         return False     return a == b",
+            "def isstring(value):     \"\"\"Report whether the given value is a byte or unicode string.\"\"\"     classes = (str, bytes) if pyutils.PY3 else basestring  # noqa: F821     return isinstance(value, classes)",
+            "def is_dimension(self):         \"\"\"Return true if the colum is a dimension\"\"\"         from ambry.valuetype.core import ROLE         return self.role == ROLE.DIMENSION",
+            "def is_number(obj):     \"\"\"     Helper function to determine numbers     across Python 2.x and 3.x     \"\"\"     try:         from numbers import Number     except ImportError:         from operator import isNumberType         return isNumberType(obj)     else:         return isinstance(obj, Number)"
+        ],
+        [
+            "def is_integer(obj):     \"\"\"Is this an integer.      :param object obj:     :return:     \"\"\"     if PYTHON3:         return isinstance(obj, int)     return isinstance(obj, (int, long))",
+            "def isreal(obj):     \"\"\"     Test if the argument is a real number (float or integer).      :param obj: Object     :type  obj: any      :rtype: boolean     \"\"\"     return (         (obj is not None)         and (not isinstance(obj, bool))         and isinstance(obj, (int, float))     )"
+        ]
+    ],
+    [
+        "python sort second item in a list of tuples",
+        [
+            "def natural_sort(list_to_sort: Iterable[str]) -> List[str]:     \"\"\"     Sorts a list of strings case insensitively as well as numerically.      For example: ['a1', 'A2', 'a3', 'A11', 'a22']      To sort a list in place, don't call this method, which makes a copy. Instead, do this:      my_list.sort(key=natural_keys)      :param list_to_sort: the list being sorted     :return: the list sorted naturally     \"\"\"     return sorted(list_to_sort, key=natural_keys)",
+            "def csort(objs, key):     \"\"\"Order-preserving sorting function.\"\"\"     idxs = dict((obj, i) for (i, obj) in enumerate(objs))     return sorted(objs, key=lambda obj: (key(obj), idxs[obj]))",
+            "def transcript_sort_key(transcript):     \"\"\"     Key function used to sort transcripts. Taking the negative of     protein sequence length and nucleotide sequence length so that     the transcripts with longest sequences come first in the list. This couldn't     be accomplished with `reverse=True` since we're also sorting by     transcript name (which places TP53-001 before TP53-002).     \"\"\"     return (         -len(transcript.protein_sequence),         -len(transcript.sequence),         transcript.name     )",
+            "def pairwise(iterable):     \"\"\"From itertools cookbook. [a, b, c, ...] -> (a, b), (b, c), ...\"\"\"     first, second = tee(iterable)     next(second, None)     return zip(first, second)",
+            "def sort_data(data, cols):     \"\"\"Sort `data` rows and order columns\"\"\"     return data.sort_values(cols)[cols + ['value']].reset_index(drop=True)"
+        ],
+        [
+            "def csort(objs, key):     \"\"\"Order-preserving sorting function.\"\"\"     idxs = dict((obj, i) for (i, obj) in enumerate(objs))     return sorted(objs, key=lambda obj: (key(obj), idxs[obj]))",
+            "def natural_sort(list_to_sort: Iterable[str]) -> List[str]:     \"\"\"     Sorts a list of strings case insensitively as well as numerically.      For example: ['a1', 'A2', 'a3', 'A11', 'a22']      To sort a list in place, don't call this method, which makes a copy. Instead, do this:      my_list.sort(key=natural_keys)      :param list_to_sort: the list being sorted     :return: the list sorted naturally     \"\"\"     return sorted(list_to_sort, key=natural_keys)",
+            "def transcript_sort_key(transcript):     \"\"\"     Key function used to sort transcripts. Taking the negative of     protein sequence length and nucleotide sequence length so that     the transcripts with longest sequences come first in the list. This couldn't     be accomplished with `reverse=True` since we're also sorting by     transcript name (which places TP53-001 before TP53-002).     \"\"\"     return (         -len(transcript.protein_sequence),         -len(transcript.sequence),         transcript.name     )",
+            "def sort_data(data, cols):     \"\"\"Sort `data` rows and order columns\"\"\"     return data.sort_values(cols)[cols + ['value']].reset_index(drop=True)",
+            "def get_order(self, codes):         \"\"\"Return evidence codes in order shown in code2name.\"\"\"         return sorted(codes, key=lambda e: [self.ev2idx.get(e)])"
+        ],
+        [
+            "def pairwise(iterable):     \"\"\"From itertools cookbook. [a, b, c, ...] -> (a, b), (b, c), ...\"\"\"     first, second = tee(iterable)     next(second, None)     return zip(first, second)",
+            "def as_tuple(self, value):         \"\"\"Utility function which converts lists to tuples.\"\"\"         if isinstance(value, list):             value = tuple(value)         return value"
+        ]
+    ]
+]
