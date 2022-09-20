@@ -522,7 +522,7 @@ class PerturbAst(ast.NodeTransformer):
         return perturbed_code
 
     def generate(self, code: str, maxm: int=15, verbose: bool=False) -> List[str]:
-        candidates: List[str] = []
+        candidates_and_rule: List[str, str] = []
         tree: _ast.Module = ast.parse(bytes(code, "utf8")) # get parsed AST.
         valid_rules: List[str] = self.collect_applicable_rules(tree) # find list of applicable rules.
         # NOTE: if no rules applicable, then FAIL SILENTLY
@@ -541,21 +541,22 @@ class PerturbAst(ast.NodeTransformer):
                     if ctr > maxm: break
                     copy_tree = copy.deepcopy(tree)
                     self.rule_filter.smartFnSub(i)
-                    
-                    candidates.append(self._generate_i(copy_tree, code, verbose))
+                    candidate = self._generate_i(copy_tree, code, verbose)
+                    candidates_and_rule.append((candidate, rule))
             else: 
                 ctr += 1
                 if ctr > maxm: break
-                candidates.append(self._generate_i(copy_tree, code, verbose))
+                candidate = self._generate_i(copy_tree, code, verbose)
+                candidates_and_rule.append((candidate, rule))
         # store in global variable (for multi-threaded setting.)
-        AST_NEG_SAMPLES_DB[code] = candidates 
+        AST_NEG_SAMPLES_DB[code] = candidates_and_rule 
         # print("###############")
         # print(f"\x1b[33m{code}\x1b[0m")
         # print("———————————————")
         # for i, cand in enumerate(candidates):
         #     print(f"{i+1}. \x1b[34m{cand}\x1b[0m")
         # print("###############")
-        return candidates
+        return candidates_and_rule
 
     def batch_generate(self, codes: List[str], **args):
         batch_candidates: List[List[str]] = []

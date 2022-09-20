@@ -35,7 +35,8 @@ VALID_STEPS = 501
 SHUFFLE_BATCH_DEBUG_SETTING = True
 # get arguments
 def get_args():
-    parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the CodeBERT in Late Fusion configuration for Neural Code Search.")
+    parser = argparse.ArgumentParser("""script to train (using triplet margin loss), evaluate and predict
+                                     with the CodeBERT in Late Fusion configuration for Neural Code Search.""")
     parser.add_argument("-pp", "--predict_path", type=str, default="triples/triples_train.json", help="path to data for prediction of regression scores")
     parser.add_argument("-tp", "--train_path", type=str, default="triples/triples_train.json", help="path to training triplet data")
     parser.add_argument("-vp", "--val_path", type=str, default="triples/triples_test.json", help="path to validation triplet data")

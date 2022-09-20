@@ -29,9 +29,9 @@ def get_args():
                         help=f"dataset to work with from: {DATASETS}")
     parser.add_argument("-ns", "--num_splits", type=int, default=4)
     parser.add_argument("-si", "--split_index", type=int, required=True)
-#     parser.add_argument("-topk", "--topk", default=10, type=int,
-#                         help="no. of similar intents to be paired with each intent")
-#     parser.add_argument("-bs", "--batch_size", type=int, default=64, help="batch size")
+    # parser.add_argument("-topk", "--topk", default=10, type=int,
+    #                     help="no. of similar intents to be paired with each intent")
+    # parser.add_argument("-bs", "--batch_size", type=int, default=64, help="batch size")
     parser.add_argument("-tqdm", "--use_tqdm", action="store_true",
                         help="show tqdm progress bar during inference")
 
@@ -122,5 +122,4 @@ if __name__ == "__main__":
     path = f"{args.dataset}_AST_neg_samples_{args.num_splits}_{args.split_index+1}.json"
     with open(path, "w") as f:
         json.dump(snippet_ast_neg_map, f)
-        
 # python ast_perturb/gen_ast_neg_sampes.py -d CoNaLa -ns 4 -si 0 -tqdm

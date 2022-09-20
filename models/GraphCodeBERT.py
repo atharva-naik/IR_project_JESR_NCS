@@ -34,7 +34,8 @@ VALID_STEPS = 501
 SHUFFLE_BATCH_DEBUG_SETTING = True
 # get arguments
 def get_args():
-    parser = argparse.ArgumentParser("script to train (using triplet margin loss), evaluate and predict with the GraphCodeBERT in Late Fusion configuration for Neural Code Search.")    
+    parser = argparse.ArgumentParser("""script to train (using triplet margin loss), evaluate and predict with 
+                                     the GraphCodeBERT in Late Fusion configuration for Neural Code Search.""")    
     parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_rel_thresh", help="experiment name (will be used as folder name)")
     parser.add_argument("-c", "--candidates_path", type=str, default="candidate_snippets.json", help="path to candidates (to test retrieval)")
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json", help="path to queries (to test retrieval)")
