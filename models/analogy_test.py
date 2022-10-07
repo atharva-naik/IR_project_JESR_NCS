@@ -11,6 +11,7 @@ from torch.utils.data import Dataset
 from models.CodeBERT import CodeBERTripletNet
 from models.UniXcoder import UniXcoderTripletNet
 from models.GraphCodeBERT import GraphCodeBERTripletNet
+from torchmetrics.functional import pairwise_cosine_similarity
 
 # parse command line arguments.
 parser = argparse.ArgumentParser()
@@ -75,7 +76,8 @@ a = torch.stack(a)
 b = torch.stack(b)
 c = torch.stack(c)
 d = torch.stack(d)
-dists = torch.cdist(c+b-a, d, p=2)
+# dists = torch.cdist(c+b-a, d, p=2)
+dists = -pairwise_cosine_similarity(c+b-a, d)
 doc_ranks = dists.argsort(axis=1)
 # recall@5 for analogy test.
 # correct documents are range(len(d))

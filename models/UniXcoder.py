@@ -55,6 +55,8 @@ def get_args():
                         help="path to dictionary containing AST perturbed codes corresponding to a given code")
     parser.add_argument("-p", "--p", type=int, default=2, help="the p used in mastering rate")
     parser.add_argument("-beta", "--beta", type=float, default=0.01, help="the beta used in the von-Mises fisher sampling")
+    parser.add_argument("-nc", "--no_curriculum", action="store_true", help="turn of curriclum (only hard negatives)")
+    parser.add_argument("-rc", "--rand_curriculum", action="store_true", help="random curriculum: equal probability of hard and soft negatives")
     parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
                         help="dynamic sampling based on similar intents")
@@ -73,6 +75,8 @@ class CodeDataset(Dataset):
         return len(self.data)
     
     def proc_code(self, code: str):
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
     
@@ -166,6 +170,8 @@ class TriplesDataset(Dataset):
         return text
     
     def proc_code(self, code: str):
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
         
@@ -316,7 +322,8 @@ class UniXcoderTripletNet(nn.Module):
         epochs = args.get("epochs", 5)
         beta = args.get("beta", 0.01)
         p = args.get("p", 2)
-        
+        use_curriculum = not(args.get("no_curriculum", False))
+        rand_curriculum = args.get("rand_curriculum", False)
         use_AST = args.get("use_AST", False)
         sim_intents_path = args.get("sim_intents_path")
         perturbed_codes_path = args.get("perturbed_codes_path")
@@ -355,6 +362,7 @@ class UniXcoderTripletNet(nn.Module):
             trainset = DynamicTriplesDataset(
                 train_path, "unixcoder", device=device_id, beta=beta, warmup_steps=warmup_steps,
                 sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes,
+                use_curriculum=use_curriculum, rand_curriculum=rand_curriculum,
                 use_AST=use_AST, model=self, p=p, max_length=100, padding=True,
             )
             valset = ValRetDataset(val_path)
@@ -435,9 +443,13 @@ class UniXcoderTripletNet(nn.Module):
                     )
                     HARD_ACC = f" hacc: {100*train_hard_neg_acc.get():.2f}"
                     trainset.update(
-                        train_soft_neg_acc.get(),
-                        train_hard_neg_acc.get(),
+                        train_soft_neg_acc.last_batch_acc,
+                        train_hard_neg_acc.last_batch_acc,
                     )
+                    # trainset.update(
+                    #     train_soft_neg_acc.get(),
+                    #     train_hard_neg_acc.get(),
+                    # )
                     MIX_STEP = trainset.mix_step()
                     pbar.set_description(
                         f"train: epoch: {epoch_i+1}/{epochs} {MIX_STEP}batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
@@ -494,7 +506,8 @@ def main(args):
                               beta=args.beta, p=args.p, warmup_steps=args.warmup_steps,
                               dynamic_negative_sampling=args.dynamic_negative_sampling,
                               sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
-                              intent_level_dynamic_sampling=args.intent_level_dynamic_sampling)
+                              intent_level_dynamic_sampling=args.intent_level_dynamic_sampling,
+                              no_curriculum=args.no_curriculum, rand_curriculum=args.rand_curriculum)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")

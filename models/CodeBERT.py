@@ -23,6 +23,7 @@ from transformers import RobertaModel, RobertaTokenizer
 from models.metrics import TripletAccuracy, recall_at_k
 from sklearn.metrics import label_ranking_average_precision_score as MRR
 from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
+from datautils.parser import remove_comments_and_docstrings
 
 # set logging level of transformers.
 transformers.logging.set_verbosity_error()
@@ -65,6 +66,8 @@ def get_args():
     parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
                         help="dynamic sampling based on similar intents")
+    parser.add_argument("-nc", "--no_curriculum", action="store_true", help="turn of curriclum (only hard negatives)")
+    parser.add_argument("-rc", "--rand_curriculum", action="store_true", help="random curriculum: equal probability of hard and soft negatives")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     return parser.parse_args()
@@ -86,6 +89,8 @@ class CodeDataset(Dataset):
         return len(self.data)
     
     def proc_code(self, code: str):
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
     
@@ -190,6 +195,8 @@ class RelevanceClassifierDataset(Dataset):
         return len(self.data)
     
     def proc_code(self, code: str):
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
     
@@ -233,6 +240,8 @@ class RelevanceRegressionDataset(Dataset):
         return len(self.data)
     
     def proc_code(self, code: str):
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
     
@@ -276,6 +285,8 @@ class TextCodePairDataset(Dataset):
         return len(self.data)
     
     def proc_code(self, code: str):
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
     
@@ -317,6 +328,8 @@ class TriplesDataset(Dataset):
         return text
     
     def proc_code(self, code: str):
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
         
@@ -812,6 +825,8 @@ class CodeBERTripletNet(nn.Module):
         beta = args.get("beta", 0.01) # NEW
         p = args.get("p") # NEW
         do_dynamic_negative_sampling = args.get("dynamic_negative_sampling", False)
+        use_curriculum = not(args.get("no_curriculum", False))
+        rand_curriculum = args.get("rand_curriculum", False)
         
         use_AST = args.get("use_AST", False)
         sim_intents_path = args.get("sim_intents_path")
@@ -850,9 +865,9 @@ class CodeBERTripletNet(nn.Module):
             # creat the data loaders.
             trainset = DynamicTriplesDataset(
                 train_path, "codebert", device=device_id, beta=beta, warmup_steps=warmup_steps,
-                sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes,
-                use_AST=use_AST, model=self, tokenizer=self.tokenizer, max_length=100, p=p,
-                padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+                sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
+                tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, rand_curriculum=rand_curriculum,
+                max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
             )
             # trainset = DynamicTriplesDataset(
             #     train_path, "codebert", sim_intents_map=sim_intents_map,
@@ -942,13 +957,23 @@ class CodeBERTripletNet(nn.Module):
                     )
                     HARD_ACC = f" hacc: {100*train_hard_neg_acc.get():.2f}"
                     trainset.update(
-                        train_soft_neg_acc.get(),
-                        train_hard_neg_acc.get(),
+                        train_soft_neg_acc.last_batch_acc,
+                        train_hard_neg_acc.last_batch_acc,
                     )
+                    # trainset.update(
+                    #     train_soft_neg_acc.get(),
+                    #     train_hard_neg_acc.get(),
+                    # )
                     MIX_STEP = trainset.mix_step()
                     pbar.set_description(
                         f"train: epoch: {epoch_i+1}/{epochs} {MIX_STEP}batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
                     )
+                    # # show accuracy buffers
+                    # if step % trainset.soft_master_rate.window_size == 0:
+                    #     print("\x1b[1msoft_master_rate\x1b[0m acc_buffer:", 
+                    #           trainset.soft_master_rate.acc_buffer)
+                    #     print("\x1b[1mhard_master_rate\x1b[0m acc_buffer:", 
+                    #           trainset.hard_master_rate.acc_buffer)
                 else: 
                     train_soft_neg_acc.update(
                         anchor_text_emb, 
@@ -1016,7 +1041,8 @@ def main(args):
                               beta=args.beta, p=args.p, warmup_steps=args.warmup_steps,
                               dynamic_negative_sampling=args.dynamic_negative_sampling,
                               sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
-                              intent_level_dynamic_sampling=args.intent_level_dynamic_sampling)
+                              intent_level_dynamic_sampling=args.intent_level_dynamic_sampling,
+                              no_curriculum=args.no_curriculum, rand_curriculum=args.rand_curriculum)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")

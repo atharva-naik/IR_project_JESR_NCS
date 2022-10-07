@@ -9,6 +9,7 @@ class TripletAccuracy:
         self.pdist = nn.PairwiseDistance()
         self.margin = margin
         self.reset()
+        self.last_batch_acc = None
         
     def reset(self):
         self.count = 0
@@ -20,16 +21,23 @@ class TripletAccuracy:
         
     def update(self, anchor, pos, neg, mask=None):
         """mask can be a boolean or integer tensor."""
+        batch_tot = 0
+        batch_count = 0
         pos = self.pdist(anchor, pos).cpu()
         neg = self.pdist(anchor, neg).cpu()
         # print(pos, neg)
         # print("shapes:", pos.shape, neg.shape)
         if mask is not None:
-            self.count += (mask*torch.as_tensor((neg-pos)>self.margin)).sum().item()
-            self.tot += mask.sum().item()
+            batch_count += (mask*torch.as_tensor((neg-pos)>self.margin)).sum().item()
+            batch_tot += mask.sum().item()
         else:
-            self.count += torch.as_tensor((neg-pos)>self.margin).sum().item()
-            self.tot += len(pos)
+            batch_count += torch.as_tensor((neg-pos)>self.margin).sum().item()
+            batch_tot += len(pos)
+        self.count += batch_count
+        self.tot += batch_tot
+        if batch_tot != 0:
+            self.last_batch_acc = batch_count/batch_tot
+        else: self.last_batch_acc = 0
 
 # test metrics.
 def recall_at_k(actual, predicted, k: int=10):

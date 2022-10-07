@@ -56,6 +56,8 @@ def get_args():
                         help="path to dictionary containing AST perturbed codes corresponding to a given code")
     parser.add_argument("-w", "--warmup_steps", type=int, default=3000, help="no. of warmup steps (soft negatives only during warmup)")
     parser.add_argument("-p", "--p", type=int, default=2, help="the p used in mastering rate")
+    parser.add_argument("-nc", "--no_curriculum", action="store_true", help="turn of curriclum (only hard negatives)")
+    parser.add_argument("-rc", "--rand_curriculum", action="store_true", help="random curriculum: equal probability of hard and soft negatives")
     parser.add_argument("-beta", "--beta", type=float, default=0.01, help="the beta used in the von-Mises fisher sampling")
     parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
@@ -294,10 +296,8 @@ class TextCodePairDataset(Dataset):
         return len(self.data)
     
     def proc_code(self, code: str):
-        try:
-            code = remove_comments_and_docstrings(code, 'python')
-        except:
-            pass
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         # print(type(code))
         tree = self.parser[0].parse(bytes(code,'utf8'))    
         root_node = tree.root_node  
@@ -430,8 +430,7 @@ class TriplesDataset(Dataset):
         return text
     
     def proc_code(self, code: str):
-        try:
-            code = remove_comments_and_docstrings(code, 'python')
+        try: code = remove_comments_and_docstrings(code, 'python')
         except: pass
         tree = self.parser[0].parse(bytes(code, 'utf8'))    
         root_node = tree.root_node  
@@ -768,6 +767,8 @@ class GraphCodeBERTripletNet(nn.Module):
 #         # print(type(all_embeds[0]), len(all_embeds))
 #         return all_embeds
     def fit(self, train_path: str, val_path: str, **args):
+        use_curriculum = not(args.get("no_curriculum", False))
+        rand_curriculum = args.get("rand_curriculum", False)
         warmup_steps = args.get("warmup_steps", 3000) # NEW
         beta = args.get("beta", 0.01) # NEW
         p = args.get("p") # NEW
@@ -816,6 +817,7 @@ class GraphCodeBERTripletNet(nn.Module):
                 use_AST=use_AST, model=self, tokenizer=self.tokenizer,
                 sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes,
                 nl_length=100, code_length=100, data_flow_length=64,
+                use_curriculum=use_curriculum, rand_curriculum=rand_curriculum,
             )
             valset = ValRetDataset(val_path)
             self.config["trainset.warmup_steps"] = trainset.warmup_steps
@@ -896,9 +898,13 @@ class GraphCodeBERTripletNet(nn.Module):
                     )
                     HARD_ACC = f" hacc: {100*train_hard_neg_acc.get():.2f}"
                     trainset.update(
-                        train_soft_neg_acc.get(),
-                        train_hard_neg_acc.get(),
+                        train_soft_neg_acc.last_batch_acc,
+                        train_hard_neg_acc.last_batch_acc,
                     )
+                    # trainset.update(
+                    #     train_soft_neg_acc.get(),
+                    #     train_hard_neg_acc.get(),
+                    # )
                     MIX_STEP = trainset.mix_step()
                     pbar.set_description(
                         f"train: epoch: {epoch_i+1}/{epochs} {MIX_STEP}batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_soft_neg_acc.get():.2f}{HARD_ACC}"

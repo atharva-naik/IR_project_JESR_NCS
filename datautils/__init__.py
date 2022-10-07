@@ -283,9 +283,11 @@ class MasteringRate:
 class DynamicTriplesDataset(Dataset):
     def __init__(self, path: str, model_name: str, model=None, tokenizer=None,
                  use_AST=False, val=False, warmup_steps=3000, beta=0.001, p=2,
-                 sim_intents_map={}, perturbed_codes={}, device="cuda:0",
-                 win_size=20, delta=0.5, epsilon=0.8, **tok_args):
+                 sim_intents_map={}, perturbed_codes={}, device="cuda:0", win_size=20, 
+                 delta=0.5, epsilon=0.8, use_curriculum=True, rand_curriculum=False, **tok_args):
         super(DynamicTriplesDataset, self).__init__()
+        self.use_curriculum = use_curriculum
+        self.rand_curriculum = rand_curriculum
         assert model_name in MODEL_OPTIONS
         self.model_name = model_name
         self.warmup_steps = warmup_steps
@@ -375,6 +377,8 @@ class DynamicTriplesDataset(Dataset):
     def _proc_code(self, code: str) -> Union[str, Tuple[str, list]]:
         """returns processed code for CodeBERT and UniXcoder,
         returns proccessed code and dataflow graph for GraphCodeBERT."""
+        try: code = remove_comments_and_docstrings(code, 'python')
+        except: pass
         if self.model_name == "graphcodebert":
             return self._graphcodebert_proc_code(code)
         else:
@@ -418,8 +422,8 @@ class DynamicTriplesDataset(Dataset):
                                backup_neg: Union[str, None]=None):
         codes_for_sim_intents: List[str] = []
         if use_AST: # when using AST only use AST.
-            codes_for_sim_intents += self.perturbed_codes[PL] # codes from AST.
-            # print(PL)
+            for tup in self.perturbed_codes[PL]: # codes from AST.
+                if isinstance(tup, (tuple, list)): codes_for_sim_intents.append(tup[0])
             # print(codes_for_sim_intents)
         else: # TODO: add a flag for IDNS.
             sim_intents: List[str] = self.sim_intents_map[NL]
@@ -469,6 +473,10 @@ class DynamicTriplesDataset(Dataset):
                     self.soft_neg_weight, 
                     self.hard_neg_weight,
                 ])
+        # if curriculum is turned off then just use hard negatives all the time.
+        if not self.use_curriculum: hard_neg = True
+        if self.rand_curriculum:
+            hard_neg = np.random.choice([False, True], p=[0.5, 0.5])
         if hard_neg: # sample hard similar intent or AST based negatives.
             # anchor, pos, neg = self._retrieve_best_triplet(
             #     NL=self.data[item]["intent"], 
