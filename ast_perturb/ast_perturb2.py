@@ -6,8 +6,9 @@ from typing import *
 import random, pprint
 from threading import Thread
 from dataclasses import dataclass
-from ast_unparse37 import Unparser
-import os, ast, _ast, copy, json, string
+from collections import defaultdict
+import os, io, ast, _ast, copy, json, string
+from ast_perturb.ast_unparse37 import Unparser
 
 # global variable (dict) to collect AST key value pairs of candidates for a given code in the multi-threaded setting.
 AST_NEG_SAMPLES_DB = {}
@@ -35,6 +36,12 @@ obj: {obj}
 \x1b[32mlen: {length}\x1b[0m
 attrs: {attrs(obj)}
 """)
+def dearrange(l):
+    if len(l) <= 1: return l
+    while True:
+        r = random.sample(l, k=len(l))
+        if r != l: return r
+        # else: print(r)
 # CODE = """
 # import os, re
 # from torch.utils.data import *
@@ -81,7 +88,7 @@ for key, value in signatures.items():
 fn_names = list(fn_names)
 builtin_fn_names = ["abs", "aiter","all", "any", "anext", "ascii", "bin", "bool", "breakpoint", "bytearray", "bytes", "callable", "chr", "classmethod", "compile", "complex", "delattr", "dict", "dir", "divmod", "enumerate", "eval", "exec", "filter", "float", "format", "frozenset", "getattr", "globals", "hasattr", "hash", "help", "hex", "id", "input", "int", "isinstance", "issubclass", "iter", "len", "list", "locals", "map", "max", "memoryview", "min", "next", "object", "oct", "open", "ord", "pow", "print", "property", "range", "repr", "reversed", "round", "set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super", "tuple", "type", "vars", "zip", "__import__"]
 fn_names.extend(builtin_fn_names)
-# perturbation class.
+# class for capturing negative example generation rules.
 @dataclass(frozen=False)
 class RuleFilter:
     rule1:bool=False
@@ -93,15 +100,33 @@ class RuleFilter:
     rule7:bool=False
     rule8:bool=False
     rule9:bool=False
+    rule10:bool=False
+    rule11:bool=False
+    rule12:bool=False
+    rule13:bool=False
+    rule14:bool=False
+    rule15:bool=False
+    rule16:bool=False
+    rule17:bool=False
+    rule18:bool=False
     rule1_metadata:str="Library function substitution"
     rule2_metadata:str="List comprehension to set comprehension"
     rule3_metadata:str="Set comprehension to list comprehension"
-    rule4_metadata:str="Change type of constant `int`/`float` to `str` and vice-versa"
+    rule4_metadata:str="Change `int`/`float` constant to `str`"
     rule5_metadata:str="Flip boolean constants"
     rule6_metadata:str="Flip comparators: == to !=, < to >=, > to <=, 'is' to 'is not', 'in' to 'not in' and vice versa for each case"
     rule7_metadata:str="Swap 'And', 'Or' boolean operators"
     rule8_metadata:str="Replace function call with identifier having the same name as the function"
-    rule9_metadata:str="Replace If-Else statement with it's body"
+    rule9_metadata:str="Replace If-Else statement with if's body"
+    rule10_metadata:str="Swap function arguments"
+    rule11_metadata:str="Replace If-Else statement with else's body"
+    rule12_metadata:str="Change `str` constant to `int`"
+    rule13_metadata:str="Change `str` constant to `float`"
+    rule14_metadata:str="Replace variables with each other"
+    rule15_metadata:str="Division-by-zero error introduced"
+    rule16_metadata:str="Flip unary operators"
+    rule17_metadata:str="Replace function call with pass"
+    rule18_metadata:str="ValueMisuse: In non tuple assignments, replace arithmetic expressions (BinOp)/numeric (Num) values with negative of the value"
     random_fn_sub:bool=True
     recursive_sub:bool=True
     fn_choose_index:int=0
@@ -186,29 +211,21 @@ class RuleFilter:
     @classmethod
     def AllowAll(cls):
         return RuleFilter(
-            rule1=True,
-            rule2=True,
-            rule3=True, 
-            rule4=True,
-            rule5=True,
-            rule6=True,
-            rule7=True,
-            rule8=True,
-            rule9=True,
+            rule1=True, rule2=True, rule3=True, rule4=True,
+            rule5=True, rule6=True, rule7=True, rule8=True,
+            rule9=True, rule10=True, rule11=True, rule12=True,
+            rule13=True, rule14=True, rule15=True, rule16=True,
+            rule17=True, rule18=True,
         )
 
     @classmethod
     def BlockAll(cls):
         return RuleFilter(
-            rule1=False,
-            rule2=False,
-            rule3=False,
-            rule4=False,
-            rule5=False,
-            rule6=False,
-            rule7=False,
-            rule8=False,
-            rule9=False,
+            rule1=False, rule2=False, rule3=False, rule4=False,
+            rule5=False, rule6=False, rule7=False, rule8=False,
+            rule9=False, rule10=False, rule11=False, rule12=False, 
+            rule13=False, rule14=False, rule15=False, rule16=False,
+            rule17=False, rule18=False,
         )
 
     def __call__(self, index: int):
@@ -224,51 +241,101 @@ class RuleFilter:
             if getattr(self, f"rule{i+1}"): 
                 print(f"\x1b[32;1m{i+1}. "+metadata+" (Allow)\x1b[0m")
             else: print(f"\x1b[31;1m{i+1}. "+metadata+" (Block)\x1b[0m")
+# class for capturing positive example generation rules.
+@dataclass(frozen=False)
+class PosRuleFilter(RuleFilter)
+    rule1:bool=False
+    rule2:bool=False
+    rule3:bool=False
+    rule4:bool=False
+    rule5:bool=False
+    rule6:bool=False
+    rule7:bool=False
+    rule8:bool=False
+    rule9:bool=False
+    rule10:bool=False
+    rule11:bool=False
+    rule12:bool=False
+    rule13:bool=False
+    rule14:bool=False
+    rule15:bool=False
+    rule16:bool=False
+    rule17:bool=False
+    rule18:bool=False
+    rule1_metadata:str="Variable renaming"
+    rule2_metadata:str="Comparison expressions"
+    rule3_metadata:str=""
+    rule4_metadata:str="Change `int`/`float` constant to `str`"
+    rule5_metadata:str="Flip boolean constants"
+    rule6_metadata:str="Flip comparators: == to !=, < to >=, > to <=, 'is' to 'is not', 'in' to 'not in' and vice versa for each case"
+    rule7_metadata:str="Swap 'And', 'Or' boolean operators"
+    rule8_metadata:str="Replace function call with identifier having the same name as the function"
+    rule9_metadata:str="Replace If-Else statement with if's body"
+    rule10_metadata:str="Swap function arguments"
+    rule11_metadata:str="Replace If-Else statement with else's body"
+    rule12_metadata:str="Change `str` constant to `int`"
+    rule13_metadata:str="Change `str` constant to `float`"
+    rule14_metadata:str="Replace variables with each other"
+    rule15_metadata:str="Division-by-zero error introduced"
+    rule16_metadata:str="Flip unary operators"
+    rule17_metadata:str="Replace function call with pass"
+    rule18_metadata:str="ValueMisuse: In non tuple assignments, replace arithmetic expressions (BinOp)/numeric (Num) values with negative of the value"
+    random_fn_sub:bool=True
+    recursive_sub:bool=True
+    fn_choose_index:int=0
+    
+# class DataTypeNode:
+#     def __init__(self, type_str: str):
+#         type_str = type_str.strip()
+#         self.type_str = type_str
+#         self.isAny = False # node can be matched to any type.
+#         self.baseName = None # name of the base class.
+#         # str, float, bool, int, None
+#         self.isStdType = False
+#         self.stdTypeName = None 
+#         # e.g. <class 'torch.jit.cuda.StreamContext'> is wrapped.
+#         self.wrapped = False 
+#         # child elements and ptr to parent.
+#         self.children = []
+#         self.class_name = None
+#         self.parent_ptr = None
+#         # relation with parent, can be in [OR ("Union", "|"), AND (Tuple[], tuple[])]
+#         self.rel_to_parent = None
+#         self._parse(type_str)
 
-class DataTypeNode:
-    def __init__(self, type_str: str):
-        type_str = type_str.strip()
-        self.type_str = type_str
-        self.isAny = False # node can be matched to any type.
-        self.baseName = None # name of the base class.
-        # str, float, bool, int, None
-        self.isStdType = False
-        self.stdTypeName = None 
-        # e.g. <class 'torch.jit.cuda.StreamContext'> is wrapped.
-        self.wrapped = False 
-        # child elements and ptr to parent.
-        self.children = []
-        self.class_name = None
-        self.parent_ptr = None
-        # relation with parent, can be in [OR ("Union", "|"), AND (Tuple[], tuple[])]
-        self.rel_to_parent = None
-        self._parse(type_str)
+#     def _parse(self, type_string: str):
+#         import parse
+#         # check if it is a standard data type.
+#         # deal with class type case.
+#         result = parse.parse(
+#             "<class '{}'>", 
+#             type_string,
+#         )
+#         if result is not None:
+#             self.class_type = True
+#             self.class_name = result[0]
 
-    def _parse(self, type_string: str):
-        import parse
-        # check if it is a standard data type.
-        # deal with class type case.
-        result = parse.parse(
-            "<class '{}'>", 
-            type_string,
-        )
-        if result is not None:
-            self.class_type = True
-            self.class_name = result[0]
+#     def __eq__(self, other) -> bool:
+#         # handle cases where this datatype if of standard type.
+#         if self.isStdType:
+#             if other.isStdType: 
+#                 return self.stdTypeName == other.stdTypeName
+#             else: return False
 
-    def __eq__(self, other) -> bool:
-        # handle cases where this datatype if of standard type.
-        if self.isStdType:
-            if other.isStdType: 
-                return self.stdTypeName == other.stdTypeName
-            else: return False
+#         return False
 
-        return False
-
-    def score_match(self, other) -> float:
-        if self == other:
-            return 1
-
+#     def score_match(self, other) -> float:
+#         if self == other:
+#             return 1
+class VarScrambler(ast.NodeTransformer):
+    """class for scrambling variable."""
+    def __init__(self):
+        self.var_to_nodes = defaultdict(lambda:[])
+        
+    def visit_Name(self, node):
+        self.var_to_nodes[node.id].append(node)
+        return super(VarScrambler, self).generic_visit(node)
+    
 # class for perturbing AST parse tree.
 class PerturbAst(ast.NodeTransformer):
     """Perturb AST using various rules:
@@ -283,6 +350,7 @@ class PerturbAst(ast.NodeTransformer):
     def __init__(self, *args, rule_filter: Union[RuleFilter, None]=None, **kwargs):
         self.visit_sequence = []
         super(PerturbAst, self).__init__(*args, **kwargs)
+        self.var_to_node = {}
         if rule_filter is None:
             self.rule_filter = RuleFilter.AllowAll()
         else: self.rule_filter = rule_filter
@@ -293,7 +361,7 @@ class PerturbAst(ast.NodeTransformer):
         from sortedcontainers import SortedSet
         global fn_names
         global signatures
-
+        
         self.rule_checking_mode = False
         self.applied_rules = SortedSet()
         self.valid_rules = SortedSet()
@@ -301,7 +369,8 @@ class PerturbAst(ast.NodeTransformer):
         self.lib_fn_names = fn_names
         
     def reset(self):
-        # clear visit sequence.
+        """clear visit sequence."""
+        # print("\x1b[32;1mresetting\x1b[0m")
         self.visit_sequence = []
         self.init()
     
@@ -487,6 +556,13 @@ class PerturbAst(ast.NodeTransformer):
             tree = tree_or_code
         elif isinstance(tree_or_code, str):
             tree = ast.parse(bytes(tree_or_code, "utf8")) 
+        # use var scrambler NodeTransformer to see if VarMisuse is feasible:
+        var_scrambler = VarScrambler()
+        var_scrambler.visit(tree)
+        for _, node_list in var_scrambler.var_to_nodes.items():
+            if len(node_list) > 1:
+                self.valid_rules.add("rule14")
+                break
         self.rule_checking_mode = True
         self.visit(tree) # traverse tree to enumerate all applicable rules without modifying it.
         valid_rules = list(self.valid_rules)
@@ -497,16 +573,17 @@ class PerturbAst(ast.NodeTransformer):
 
     def serialize_tree(self, tree):
         # convert tree back to code block.
-        content = ""
-        fname = f"{rand_str(16)}.py"
-        with open(fname, "w") as f:
-            Unparser(tree, file=f)
-        with open(fname, "r") as f:
-            content = f.read()
-        os.remove(fname)
-        
-        return content.strip("\n")
-
+        f = io.StringIO()
+        Unparser(tree, file=f)
+        return f.getvalue().strip("\n")
+#         content = ""
+#         fname = f"{rand_str(16)}.py"
+#         with open(fname, "w") as f:
+#             Unparser(tree, file=f)
+#         with open(fname, "r") as f:
+#             content = f.read()
+#         os.remove(fname)
+#         return content.strip("\n")
     def _generate_i(self, tree, code: str, verbose: bool) -> str:
         # get the perturbed tree.
         perturbed_tree: _ast.Module = self.visit(tree)
@@ -520,9 +597,28 @@ class PerturbAst(ast.NodeTransformer):
         self.reset()
 
         return perturbed_code
+    
+    def _apply_var_misuse(self, tree) -> List[Tuple[str, str]]:
+        cands = []
+        var_scrambler = VarScrambler()
+        var_scrambler.visit(tree)
+        var_to_nodes = var_scrambler.var_to_nodes
+        all_var_names = list(var_to_nodes.keys())
+        rand_var_names = dearrange(all_var_names)
+        ind = -1
+        for var_name, node_list in var_to_nodes.items():
+            ind += 1
+            if len(node_list) <= 1: continue
+            for node in node_list:
+                node.id = rand_var_names[ind]
+                cands.append((self.serialize_tree(tree), "rule14"))
+                node.id = var_name
+        
+        return cands
 
-    def generate(self, code: str, maxm: int=15, verbose: bool=False) -> List[str]:
+    def generate(self, code: str, maxm: int=25, verbose: bool=False) -> List[str]:
         candidates_and_rule: List[str, str] = []
+        self.var_to_node = {}
         tree: _ast.Module = ast.parse(bytes(code, "utf8")) # get parsed AST.
         valid_rules: List[str] = self.collect_applicable_rules(tree) # find list of applicable rules.
         # NOTE: if no rules applicable, then FAIL SILENTLY
@@ -531,21 +627,25 @@ class PerturbAst(ast.NodeTransformer):
         # this is done to prevent bias towards the rule1.
         valid_rules = sorted(valid_rules, reverse=True)
         if verbose: print("applicable rules: ", valid_rules)
-        ctr = 0
+        # ctr = 0
         for rule in valid_rules:
             copy_tree = copy.deepcopy(tree)
             self.rule_filter.setOneHotFromName(rule)
             if rule == "rule1":
                 for i in range(15):
-                    ctr += 1
-                    if ctr > maxm: break
+                    # ctr += 1
+                    # if ctr > maxm: break
                     copy_tree = copy.deepcopy(tree)
                     self.rule_filter.smartFnSub(i)
                     candidate = self._generate_i(copy_tree, code, verbose)
                     candidates_and_rule.append((candidate, rule))
+            elif rule == "rule14":
+                # ctr += 1
+                self.applied_rules.add("rule14")
+                candidates_and_rule += self._apply_var_misuse(copy_tree)
             else: 
-                ctr += 1
-                if ctr > maxm: break
+                # ctr += 1
+                # if ctr > maxm: break
                 candidate = self._generate_i(copy_tree, code, verbose)
                 candidates_and_rule.append((candidate, rule))
         # store in global variable (for multi-threaded setting.)
@@ -571,15 +671,13 @@ class PerturbAst(ast.NodeTransformer):
         tree: _ast.Module = ast.parse(bytes(code, "utf8"))
         # find list of applicable rules.
         rules: List[str] = self.collect_applicable_rules(tree)
-        
         # NOTE: if no rules applicable, then FAIL SILENTLY
         if rules == []: 
             return tree, {
+            "rule_applied": None,
             "original_code": code,
             "perturbed_code": code,
-            "rule_applied": None,
         }
-        
         # print("applicable rules: ", rules)
         rules_mask: List[int]= self.rule_filter.getMaskFromNames(rules)
         # print("rules mask: ", rules_mask)
@@ -612,6 +710,33 @@ class PerturbAst(ast.NodeTransformer):
             "perturbed_code": self.serialize_tree(perturbed_tree),
             "rule_applied": sampled_rule,
         }
+    
+    def visit_UnaryOp(self, node):
+        if self.rule_checking_mode:
+            self.valid_rules.add("rule16")
+            return super(PerturbAst, self).generic_visit(node)
+        if self.rule_filter(16):
+            self.applied_rules.add("rule16")
+            if isinstance(node.op, _ast.UAdd):
+                node.op = _ast.USub()
+            elif isinstance(node.op, _ast.USub):
+                node.op = _ast.UAdd()
+            elif isinstance(node.op, (_ast.Not, _ast.Invert)):
+                node = node.operand
+            return super(PerturbAst, self).generic_visit(node)
+        return super(PerturbAst, self).generic_visit(node)
+    
+    def visit_BinOp(self, node):
+        if self.rule_checking_mode:
+            if isinstance(node.op, _ast.Div):
+                self.valid_rules.add("rule15")
+            return super(PerturbAst, self).generic_visit(node)
+        if self.rule_filter(15):
+            if isinstance(node.op, _ast.Div):
+                self.applied_rules.add("rule15")
+                node.right.id = '0'
+            return super(PerturbAst, self).generic_visit(node)
+        return super(PerturbAst, self).generic_visit(node)
     # NOTE: depreceated for version 3.8, not available for version > 3.9
     def visit_NameConstant(self, node):
         if self.rule_checking_mode:
@@ -640,27 +765,44 @@ class PerturbAst(ast.NodeTransformer):
     # NOTE: depreceated for version 3.8, not available for version > 3.9
     def visit_Str(self, node):
         if self.rule_checking_mode:
-            self.valid_rules.add("rule4")
+            self.valid_rules.add("rule12")
+            self.valid_rules.add("rule13")
             return super(PerturbAst, self).generic_visit(node)
-        if self.rule_filter(4):
-            self.applied_rules.add("rule4")
+        if self.rule_filter(12):
+            self.applied_rules.add("rule12")
             # check if int conversion is allowed.
             try: n = int(node.s)
-            except ValueError:
-                # check if float conversion is allowed.
-                try: n = float(node.s)
-                # pick a random float or int.
-                except ValueError: 
-                    subs_type = random.choice([int,float])
-                    n = subs_type(len(node.s))
+            except ValueError: n = int(len(node.s)) # subs_type = random.choice([int,float])
+            node = _ast.Num(
+                n=n, lineno=node.lineno,
+                col_offset=node.col_offset
+            )
+            return super(PerturbAst, self).generic_visit(node)
+        if self.rule_filter(13):
+            self.applied_rules.add("rule13")
+            # check if float conversion is allowed.
+            try: n = float(node.s)
+            except ValueError: n = float(len(node.s))
             node = _ast.Num(
                 n=n, lineno=node.lineno,
                 col_offset=node.col_offset
             )
             return super(PerturbAst, self).generic_visit(node)
         else: return super(PerturbAst, self).generic_visit(node)
-    # def visit_Assign(self, node: _ast.Assign) -> Any:
-    #     return super().visit_Assign(node)
+    
+    def visit_Assign(self, node: _ast.Assign) -> Any:
+        if self.rule_checking_mode:
+            if isinstance(node.value, (_ast.Num, _ast.BinOp)):
+                self.valid_rules.add("rule18")
+            return super(PerturbAst, self).generic_visit(node)
+        if self.rule_filter(18):
+            # an implementation of ValueMisuse
+            new_value = _ast.UnaryOp()
+            new_value.op = _ast.USub()
+            new_value.operand = node.value
+            node.value = new_value
+            return super(PerturbAst, self).generic_visit(node)
+        return super(PerturbAst, self).generic_visit(node)
     # def visit_Compare(self, node):
     #     # print(node.left, node.ops, node.comparators)
     #     print(dir(node.ops))
@@ -776,6 +918,8 @@ class PerturbAst(ast.NodeTransformer):
     def visit_If(self, node: _ast.IfExp) -> Any:
         if self.rule_checking_mode:
             self.valid_rules.add("rule9")
+            if hasattr(node, "orelse"):
+                self.valid_rules.add("rule11")
             return super(PerturbAst, self).generic_visit(node)
         if self.rule_filter(9):
             node = _ast.Module(
@@ -783,18 +927,30 @@ class PerturbAst(ast.NodeTransformer):
                 col_offset=node.col_offset,
             )
             self.applied_rules.add("rule9")
+        if self.rule_filter(11):
+            node = _ast.Module(
+                body=node.orelse, lineno=node.lineno,
+                col_offset=node.col_offset,
+            )
+            self.applied_rules.add("rule11")
         return super(PerturbAst, self).generic_visit(node)
 
     def visit_IfExp(self, node: _ast.IfExp) -> Any:
         if self.rule_checking_mode:
             self.valid_rules.add("rule9")
+            if hasattr(node, "orelse"):
+                self.valid_rules.add("rule11")
             return super(PerturbAst, self).generic_visit(node)
         if self.rule_filter(9):
-            node = _ast.Expr(
-                value=node.body, lineno=node.lineno,
-                col_offset=node.col_offset,
-            )
+            node = node.body
+            # _ast.Expr(
+            #     value=node.body, lineno=node.lineno,
+            #     col_offset=node.col_offset,
+            # )
             self.applied_rules.add("rule9")
+        if self.rule_filter(11):
+            node = node.orelse
+            self.applied_rules.add("rule11")
         return super(PerturbAst, self).generic_visit(node)
 
     def visit_Call(self, node):
@@ -812,8 +968,11 @@ class PerturbAst(ast.NodeTransformer):
             full_name = fn_name
         if self.rule_checking_mode:
             self.valid_rules.add("rule8")
+            self.valid_rules.add("rule17")
             if self.is_rule1_applicable(full_name):
                 self.valid_rules.add("rule1")
+            if hasattr(node, "args") and len(node.args) > 1:
+                self.valid_rules.add("rule10")
             return super(PerturbAst, self).generic_visit(node)
         # check if rule1 is applicable
         if self.is_rule1_applicable(full_name) and self.rule_filter(1):
@@ -821,14 +980,23 @@ class PerturbAst(ast.NodeTransformer):
             if self.rule_filter.random_fn_sub:
                 self.apply_rule1_rand(node.func)
             else: self.apply_rule1_smart(node.func)
-
+            # do only top level function substitution.
+            return node
+        if self.rule_filter(17):
+            node = _ast.Pass()
+            self.applied_rules.add("rule17")
         if self.rule_filter(8):
             node = _ast.Name(
                 id=fn_name, lineno=node.lineno,
                 col_offset=node.col_offset,
             )
             self.applied_rules.add("rule8") 
-
+        if self.rule_filter(10):
+            # arugment swapping rule.
+            # print(node.args)
+            # print(node.args)
+            node.args = dearrange(node.args)
+            self.applied_rules.add("rule10")
         return super(PerturbAst, self).generic_visit(node)
 
     def visit_ListComp(self, node: _ast.ListComp) -> Any:

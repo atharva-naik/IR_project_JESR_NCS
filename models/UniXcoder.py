@@ -75,8 +75,6 @@ class CodeDataset(Dataset):
         return len(self.data)
     
     def proc_code(self, code: str):
-        try: code = remove_comments_and_docstrings(code, 'python')
-        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
     
@@ -170,8 +168,6 @@ class TriplesDataset(Dataset):
         return text
     
     def proc_code(self, code: str):
-        try: code = remove_comments_and_docstrings(code, 'python')
-        except: pass
         code = " ".join(code.split("\n")).strip()
         return code
         

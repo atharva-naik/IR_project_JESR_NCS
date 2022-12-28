@@ -20,7 +20,7 @@ from datautils import read_jsonl
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
-from models.metrics import TripletAccuracy, recall_at_k
+from models.metrics import TripletAccuracy, RuleWiseAccuracy, recall_at_k
 from sklearn.metrics import label_ranking_average_precision_score as MRR
 from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
 from datautils.parser import remove_comments_and_docstrings
@@ -45,10 +45,11 @@ def get_args():
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json", help="path to queries (to test retrieval)")
     parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_rel_thresh", help="experiment name (will be used as folder name)")
     parser.add_argument("-d", "--device_id", type=str, default="cpu", help="device string (GPU) for doing training/testing")
-    parser.add_argument("-tec", "--test_cls", action="store_true", help="")
-    parser.add_argument("-tc", "--train_cls", action="store_true", help="")
-    parser.add_argument("-ter", "--test_rel", action="store_true", help="")
-    parser.add_argument("-tr", "--train_rel", action="store_true", help="")
+    # parser.add_argument("-tec", "--test_cls", action="store_true", help="")
+    # parser.add_argument("-tc", "--train_cls", action="store_true", help="")
+    # parser.add_argument("-ter", "--test_rel", action="store_true", help="")
+    # parser.add_argument("-tr", "--train_rel", action="store_true", help="")
+    parser.add_argument("-scl", "--use_scl", action="store_true", help="use selectively contrastive learning")
     parser.add_argument("-lr", "--lr", type=float, default=1e-5, help="learning rate for training (defaults to 1e-5)")
     parser.add_argument("-te", "--test", action="store_true", help="flag to do testing")
     parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
@@ -67,7 +68,12 @@ def get_args():
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
                         help="dynamic sampling based on similar intents")
     parser.add_argument("-nc", "--no_curriculum", action="store_true", help="turn of curriclum (only hard negatives)")
-    parser.add_argument("-rc", "--rand_curriculum", action="store_true", help="random curriculum: equal probability of hard and soft negatives")
+    parser.add_argument("-ct", "--curr_type", type=str, default="mr", choices=['mr', 'rand', 'lp', 'exp'],
+                        help="""type of curriculum (listed below): 
+                             1) mr: mastering rate based curriculum 
+                             2) rand: equal prob. of hard & soft -ves
+                             3) lp: learning progress based curriculum
+                             4) exp: exponential decay with steps/epochs""")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     return parser.parse_args()
@@ -173,100 +179,94 @@ class TextDataset(Dataset):
             return [text["input_ids"][0], 
                     text["attention_mask"][0]]
         else:
-            return [text]
-        
-        
-class RelevanceClassifierDataset(Dataset):
-    def __init__(self, path: str, thresh: float=0.06441,
-                 tokenizer: Union[str, None, RobertaTokenizer]=None, 
-                 **tok_args):
-        super(RelevanceClassifierDataset, self).__init__()
-        self.data = json.load(open(path))
-        self.tok_args = tok_args
-        if isinstance(tokenizer, RobertaTokenizer):
-            self.tokenizer = tokenizer
-        elif isinstance(tokenizer, str):
-            self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
-        else:
-            self.tokenizer = tokenizer
-        self.thresh = thresh
+            return [text]      
+# class RelevanceClassifierDataset(Dataset):
+#     def __init__(self, path: str, thresh: float=0.06441,
+#                  tokenizer: Union[str, None, RobertaTokenizer]=None, 
+#                  **tok_args):
+#         super(RelevanceClassifierDataset, self).__init__()
+#         self.data = json.load(open(path))
+#         self.tok_args = tok_args
+#         if isinstance(tokenizer, RobertaTokenizer):
+#             self.tokenizer = tokenizer
+#         elif isinstance(tokenizer, str):
+#             self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
+#         else:
+#             self.tokenizer = tokenizer
+#         self.thresh = thresh
     
-    def __len__(self):
-        return len(self.data)
+#     def __len__(self):
+#         return len(self.data)
     
-    def proc_code(self, code: str):
-        try: code = remove_comments_and_docstrings(code, 'python')
-        except: pass
-        code = " ".join(code.split("\n")).strip()
-        return code
+#     def proc_code(self, code: str):
+#         try: code = remove_comments_and_docstrings(code, 'python')
+#         except: pass
+#         code = " ".join(code.split("\n")).strip()
+#         return code
     
-    def proc_text(self, text: str):
-        text = " ".join(text.split("\n"))
-        text = " ".join(text.split()).strip()
-        return text
+#     def proc_text(self, text: str):
+#         text = " ".join(text.split("\n"))
+#         text = " ".join(text.split()).strip()
+#         return text
     
-    def __getitem__(self, i: int):
-        try:
-            text = self.proc_text(self.data[i]["intent"])
-            code = self.proc_code(self.data[i]["snippet"])
-            label = 1 if self.data[i]["prob"] >= self.thresh else 0
-        except TypeError:
-            print(self.data[i])
-        if self.tokenizer:
-            # special tokens are added by default.
-            text_n_code = self.tokenizer(text, code, **self.tok_args)
-            return [text_n_code["input_ids"][0], 
-                    text_n_code["attention_mask"][0],
-                    torch.as_tensor(label)]
-        else:
-            return [text_n_code, label]
-        
-
-class RelevanceRegressionDataset(Dataset):
-    def __init__(self, path: str, 
-                 tokenizer: Union[str, None, RobertaTokenizer]=None, 
-                 **tok_args):
-        super(RelevanceRegressionDataset, self).__init__()
-        self.data = json.load(open(path))
-        self.tok_args = tok_args
-        if isinstance(tokenizer, RobertaTokenizer):
-            self.tokenizer = tokenizer
-        elif isinstance(tokenizer, str):
-            self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
-        else:
-            self.tokenizer = tokenizer
+#     def __getitem__(self, i: int):
+#         try:
+#             text = self.proc_text(self.data[i]["intent"])
+#             code = self.proc_code(self.data[i]["snippet"])
+#             label = 1 if self.data[i]["prob"] >= self.thresh else 0
+#         except TypeError:
+#             print(self.data[i])
+#         if self.tokenizer:
+#             # special tokens are added by default.
+#             text_n_code = self.tokenizer(text, code, **self.tok_args)
+#             return [text_n_code["input_ids"][0], 
+#                     text_n_code["attention_mask"][0],
+#                     torch.as_tensor(label)]
+#         else:
+#             return [text_n_code, label]
+# class RelevanceRegressionDataset(Dataset):
+#     def __init__(self, path: str, 
+#                  tokenizer: Union[str, None, RobertaTokenizer]=None, 
+#                  **tok_args):
+#         super(RelevanceRegressionDataset, self).__init__()
+#         self.data = json.load(open(path))
+#         self.tok_args = tok_args
+#         if isinstance(tokenizer, RobertaTokenizer):
+#             self.tokenizer = tokenizer
+#         elif isinstance(tokenizer, str):
+#             self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
+#         else:
+#             self.tokenizer = tokenizer
     
-    def __len__(self):
-        return len(self.data)
+#     def __len__(self):
+#         return len(self.data)
     
-    def proc_code(self, code: str):
-        try: code = remove_comments_and_docstrings(code, 'python')
-        except: pass
-        code = " ".join(code.split("\n")).strip()
-        return code
+#     def proc_code(self, code: str):
+#         try: code = remove_comments_and_docstrings(code, 'python')
+#         except: pass
+#         code = " ".join(code.split("\n")).strip()
+#         return code
     
-    def proc_text(self, text: str):
-        text = " ".join(text.split("\n"))
-        text = " ".join(text.split()).strip()
-        return text
+#     def proc_text(self, text: str):
+#         text = " ".join(text.split("\n"))
+#         text = " ".join(text.split()).strip()
+#         return text
     
-    def __getitem__(self, i: int):
-        try:
-            text = self.proc_text(self.data[i]["intent"])
-            code = self.proc_code(self.data[i]["snippet"])
-            label = float(self.data[i]["prob"])
-        except TypeError:
-            print(self.data[i])
-        if self.tokenizer:
-            # special tokens are added by default.
-            text_n_code = self.tokenizer(text, code, **self.tok_args)
-            return [text_n_code["input_ids"][0], 
-                    text_n_code["attention_mask"][0],
-                    torch.as_tensor(label)]
-        else:
-            return [text_n_code, label]
-        
-        
+#     def __getitem__(self, i: int):
+#         try:
+#             text = self.proc_text(self.data[i]["intent"])
+#             code = self.proc_code(self.data[i]["snippet"])
+#             label = float(self.data[i]["prob"])
+#         except TypeError:
+#             print(self.data[i])
+#         if self.tokenizer:
+#             # special tokens are added by default.
+#             text_n_code = self.tokenizer(text, code, **self.tok_args)
+#             return [text_n_code["input_ids"][0], 
+#                     text_n_code["attention_mask"][0],
+#                     torch.as_tensor(label)]
+#         else:
+#             return [text_n_code, label]  
 class TextCodePairDataset(Dataset):
     def __init__(self, query_candidate_pairs: str, 
                  tokenizer: Union[str, None, RobertaTokenizer]=None, 
@@ -350,49 +350,210 @@ class TriplesDataset(Dataset):
                    ]
         else:
             return [anchor, pos, neg]      
+# class CodeBERTRelevanceClassifier(nn.Module):
+#     """
+#     finetune CodeBERT over CoNaLa mined pairs 
+#     for predicting relevance score using regression
+#     """
+#     def __init__(self, model_path: str="microsoft/codebert-base", 
+#                  tok_path: str="microsoft/codebert-base", **args):
+#         super(CodeBERTRelevanceClassifier, self).__init__()
+#         self.config = {}
+#         self.config["tok_path"] = tok_path
+#         self.config["model_path"] = model_path
         
+#         print(f"loading pretrained CodeBERT embedding model from {model_path}")
+#         start = time.time()
+#         self.model = RobertaModel.from_pretrained(model_path)
+#         print(f"loaded CodeBERT model in {(time.time()-start):.2f}s")
+#         print(f"loaded tokenizer files from {tok_path}")
+#         self.mlp = nn.Linear(768, 1)
+#         self.sigmoid = nn.Sigmoid()
+#         self.tokenizer = RobertaTokenizer.from_pretrained(tok_path)
+#         # optimizer and loss.
+#         adam_eps = 1e-8
+#         lr = args.get("lr", 1e-5)
+#         self.config["lr"] = lr
         
-class CodeBERTRelevanceClassifier(nn.Module):
-    """
-    finetune CodeBERT over CoNaLa mined pairs 
-    for predicting relevance score using regression
-    """
-    def __init__(self, model_path: str="microsoft/codebert-base", 
-                 tok_path: str="microsoft/codebert-base", **args):
-        super(CodeBERTRelevanceClassifier, self).__init__()
-        self.config = {}
-        self.config["tok_path"] = tok_path
-        self.config["model_path"] = model_path
+#         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
+#         self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
+#         self.config["optimizer"] = f"{self.optimizer}"
         
-        print(f"loading pretrained CodeBERT embedding model from {model_path}")
-        start = time.time()
-        self.model = RobertaModel.from_pretrained(model_path)
-        print(f"loaded CodeBERT model in {(time.time()-start):.2f}s")
-        print(f"loaded tokenizer files from {tok_path}")
-        self.mlp = nn.Linear(768, 1)
-        self.sigmoid = nn.Sigmoid()
-        self.tokenizer = RobertaTokenizer.from_pretrained(tok_path)
-        # optimizer and loss.
-        adam_eps = 1e-8
-        lr = args.get("lr", 1e-5)
-        self.config["lr"] = lr
+#         self.loss_fn = nn.BCELoss()
+#         print(f"loss_fn = {self.loss_fn}")
+#         self.config["loss_fn"] = f"{self.loss_fn}"
         
-        print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
-        self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
-        self.config["optimizer"] = f"{self.optimizer}"
+#     def forward(self, text_code_pair_args):
+#         # text_code_pair_args: ids, attn_mask with "[CLS] <text> [SEP] <code> [SEP]"
+#         text_code_pair_embed = self.model(*text_code_pair_args).pooler_output # (batch, emb_size)
+#         # print("text_code_pair_embed.device =", text_code_pair_embed.device)
+#         # x = self.mlp(text_code_pair_embed)
+#         # print("x.device =", x.device)
+#         # x = self.sigmoid(x)
+#         return self.sigmoid(self.mlp(text_code_pair_embed))
+# #     def predict(self, q_and_c, **args):
+# #         queries_and_candidates = [] 
+# #         batch_size = args.get("batch_size", 32)
+# #         device = args.get("device") if torch.cuda.is_available() else "cpu"
+# #         dataset = TextCodePairDataset(q_and_c, tokenizer=self.tokenizer,
+# #                                       truncation=True, padding="max_length",
+# #                                       max_length=200, add_special_tokens=True,
+# #                                       return_tensors="pt")
+# #         dataloader = DataLoader(dataset, shuffle=False, 
+# #                                 batch_size=batch_size)
+# #         relevance_scores = []
+# #         pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc="predicting relevance")
+# #         for step, batch in pbar:
+# #             with torch.no_grad():
+# #                 text_code_pair = (batch[0].to(device), batch[1].to(device))
+# #                 pred_reg_score = self(text_code_pair).squeeze().tolist()
+# #                 relevance_scores += pred_reg_score
+# #                 # if step == 5: break # DEBUG
+# #         return relevance_scores
+#     def val(self, valloader: DataLoader, epoch_i: int=0, epochs: int=0, device="cuda:0"):
+#         self.eval()
+#         batch_losses = []
+#         pbar = tqdm(enumerate(valloader), total=len(valloader), 
+#                     desc=f"val: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
+#         tot = 0
+#         matches = 0
+#         for step, batch in pbar:
+#             with torch.no_grad():
+#                 text_code_pair = (batch[0].to(device), batch[1].to(device))
+#                 rel_label = batch[2].float().to(device) # 0 or 1.
+#                 pred_probs = self(text_code_pair).squeeze()
+#                 batch_loss = self.loss_fn(pred_probs, rel_label)
+#                 batch_losses.append(batch_loss.item())
+#                 tot += len(rel_label)
+#                 matches += ((pred_probs > 0.06441).float() == rel_label).sum().item()
+#                 acc = (matches/tot)
+#                 pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} acc: {100*acc:.2f} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
+#                 # if step == 5: break # DEBUG
+#         return np.mean(batch_losses)
+    
+#     def fit(self, train_path: str, val_path: str, **args):
+#         thresh: float = 0.06441
+#         batch_size = args.get("batch_size", 32)
+#         epochs = args.get("epochs", 5)
+#         device_id = args.get("device_id", "cuda:0")
+#         device = device_id if torch.cuda.is_available() else "cpu"
+#         exp_name = args.get("exp_name", "experiment")
+#         os.makedirs(exp_name, exist_ok=True)
+#         save_path = os.path.join(exp_name, "model.pt")
+#         # store config info.
+#         self.config["batch_size"] = batch_size
+#         self.config["train_path"] = train_path
+#         self.config["device_id"] = device_id
+#         self.config["exp_name"] = exp_name
+#         self.config["val_path"] = val_path
+#         self.config["epochs"] = epochs
         
-        self.loss_fn = nn.BCELoss()
-        print(f"loss_fn = {self.loss_fn}")
-        self.config["loss_fn"] = f"{self.loss_fn}"
+#         config_path = os.path.join(exp_name, "config.json")
+#         with open(config_path, "w") as f:
+#             json.dump(self.config, f)
+#         print(f"saved config to {config_path}")
+#         print(f"model will be saved at {save_path}")
+#         print(f"moving model to {device}")
+#         self.to(device)
+#         trainset = RelevanceClassifierDataset(train_path, tokenizer=self.tokenizer,
+#                                               truncation=True, padding="max_length",
+#                                               max_length=200, add_special_tokens=True,
+#                                               return_tensors="pt", thresh=0.06441)
+#         valset = RelevanceClassifierDataset(val_path, tokenizer=self.tokenizer,
+#                                             truncation=True, padding="max_length",
+#                                             max_length=200, add_special_tokens=True,
+#                                             return_tensors="pt", thresh=0.06441)
+#         trainloader = DataLoader(trainset, shuffle=True, 
+#                                  batch_size=batch_size)
+#         valloader = DataLoader(valset, shuffle=False,
+#                                batch_size=batch_size)
+#         train_metrics = {
+#             "epochs": [],
+#             "summary": [],
+#         } 
+#         best_val_loss = 100
+#         for epoch_i in range(epochs):
+#             tot = 0
+#             matches = 0
+#             self.train()
+#             batch_losses = []
+#             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
+#                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
+#             for step, batch in pbar:      
+#                 text_code_pair = (batch[0].to(device), batch[1].to(device))
+#                 rel_label = batch[2].float().to(device)
+#                 pred_probs = self(text_code_pair).squeeze()
+#                 # print(true_reg_score)
+#                 # print(pred_reg_score.device)
+#                 batch_loss = self.loss_fn(pred_probs, rel_label)
+#                 batch_loss.backward()
+#                 self.optimizer.step()
+#                 # scheduler.step()  # Update learning rate schedule
+#                 self.zero_grad()
+#                 batch_losses.append(batch_loss.item())
+#                 tot += len(rel_label)
+#                 matches += ((pred_probs > 0.06441).float() == rel_label).sum().item()
+#                 acc = (matches/tot)
+#                 pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} acc: {100*acc:.2f} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
+#                 # if step == 5: break # DEBUG
+#             # validate current model
+#             val_loss = self.val(valloader, epoch_i=epoch_i, 
+#                                 epochs=epochs, device=device)
+#             if val_loss < best_val_loss:
+#                 print(f"saving best model till now with val_loss: {val_loss} at {save_path}")
+#                 best_val_loss = val_loss
+#                 torch.save(self.state_dict(), save_path)
+#             train_metrics["epochs"].append({
+#                 "train_batch_losses": batch_losses, 
+#                 "train_loss": np.mean(batch_losses), 
+#                 "val_loss": val_loss,
+#             })
         
-    def forward(self, text_code_pair_args):
-        # text_code_pair_args: ids, attn_mask with "[CLS] <text> [SEP] <code> [SEP]"
-        text_code_pair_embed = self.model(*text_code_pair_args).pooler_output # (batch, emb_size)
-        # print("text_code_pair_embed.device =", text_code_pair_embed.device)
-        # x = self.mlp(text_code_pair_embed)
-        # print("x.device =", x.device)
-        # x = self.sigmoid(x)
-        return self.sigmoid(self.mlp(text_code_pair_embed))
+#         return train_metrics
+    
+    
+# class CodeBERTRelevanceRegressor(nn.Module):
+#     """
+#     finetune CodeBERT over CoNaLa mined pairs 
+#     for predicting relevance score using regression
+#     """
+#     def __init__(self, model_path: str="microsoft/codebert-base", 
+#                  tok_path: str="microsoft/codebert-base", **args):
+#         super(CodeBERTRelevanceRegressor, self).__init__()
+#         self.config = {}
+#         self.config["model_path"] = model_path
+#         self.config["tok_path"] = tok_path
+        
+#         print(f"loading pretrained CodeBERT embedding model from {model_path}")
+#         start = time.time()
+#         self.model = RobertaModel.from_pretrained(model_path)
+#         print(f"loaded CodeBERT model in {(time.time()-start):.2f}s")
+#         print(f"loaded tokenizer files from {tok_path}")
+#         self.mlp = nn.Linear(768, 1)
+#         self.sigmoid = nn.Sigmoid()
+#         self.tokenizer = RobertaTokenizer.from_pretrained(tok_path)
+#         # optimizer and loss.
+#         adam_eps = 1e-8
+#         lr = args.get("lr", 1e-5)
+#         self.config["lr"] = lr
+        
+#         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
+#         self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
+#         self.config["optimizer"] = f"{self.optimizer}"
+        
+#         self.loss_fn = nn.MSELoss()
+#         print(f"loss_fn = {self.loss_fn}")
+#         self.config["loss_fn"] = f"{self.loss_fn}"
+        
+#     def forward(self, text_code_pair_args):
+#         # text_code_pair_args: ids, attn_mask with "[CLS] <text> [SEP] <code> [SEP]"
+#         text_code_pair_embed = self.model(*text_code_pair_args).pooler_output # (batch, emb_size)
+#         # print("text_code_pair_embed.device =", text_code_pair_embed.device)
+#         # x = self.mlp(text_code_pair_embed)
+#         # print("x.device =", x.device)
+#         # x = self.sigmoid(x)
+#         return self.sigmoid(self.mlp(text_code_pair_embed))
+    
 #     def predict(self, q_and_c, **args):
 #         queries_and_candidates = [] 
 #         batch_size = args.get("batch_size", 32)
@@ -412,260 +573,95 @@ class CodeBERTRelevanceClassifier(nn.Module):
 #                 relevance_scores += pred_reg_score
 #                 # if step == 5: break # DEBUG
 #         return relevance_scores
-    def val(self, valloader: DataLoader, epoch_i: int=0, epochs: int=0, device="cuda:0"):
-        self.eval()
-        batch_losses = []
-        pbar = tqdm(enumerate(valloader), total=len(valloader), 
-                    desc=f"val: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
-        tot = 0
-        matches = 0
-        for step, batch in pbar:
-            with torch.no_grad():
-                text_code_pair = (batch[0].to(device), batch[1].to(device))
-                rel_label = batch[2].float().to(device) # 0 or 1.
-                pred_probs = self(text_code_pair).squeeze()
-                batch_loss = self.loss_fn(pred_probs, rel_label)
-                batch_losses.append(batch_loss.item())
-                tot += len(rel_label)
-                matches += ((pred_probs > 0.06441).float() == rel_label).sum().item()
-                acc = (matches/tot)
-                pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} acc: {100*acc:.2f} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
-                # if step == 5: break # DEBUG
-        return np.mean(batch_losses)
-    
-    def fit(self, train_path: str, val_path: str, **args):
-        thresh: float = 0.06441
-        batch_size = args.get("batch_size", 32)
-        epochs = args.get("epochs", 5)
-        device_id = args.get("device_id", "cuda:0")
-        device = device_id if torch.cuda.is_available() else "cpu"
-        exp_name = args.get("exp_name", "experiment")
-        os.makedirs(exp_name, exist_ok=True)
-        save_path = os.path.join(exp_name, "model.pt")
-        # store config info.
-        self.config["batch_size"] = batch_size
-        self.config["train_path"] = train_path
-        self.config["device_id"] = device_id
-        self.config["exp_name"] = exp_name
-        self.config["val_path"] = val_path
-        self.config["epochs"] = epochs
-        
-        config_path = os.path.join(exp_name, "config.json")
-        with open(config_path, "w") as f:
-            json.dump(self.config, f)
-        print(f"saved config to {config_path}")
-        print(f"model will be saved at {save_path}")
-        print(f"moving model to {device}")
-        self.to(device)
-        trainset = RelevanceClassifierDataset(train_path, tokenizer=self.tokenizer,
-                                              truncation=True, padding="max_length",
-                                              max_length=200, add_special_tokens=True,
-                                              return_tensors="pt", thresh=0.06441)
-        valset = RelevanceClassifierDataset(val_path, tokenizer=self.tokenizer,
-                                            truncation=True, padding="max_length",
-                                            max_length=200, add_special_tokens=True,
-                                            return_tensors="pt", thresh=0.06441)
-        trainloader = DataLoader(trainset, shuffle=True, 
-                                 batch_size=batch_size)
-        valloader = DataLoader(valset, shuffle=False,
-                               batch_size=batch_size)
-        train_metrics = {
-            "epochs": [],
-            "summary": [],
-        } 
-        best_val_loss = 100
-        for epoch_i in range(epochs):
-            tot = 0
-            matches = 0
-            self.train()
-            batch_losses = []
-            pbar = tqdm(enumerate(trainloader), total=len(trainloader),
-                        desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
-            for step, batch in pbar:      
-                text_code_pair = (batch[0].to(device), batch[1].to(device))
-                rel_label = batch[2].float().to(device)
-                pred_probs = self(text_code_pair).squeeze()
-                # print(true_reg_score)
-                # print(pred_reg_score.device)
-                batch_loss = self.loss_fn(pred_probs, rel_label)
-                batch_loss.backward()
-                self.optimizer.step()
-                # scheduler.step()  # Update learning rate schedule
-                self.zero_grad()
-                batch_losses.append(batch_loss.item())
-                tot += len(rel_label)
-                matches += ((pred_probs > 0.06441).float() == rel_label).sum().item()
-                acc = (matches/tot)
-                pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} acc: {100*acc:.2f} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
-                # if step == 5: break # DEBUG
-            # validate current model
-            val_loss = self.val(valloader, epoch_i=epoch_i, 
-                                epochs=epochs, device=device)
-            if val_loss < best_val_loss:
-                print(f"saving best model till now with val_loss: {val_loss} at {save_path}")
-                best_val_loss = val_loss
-                torch.save(self.state_dict(), save_path)
-            train_metrics["epochs"].append({
-                "train_batch_losses": batch_losses, 
-                "train_loss": np.mean(batch_losses), 
-                "val_loss": val_loss,
-            })
-        
-        return train_metrics
-    
-    
-class CodeBERTRelevanceRegressor(nn.Module):
-    """
-    finetune CodeBERT over CoNaLa mined pairs 
-    for predicting relevance score using regression
-    """
-    def __init__(self, model_path: str="microsoft/codebert-base", 
-                 tok_path: str="microsoft/codebert-base", **args):
-        super(CodeBERTRelevanceRegressor, self).__init__()
-        self.config = {}
-        self.config["model_path"] = model_path
-        self.config["tok_path"] = tok_path
-        
-        print(f"loading pretrained CodeBERT embedding model from {model_path}")
-        start = time.time()
-        self.model = RobertaModel.from_pretrained(model_path)
-        print(f"loaded CodeBERT model in {(time.time()-start):.2f}s")
-        print(f"loaded tokenizer files from {tok_path}")
-        self.mlp = nn.Linear(768, 1)
-        self.sigmoid = nn.Sigmoid()
-        self.tokenizer = RobertaTokenizer.from_pretrained(tok_path)
-        # optimizer and loss.
-        adam_eps = 1e-8
-        lr = args.get("lr", 1e-5)
-        self.config["lr"] = lr
-        
-        print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
-        self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
-        self.config["optimizer"] = f"{self.optimizer}"
-        
-        self.loss_fn = nn.MSELoss()
-        print(f"loss_fn = {self.loss_fn}")
-        self.config["loss_fn"] = f"{self.loss_fn}"
-        
-    def forward(self, text_code_pair_args):
-        # text_code_pair_args: ids, attn_mask with "[CLS] <text> [SEP] <code> [SEP]"
-        text_code_pair_embed = self.model(*text_code_pair_args).pooler_output # (batch, emb_size)
-        # print("text_code_pair_embed.device =", text_code_pair_embed.device)
-        # x = self.mlp(text_code_pair_embed)
-        # print("x.device =", x.device)
-        # x = self.sigmoid(x)
-        return self.sigmoid(self.mlp(text_code_pair_embed))
-    
-    def predict(self, q_and_c, **args):
-        queries_and_candidates = [] 
-        batch_size = args.get("batch_size", 32)
-        device = args.get("device") if torch.cuda.is_available() else "cpu"
-        dataset = TextCodePairDataset(q_and_c, tokenizer=self.tokenizer,
-                                      truncation=True, padding="max_length",
-                                      max_length=200, add_special_tokens=True,
-                                      return_tensors="pt")
-        dataloader = DataLoader(dataset, shuffle=False, 
-                                batch_size=batch_size)
-        relevance_scores = []
-        pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc="predicting relevance")
-        for step, batch in pbar:
-            with torch.no_grad():
-                text_code_pair = (batch[0].to(device), batch[1].to(device))
-                pred_reg_score = self(text_code_pair).squeeze().tolist()
-                relevance_scores += pred_reg_score
-                # if step == 5: break # DEBUG
-        return relevance_scores
 
-    def val(self, valloader: DataLoader, epoch_i: int=0, epochs: int=0, device="cuda:0"):
-        self.eval()
-        batch_losses = []
-        pbar = tqdm(enumerate(valloader), total=len(valloader), 
-                    desc=f"val: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
-        for step, batch in pbar:
-            with torch.no_grad():
-                text_code_pair = (batch[0].to(device), batch[1].to(device))
-                true_reg_score = batch[2].to(device)
-                pred_reg_score = self(text_code_pair).squeeze()
-                batch_loss = self.loss_fn(pred_reg_score, true_reg_score)
-                batch_losses.append(batch_loss.item())
-                pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
-                # if step == 5: break # DEBUG
-        return np.mean(batch_losses)
+#     def val(self, valloader: DataLoader, epoch_i: int=0, epochs: int=0, device="cuda:0"):
+#         self.eval()
+#         batch_losses = []
+#         pbar = tqdm(enumerate(valloader), total=len(valloader), 
+#                     desc=f"val: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
+#         for step, batch in pbar:
+#             with torch.no_grad():
+#                 text_code_pair = (batch[0].to(device), batch[1].to(device))
+#                 true_reg_score = batch[2].to(device)
+#                 pred_reg_score = self(text_code_pair).squeeze()
+#                 batch_loss = self.loss_fn(pred_reg_score, true_reg_score)
+#                 batch_losses.append(batch_loss.item())
+#                 pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
+#                 # if step == 5: break # DEBUG
+#         return np.mean(batch_losses)
     
-    def fit(self, train_path: str, val_path: str, **args):
-        batch_size = args.get("batch_size", 32)
-        self.config["batch_size"] = batch_size
-        epochs = args.get("epochs", 5)
-        self.config["epochs"] = epochs
-        device_id = args.get("device_id", "cuda:0")
-        self.config["device_id"] = device_id
-        device = device_id if torch.cuda.is_available() else "cpu"
-        exp_name = args.get("exp_name", "experiment")
-        self.config["exp_name"] = exp_name
-        os.makedirs(exp_name, exist_ok=True)
-        save_path = os.path.join(exp_name, "model.pt")
-        self.config["train_path"] = train_path
-        self.config["val_path"] = val_path
+#     def fit(self, train_path: str, val_path: str, **args):
+#         batch_size = args.get("batch_size", 32)
+#         self.config["batch_size"] = batch_size
+#         epochs = args.get("epochs", 5)
+#         self.config["epochs"] = epochs
+#         device_id = args.get("device_id", "cuda:0")
+#         self.config["device_id"] = device_id
+#         device = device_id if torch.cuda.is_available() else "cpu"
+#         exp_name = args.get("exp_name", "experiment")
+#         self.config["exp_name"] = exp_name
+#         os.makedirs(exp_name, exist_ok=True)
+#         save_path = os.path.join(exp_name, "model.pt")
+#         self.config["train_path"] = train_path
+#         self.config["val_path"] = val_path
         
-        config_path = os.path.join(exp_name, "config.json")
-        with open(config_path, "w") as f:
-            json.dump(self.config, f)
-        print(f"saved config to {config_path}")
-        print(f"model will be saved at {save_path}")
-        print(f"moving model to {device}")
-        self.to(device)
-        trainset = RelevanceRegressionDataset(train_path, tokenizer=self.tokenizer,
-                                              truncation=True, padding="max_length",
-                                              max_length=200, add_special_tokens=True,
-                                              return_tensors="pt")
-        valset = RelevanceRegressionDataset(val_path, tokenizer=self.tokenizer,
-                                            truncation=True, padding="max_length",
-                                            max_length=200, add_special_tokens=True,
-                                            return_tensors="pt")
-        trainloader = DataLoader(trainset, shuffle=True, 
-                                 batch_size=batch_size)
-        valloader = DataLoader(valset, shuffle=False,
-                               batch_size=batch_size)
-        train_metrics = {
-            "epochs": [],
-            "summary": [],
-        } 
-        best_val_loss = 100
-        for epoch_i in range(epochs):
-            self.train()
-            batch_losses = []
-            pbar = tqdm(enumerate(trainloader), total=len(trainloader),
-                        desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
-            for step, batch in pbar:      
-                text_code_pair = (batch[0].to(device), batch[1].to(device))
-                true_reg_score = batch[2].to(device)
-                pred_reg_score = self(text_code_pair).squeeze()
-                # print(true_reg_score)
-                # print(pred_reg_score.device)
-                batch_loss = self.loss_fn(pred_reg_score, true_reg_score)
-                batch_loss.backward()
-                self.optimizer.step()
-                # scheduler.step()  # Update learning rate schedule
-                self.zero_grad()
-                batch_losses.append(batch_loss.item())
-                pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
-                # if step == 5: break # DEBUG
-            # validate current model
-            val_loss = self.val(valloader, epoch_i=epoch_i, 
-                                         epochs=epochs, device=device)
-            if val_loss < best_val_loss:
-                print(f"saving best model till now with val_loss: {val_loss} at {save_path}")
-                best_val_loss = val_loss
-                torch.save(self.state_dict(), save_path)
-            train_metrics["epochs"].append({
-                "train_batch_losses": batch_losses, 
-                "train_loss": np.mean(batch_losses), 
-                "val_loss": val_loss,
-            })
+#         config_path = os.path.join(exp_name, "config.json")
+#         with open(config_path, "w") as f:
+#             json.dump(self.config, f)
+#         print(f"saved config to {config_path}")
+#         print(f"model will be saved at {save_path}")
+#         print(f"moving model to {device}")
+#         self.to(device)
+#         trainset = RelevanceRegressionDataset(train_path, tokenizer=self.tokenizer,
+#                                               truncation=True, padding="max_length",
+#                                               max_length=200, add_special_tokens=True,
+#                                               return_tensors="pt")
+#         valset = RelevanceRegressionDataset(val_path, tokenizer=self.tokenizer,
+#                                             truncation=True, padding="max_length",
+#                                             max_length=200, add_special_tokens=True,
+#                                             return_tensors="pt")
+#         trainloader = DataLoader(trainset, shuffle=True, 
+#                                  batch_size=batch_size)
+#         valloader = DataLoader(valset, shuffle=False,
+#                                batch_size=batch_size)
+#         train_metrics = {
+#             "epochs": [],
+#             "summary": [],
+#         } 
+#         best_val_loss = 100
+#         for epoch_i in range(epochs):
+#             self.train()
+#             batch_losses = []
+#             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
+#                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0")
+#             for step, batch in pbar:      
+#                 text_code_pair = (batch[0].to(device), batch[1].to(device))
+#                 true_reg_score = batch[2].to(device)
+#                 pred_reg_score = self(text_code_pair).squeeze()
+#                 # print(true_reg_score)
+#                 # print(pred_reg_score.device)
+#                 batch_loss = self.loss_fn(pred_reg_score, true_reg_score)
+#                 batch_loss.backward()
+#                 self.optimizer.step()
+#                 # scheduler.step()  # Update learning rate schedule
+#                 self.zero_grad()
+#                 batch_losses.append(batch_loss.item())
+#                 pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.5f} loss: {np.mean(batch_losses):.5f}")
+#                 # if step == 5: break # DEBUG
+#             # validate current model
+#             val_loss = self.val(valloader, epoch_i=epoch_i, 
+#                                          epochs=epochs, device=device)
+#             if val_loss < best_val_loss:
+#                 print(f"saving best model till now with val_loss: {val_loss} at {save_path}")
+#                 best_val_loss = val_loss
+#                 torch.save(self.state_dict(), save_path)
+#             train_metrics["epochs"].append({
+#                 "train_batch_losses": batch_losses, 
+#                 "train_loss": np.mean(batch_losses), 
+#                 "val_loss": val_loss,
+#             })
         
-        return train_metrics
-        
-    
+#         return train_metrics
 class CodeBERTripletNet(nn.Module):
     """ Class to 
     1) finetune CodeBERT in a late fusion setting using triplet margin loss.
@@ -696,7 +692,7 @@ class CodeBERTripletNet(nn.Module):
         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
         self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
         print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
-        self.loss_fn = nn.TripletMarginLoss(margin=margin, p=dist_fn_deg)
+        self.loss_fn = nn.TripletMarginLoss(margin=margin, p=dist_fn_deg, reduction="none")
         self.config["optimizer"] = f"{self.optimizer}"
         self.config["loss_fn"] = f"{self.loss_fn}"
         
@@ -740,7 +736,7 @@ class CodeBERTripletNet(nn.Module):
                 pos_snippet = (batch[2].to(device), batch[3].to(device))
                 neg_snippet = (batch[4].to(device), batch[5].to(device))
                 anchor_text_emb, pos_code_emb, neg_code_emb = self(anchor_title, pos_snippet, neg_snippet)
-                batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
+                batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb).mean()
                 val_acc.update(anchor_text_emb, pos_code_emb, neg_code_emb)
                 batch_losses.append(batch_loss.item())
                 pbar.set_description(f"val: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*val_acc.get():.2f}")
@@ -821,12 +817,13 @@ class CodeBERTripletNet(nn.Module):
         exp_name = args.get("exp_name", "experiment")
         device_id = args.get("device_id", "cuda:0")
         batch_size = args.get("batch_size", 32)
+        use_scl = args.get("use_scl", False)
         epochs = args.get("epochs", 5)
         beta = args.get("beta", 0.01) # NEW
         p = args.get("p") # NEW
         do_dynamic_negative_sampling = args.get("dynamic_negative_sampling", False)
         use_curriculum = not(args.get("no_curriculum", False))
-        rand_curriculum = args.get("rand_curriculum", False)
+        curriculum_type = args.get("curriculum_type", "mr")
         
         use_AST = args.get("use_AST", False)
         sim_intents_path = args.get("sim_intents_path")
@@ -866,8 +863,9 @@ class CodeBERTripletNet(nn.Module):
             trainset = DynamicTriplesDataset(
                 train_path, "codebert", device=device_id, beta=beta, warmup_steps=warmup_steps,
                 sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
-                tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, rand_curriculum=rand_curriculum,
+                tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, curriculum_type=curriculum_type,
                 max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+                batch_size=batch_size, num_epochs=epochs,
             )
             # trainset = DynamicTriplesDataset(
             #     train_path, "codebert", sim_intents_map=sim_intents_map,
@@ -917,6 +915,7 @@ class CodeBERTripletNet(nn.Module):
             "log_steps": [],
             "summary": [],
         } 
+        rule_wise_acc = RuleWiseAccuracy(margin=1)
         train_soft_neg_acc = TripletAccuracy(margin=1)
         train_hard_neg_acc = TripletAccuracy(margin=1)
         best_val_acc = 0
@@ -939,51 +938,51 @@ class CodeBERTripletNet(nn.Module):
                 pos_snippet = (batch[2].to(device), batch[3].to(device))
                 neg_snippet = (batch[4].to(device), batch[5].to(device))
                 anchor_text_emb, pos_code_emb, neg_code_emb = self(anchor_title, pos_snippet, neg_snippet)
-                batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
-                batch_loss.backward()
-                self.optimizer.step()
-                # train_acc.update(anchor_text_emb, pos_code_emb, neg_code_emb)
-                # scheduler.step()  # Update learning rate schedule
-                self.zero_grad()
-                batch_losses.append(batch_loss.item())
                 if hasattr(trainset, "update"):
                     train_soft_neg_acc.update(
                         anchor_text_emb, pos_code_emb, 
-                        neg_code_emb, ~batch[-1].cpu(),
+                        neg_code_emb, (batch[-1]==0).cpu(),
                     )
                     train_hard_neg_acc.update(
                         anchor_text_emb, pos_code_emb, 
-                        neg_code_emb, batch[-1].cpu(),
+                        neg_code_emb, (batch[-1]!=0).cpu(),
                     )
-                    HARD_ACC = f" hacc: {100*train_hard_neg_acc.get():.2f}"
+                    HARD_ACC = f" ha:{100*train_hard_neg_acc.get():.2f}"
                     trainset.update(
                         train_soft_neg_acc.last_batch_acc,
                         train_hard_neg_acc.last_batch_acc,
                     )
-                    # trainset.update(
-                    #     train_soft_neg_acc.get(),
-                    #     train_hard_neg_acc.get(),
-                    # )
                     MIX_STEP = trainset.mix_step()
+
+                    if use_scl:
+                        hard_loss = self.loss_fn(anchor_text_emb, torch.zeros_like(
+                                                 pos_code_emb), neg_code_emb)
+                        soft_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
+                        batch[-1] = batch[-1].to(device)
+                        batch_loss = (batch[-1]*hard_loss + (~batch[-1])*soft_loss).mean()
+                    else: batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb).mean()
+                    rule_wise_acc.update(anchor_text_emb, pos_code_emb, 
+                                         neg_code_emb, batch[-1].cpu().tolist())
                     pbar.set_description(
-                        f"train: epoch: {epoch_i+1}/{epochs} {MIX_STEP}batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
+                        f"T e:{epoch_i+1}/{epochs} {MIX_STEP}bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} a:{100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
                     )
-                    # # show accuracy buffers
-                    # if step % trainset.soft_master_rate.window_size == 0:
-                    #     print("\x1b[1msoft_master_rate\x1b[0m acc_buffer:", 
-                    #           trainset.soft_master_rate.acc_buffer)
-                    #     print("\x1b[1mhard_master_rate\x1b[0m acc_buffer:", 
-                    #           trainset.hard_master_rate.acc_buffer)
                 else: 
                     train_soft_neg_acc.update(
                         anchor_text_emb, 
                         pos_code_emb, neg_code_emb
                     )
-                    pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_soft_neg_acc.get():.2f}")
+                    batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb).mean()
+                    pbar.set_description(f"T e:{epoch_i+1}/{epochs} bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} a:{100*train_soft_neg_acc.get():.2f}")
+                batch_loss.backward()
+                self.optimizer.step() 
+                self.zero_grad()
+                batch_losses.append(batch_loss.item())
                 # pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
                 # if step == 5: break # DEBUG
                 if (step+1) % VALID_STEPS == 0:
                     # validate current model
+                    print(rule_wise_acc())
+                    print(rule_wise_acc.counts)
                     if intent_level_dynamic_sampling or use_AST:
                         s = time.time()
                         val_acc = self.val_ret(valset, device=device)
@@ -1042,91 +1041,88 @@ def main(args):
                               dynamic_negative_sampling=args.dynamic_negative_sampling,
                               sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
                               intent_level_dynamic_sampling=args.intent_level_dynamic_sampling,
-                              no_curriculum=args.no_curriculum, rand_curriculum=args.rand_curriculum)
+                              no_curriculum=args.no_curriculum, curriculum_type=args.curr_type,
+                              use_scl=args.use_scl)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")
     with open(metrics_path, "w") as f:
         json.dump(metrics, f)
-
-def train_classifier(args):
-    import os
-    print("\x1b[33;1mtraining relevance classifier\x1b[0m")
-    print("initializing model and tokenizer ..")
-    tok_path = models.get_tok_path("codebert")
-    print("creating model object")
-    rel_classifier = CodeBERTRelevanceClassifier(tok_path=tok_path)
-    print("commencing training")
-    metrics = rel_classifier.fit(train_path=args.train_path, 
-                                 device_id=args.device_id,
-                                 val_path=args.val_path, 
-                                 exp_name=args.exp_name,
-                                 epochs=5)
-    metrics_path = os.path.join(args.exp_name, "train_metrics.json")
-    print(f"saving metrics to {metrics_path}")
-    with open(metrics_path, "w") as f:
-        json.dump(metrics, f)
-        
-def train_regressor(args):
-    import os
-    print("\x1b[33;1mtraining relevance regressor\x1b[0m")
-    print("initializing model and tokenizer ..")
-    tok_path = models.get_tok_path("codebert")
-    print("creating model object")
-    rel_regressor = CodeBERTRelevanceRegressor(tok_path=tok_path)
-    print("commencing training")
-    metrics = rel_regressor.fit(train_path=args.train_path, 
-                                device_id=args.device_id,
-                                val_path=args.val_path, 
-                                exp_name=args.exp_name,
-                                epochs=5)
-    metrics_path = os.path.join(args.exp_name, "train_metrics.json")
-    print(f"saving metrics to {metrics_path}")
-    with open(metrics_path, "w") as f:
-        json.dump(metrics, f)
-
-def test_regressor(args):
-    print("\x1b[33;1mtesting relevance regressor\x1b[0m")
-    print("initializing model and tokenizer ..")
-    tok_path = models.get_tok_path("codebert")
-    print("creating model object")
+# def train_classifier(args):
+#     import os
+#     print("\x1b[33;1mtraining relevance classifier\x1b[0m")
+#     print("initializing model and tokenizer ..")
+#     tok_path = models.get_tok_path("codebert")
+#     print("creating model object")
+#     rel_classifier = CodeBERTRelevanceClassifier(tok_path=tok_path)
+#     print("commencing training")
+#     metrics = rel_classifier.fit(train_path=args.train_path, 
+#                                  device_id=args.device_id,
+#                                  val_path=args.val_path, 
+#                                  exp_name=args.exp_name,
+#                                  epochs=5)
+#     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
+#     print(f"saving metrics to {metrics_path}")
+#     with open(metrics_path, "w") as f:
+#         json.dump(metrics, f)
+# def train_regressor(args):
+#     import os
+#     print("\x1b[33;1mtraining relevance regressor\x1b[0m")
+#     print("initializing model and tokenizer ..")
+#     tok_path = models.get_tok_path("codebert")
+#     print("creating model object")
+#     rel_regressor = CodeBERTRelevanceRegressor(tok_path=tok_path)
+#     print("commencing training")
+#     metrics = rel_regressor.fit(train_path=args.train_path, 
+#                                 device_id=args.device_id,
+#                                 val_path=args.val_path, 
+#                                 exp_name=args.exp_name,
+#                                 epochs=5)
+#     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
+#     print(f"saving metrics to {metrics_path}")
+#     with open(metrics_path, "w") as f:
+#         json.dump(metrics, f)
+# def test_regressor(args):
+#     print("\x1b[33;1mtesting relevance regressor\x1b[0m")
+#     print("initializing model and tokenizer ..")
+#     tok_path = models.get_tok_path("codebert")
+#     print("creating model object")
     
-    predict_path = args.predict_path
-    stem, ext = os.path.splitext(predict_path)
-    save_path = f"{stem}_rel_scores{ext}"
-    if os.path.exists(save_path):
-        print(f"""file \x1b[34;1m'{save_path}'\x1b[0m already exists and won't be overwritten. 
-              Please delete the file if you are sure you don't need it to proceed""")
-        return
-    rel_regressor = CodeBERTRelevanceRegressor(tok_path=tok_path)
-    with open(predict_path) as f:
-        triples = json.load(f)
-    q_and_c = []
-    for item in triples:
-        a = item["a"]
-        n = item["n"]
-        #  only calculate relevance scores for missing/invalid values (-1)
-        if item["r_an"] == -1:
-            q_and_c.append((a,n))
-    q_and_c = q_and_c[:100]
-    rel_scores = rel_regressor.predict(q_and_c=q_and_c,
-                                       device_id=args.device_id,
-                                       exp_name=args.exp_name,
-                                       batch_size=32)
-    i = 0
-    print("len(rel_scores)=", len(rel_scores))
-    print(rel_scores)
-    for item in triples[:100]:
-        a = item["a"]
-        n = item["n"]
-        #  only calculate relevance scores for missing/invalid values (-1)
-        if item["r_an"] == -1:
-            item["r_an"] = rel_scores[i]
-            i += 1
-    print(f"saving relevance predictions to {save_path}")
-    with open(save_path, "w") as f:
-        json.dump(triples, f, indent=4)
-
+#     predict_path = args.predict_path
+#     stem, ext = os.path.splitext(predict_path)
+#     save_path = f"{stem}_rel_scores{ext}"
+#     if os.path.exists(save_path):
+#         print(f"""file \x1b[34;1m'{save_path}'\x1b[0m already exists and won't be overwritten. 
+#               Please delete the file if you are sure you don't need it to proceed""")
+#         return
+#     rel_regressor = CodeBERTRelevanceRegressor(tok_path=tok_path)
+#     with open(predict_path) as f:
+#         triples = json.load(f)
+#     q_and_c = []
+#     for item in triples:
+#         a = item["a"]
+#         n = item["n"]
+#         #  only calculate relevance scores for missing/invalid values (-1)
+#         if item["r_an"] == -1:
+#             q_and_c.append((a,n))
+#     q_and_c = q_and_c[:100]
+#     rel_scores = rel_regressor.predict(q_and_c=q_and_c,
+#                                        device_id=args.device_id,
+#                                        exp_name=args.exp_name,
+#                                        batch_size=32)
+#     i = 0
+#     print("len(rel_scores)=", len(rel_scores))
+#     print(rel_scores)
+#     for item in triples[:100]:
+#         a = item["a"]
+#         n = item["n"]
+#         #  only calculate relevance scores for missing/invalid values (-1)
+#         if item["r_an"] == -1:
+#             item["r_an"] = rel_scores[i]
+#             i += 1
+#     print(f"saving relevance predictions to {save_path}")
+#     with open(save_path, "w") as f:
+#         json.dump(triples, f, indent=4)
 def test_retreival(args):
     print("initializing model and tokenizer ..")
     tok_path = os.path.join(os.path.expanduser("~"), "codebert-base-tok")
@@ -1291,18 +1287,16 @@ def test_retreival(args):
                 
 if __name__ == "__main__":
     args = get_args()
-    if args.train_cls: # do relevance classification.
-        train_classifier(args)
-    if args.test_cls: # test relevance classification.
-        test_classifier(args)
-    if args.train_rel: # do regression.
-        train_regressor(args)
-    if args.test_rel: # test regression,
-        test_regressor(args)
-    if args.train: # finetune.
-        main(args)
-    if args.test: # setting in ['code', 'annot', 'code+annot']
-        test_retreival(args)
+    # if args.train_cls: # do relevance classification.
+    #     train_classifier(args)
+    # if args.test_cls: # test relevance classification.
+    #     test_classifier(args)
+    # if args.train_rel: # do regression.
+    #     train_regressor(args)
+    # if args.test_rel: # test regression,
+    #     test_regressor(args)
+    if args.train: main(args) # finetune.
+    if args.test: test_retreival(args) # setting in ['code', 'annot', 'code+annot']
     if args.test_ood: 
         print("creating model object")
         # instantiate model class.
@@ -1315,3 +1309,4 @@ if __name__ == "__main__":
             cand_paths=["candidate_snippets.json", "external_knowledge/candidates.json",
                         "data/candidates_webquery.json", "data/candidates_codesearchnet.json"], 
         )
+        

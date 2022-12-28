@@ -2,7 +2,36 @@
 # -*- coding: utf-8 -*-
 # triplet accuracy model.
 import torch
+import numpy as np
 import torch.nn as nn
+from collections import defaultdict
+        
+# rule category wise accuracy.
+class RuleWiseAccuracy:
+    def __init__(self, margin: int=1):
+        self.counts = defaultdict(lambda:0)
+        self.matches = defaultdict(lambda:0)
+        self.margin = margin
+        self.pdist = nn.PairwiseDistance()
+        
+    def update(self, anchor, pos, neg, rule_ids):
+        pos = self.pdist(anchor, pos).cpu()
+        neg = self.pdist(anchor, neg).cpu()
+        matches = (neg-pos>self.margin)
+        for ind, r in enumerate(rule_ids): # print(matches[ind])
+            self.counts[r] += 1 
+            self.matches[r] += matches[ind].item()
+            
+    def __str__(self):
+        acc = self()
+        return "|".join([f"R{r}:{100*acc[i]:.0f}" for i, r in enumerate(sorted(self.counts))])
+            
+    def __call__(self):
+        acc = np.zeros(len(self.counts))
+        for i, r in enumerate(self.counts):
+            if self.counts[r] == 0: acc[i] = 0
+            else: acc[i] = self.matches[r]/self.counts[r]
+        return acc
 
 class TripletAccuracy:
     def __init__(self, margin: int=1):

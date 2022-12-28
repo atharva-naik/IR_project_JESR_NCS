@@ -9,8 +9,10 @@ import random
 import numpy as np
 from typing import *
 from tqdm import tqdm
+import torch.nn as nn
 from datautils.utils import *
 import torch.nn.functional as F
+from collections import defaultdict
 from transformers import RobertaTokenizer
 from torch.utils.data import Dataset, DataLoader
 
@@ -32,7 +34,7 @@ def batch_shuffle_collate_fn_graphcodebert(batch):
     pos_1 = []
     pos_2 = []
     # negative PL related inputs.
-    neg_3 = []
+    neg_3 = [] # negative PL batch indices.
     neg_4 = []
     neg_5 = []
     anchor = [] # the 6th index in the batch.
@@ -164,7 +166,7 @@ def batch_shuffle_collate_fn(batch):
     is_hard_neg_mask = torch.as_tensor(is_hard_neg_mask)
     
     return [anchor, pos, neg, is_hard_neg_mask]
-        
+    
 # dynamic dataloader class: has custom collating function that can use IDNS if needed.
 class DynamicDataLoader(DataLoader):
     def __init__(self, *args, device: str="cpu", 
@@ -246,6 +248,9 @@ class MasteringRate:
         self.window_mean = 0
         self.mean_size = (size+1)/2
         
+    def __call__(self):
+        return self.window_mean
+        
     def __repr__(self):
         return repr(self.acc_buffer)
     
@@ -284,14 +289,26 @@ class DynamicTriplesDataset(Dataset):
     def __init__(self, path: str, model_name: str, model=None, tokenizer=None,
                  use_AST=False, val=False, warmup_steps=3000, beta=0.001, p=2,
                  sim_intents_map={}, perturbed_codes={}, device="cuda:0", win_size=20, 
-                 delta=0.5, epsilon=0.8, use_curriculum=True, rand_curriculum=False, **tok_args):
+                 delta=0.5, epsilon=0.8, use_curriculum=True, curriculum_type="mr", 
+                 soft_neg_bias=0.8, batch_size=None, num_epochs=None, **tok_args):
         super(DynamicTriplesDataset, self).__init__()
         self.use_curriculum = use_curriculum
-        self.rand_curriculum = rand_curriculum
+        # print(f"\x1b[31;1m{curriculum_type}\x1b[0m")
+        # self.rand_curriculum = rand_curriculum
+        # check if valid curriculum type:
+        msg = f"invalid curriculum type: {curriculum_type}"
+        assert curriculum_type in ["mr", "rand", "lp", "exp"], msg
+        self.curriculum_type = curriculum_type
+        if curriculum_type != "mr": 
+            warmup_steps = 0
         assert model_name in MODEL_OPTIONS
+        self.step_ctr = 0
+        self.num_epochs = num_epochs
+        self.batch_size = batch_size
         self.model_name = model_name
         self.warmup_steps = warmup_steps
         # self.milestone_updater = MilestoneUpdater()
+        self.p = p
         self.beta = beta
         self.epsilon = epsilon
         self.soft_master_rate = MasteringRate(
@@ -302,10 +319,9 @@ class DynamicTriplesDataset(Dataset):
             role=1, delta=delta,
             p=p, size=win_size, 
         )
+        self.soft_neg_bias = soft_neg_bias
         self.soft_neg_weight = 0.8
         self.hard_neg_weight = 0.2
-        self.soft_acc_buffer = np.zeros(20) # buffer of fixed size 20 
-        self.hard_acc_buffer = np.zeros(20) # buffer of fixed size 20
         self.model = model # pointer to model instance to find closest NL & PL examples
         self.sim_intents_map = sim_intents_map
         self.perturbed_codes = perturbed_codes
@@ -313,6 +329,8 @@ class DynamicTriplesDataset(Dataset):
         self.use_AST = use_AST
         self.device = device
         self.val = val
+        self.lp_s = 0
+        self.lp_h = 0
         # if filename endswith jsonl:
         if path.endswith(".jsonl"):
             self.data = read_jsonl(path) # NL-PL pairs.
@@ -341,20 +359,37 @@ class DynamicTriplesDataset(Dataset):
         elif isinstance(tokenizer, str):
             self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer)
         else: self.tokenizer = tokenizer
+        if curriculum_type == "exp":
+            assert batch_size is not None, "need batch size for exponential decay curriculum"
+            assert num_epochs is not None, "need num epochs for exponential decay curriculum"
+            N = len(self)*self.num_epochs
+            half_life_frac = 0.8 # this means the weights will be halved when 50% of training is complete
+            self.Z = N*half_life_frac
+            print("using exponentialy decaying curriculum")
         
     def update(self, soft_acc: float, hard_acc: float):
         # self.milestone_updater.update(acc)
         self.soft_master_rate.push_acc(soft_acc)
         self.hard_master_rate.push_acc(hard_acc)
-        if self.warmup_steps > 0: 
-            self.warmup_steps -= 1
-            return 
-        a_s = self.soft_master_rate.attn(self.hard_master_rate)
-        a_h = self.hard_master_rate.attn(self.soft_master_rate)
-        attn_dist = F.softmax(torch.as_tensor([a_s, a_h]), dim=0)
-        uniform = torch.as_tensor([0.8, 0.2])
-        weights = (1-self.epsilon)*attn_dist + self.epsilon*uniform
-        weights = weights.numpy()
+        if self.curriculum_type == "mr":
+            if self.warmup_steps > 0: self.warmup_steps -= 1; return 
+            a_s = self.soft_master_rate.attn(self.hard_master_rate)
+            a_h = self.hard_master_rate.attn(self.soft_master_rate)
+            attn_dist = F.softmax(torch.as_tensor([a_s, a_h]), dim=0)
+            bias_dist = torch.as_tensor([self.soft_neg_bias, 1-self.soft_neg_bias])
+            weights = (1-self.epsilon)*attn_dist + self.epsilon*bias_dist
+            weights = weights.numpy()
+        elif self.curriculum_type == "exp":
+            self.step_ctr += self.batch_size
+            r = self.step_ctr/self.Z
+            weights = [np.exp(-np.log(2)*r)]
+        elif self.curriculum_type == "lp":
+            lp_s = self.soft_master_rate()
+            lp_h = self.hard_master_rate()
+            a_s = (1-lp_s)*(1-lp_h)
+            a_h = (lp_s**self.p)*(1-lp_h)
+            self.lp_s, self.lp_h = lp_s, lp_h
+            weights = F.softmax(torch.as_tensor([a_s, a_h]), dim=0)
         self.soft_neg_weight = weights[0]
         self.hard_neg_weight = 1-weights[0]
         
@@ -362,9 +397,15 @@ class DynamicTriplesDataset(Dataset):
         # if self.milestone_updater.warmup_steps > 0: 
         #     return f"warmup({self.milestone_updater.warmup_steps}) {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
         # else: return f"mix: {self.milestone_updater.mixing_rate}({self.milestone_updater.steps[self.milestone_updater.i]}) "
-        if self.warmup_steps > 0:
-            return f"warmup({self.warmup_steps}) "
-        else: return f"{self.soft_neg_weight:.3f}|{self.hard_neg_weight:.3f} "
+        if self.curriculum_type == "mr":
+            if self.warmup_steps > 0:
+                return f"w({self.warmup_steps}) "
+            else: return f"{self.soft_neg_weight:.3f}|{self.hard_neg_weight:.3f} "
+        elif self.curriculum_type == "lp":
+            return f"{self.soft_neg_weight:.3f}|{self.hard_neg_weight:.3f} s:{self.lp_s:.3f}|h:{self.lp_h:.3f} "
+        elif self.curriculum_type == "exp":
+            r = self.step_ctr/self.Z
+            return f"{self.soft_neg_weight:.3f}|{self.hard_neg_weight:.3f} r:{r:.3f} "
         
     def __len__(self):
         return len(self.data)
@@ -377,8 +418,6 @@ class DynamicTriplesDataset(Dataset):
     def _proc_code(self, code: str) -> Union[str, Tuple[str, list]]:
         """returns processed code for CodeBERT and UniXcoder,
         returns proccessed code and dataflow graph for GraphCodeBERT."""
-        try: code = remove_comments_and_docstrings(code, 'python')
-        except: pass
         if self.model_name == "graphcodebert":
             return self._graphcodebert_proc_code(code)
         else:
@@ -420,21 +459,29 @@ class DynamicTriplesDataset(Dataset):
     def _retrieve_best_triplet(self, NL: str, PL: str, use_AST: bool, 
                                batch_size: int=48, stochastic=True,
                                backup_neg: Union[str, None]=None):
+        rindex = 0
         codes_for_sim_intents: List[str] = []
+        rules_for_sim_intents: List[int] = []
         if use_AST: # when using AST only use AST.
             for tup in self.perturbed_codes[PL]: # codes from AST.
-                if isinstance(tup, (tuple, list)): codes_for_sim_intents.append(tup[0])
+                if isinstance(tup, (tuple, list)): 
+                    rule_index = int(tup[1].replace("rule",""))
+                    codes_for_sim_intents.append(tup[0])
+                    rules_for_sim_intents.append(rule_index)
             # print(codes_for_sim_intents)
         else: # TODO: add a flag for IDNS.
             sim_intents: List[str] = self.sim_intents_map[NL]
             for intent, _ in sim_intents:
                 codes_for_sim_intents += self.intent_to_code[intent]
+                rules_for_sim_intents += [-1]*len(self.intent_to_code[intent])
         # print("codes_for_sim_intents:", codes_for_sim_intents)
         if len(codes_for_sim_intents) == 0: # if no pool of backup candidates is available.
             neg = backup_neg
         else:
             self.model.eval()
-            if len(codes_for_sim_intents) == 1: codes_for_sim_intents += backup_neg
+            # if len(codes_for_sim_intents) == 1: 
+            #     codes_for_sim_intents += backup_neg
+            #     rules_for_sim_intents += 0
             with torch.no_grad():
                 enc_text = torch.stack(self.model.encode_emb([NL], mode="text", 
                                                              batch_size=batch_size,
@@ -448,12 +495,15 @@ class DynamicTriplesDataset(Dataset):
                 p = F.softmax(self.beta*scores.squeeze(), dim=0).cpu().numpy()
                 try: i: int = np.random.choice(range(len(p)), p=p)
                 except TypeError:
-                    return NL, PL, backup_neg
+                    return NL, PL, backup_neg, rindex
             else:
                 i: int = torch.topk(scores, k=1).indices[0].item()
+            msg = f"{len(rules_for_sim_intents)} rules != {len(codes_for_sim_intents)} codes"
+            assert len(rules_for_sim_intents) == len(codes_for_sim_intents), msg
             neg = codes_for_sim_intents[i]
-
-        return NL, PL, neg
+            rindex = rules_for_sim_intents[i]
+            
+        return NL, PL, neg, rindex
     
     def _sample_rand_triplet(self, NL: str, PL: str):
         codes = []
@@ -466,24 +516,24 @@ class DynamicTriplesDataset(Dataset):
     def __getitem__(self, item: int):
         # combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
         if self.val or self.warmup_steps > 0:
-            hard_neg = False
+            hard_neg = 0
         else:
             hard_neg = np.random.choice(
-                [False, True], p=[
+                [0, 1], p=[
                     self.soft_neg_weight, 
                     self.hard_neg_weight,
                 ])
         # if curriculum is turned off then just use hard negatives all the time.
-        if not self.use_curriculum: hard_neg = True
-        if self.rand_curriculum:
-            hard_neg = np.random.choice([False, True], p=[0.5, 0.5])
+        if not self.use_curriculum: hard_neg = 1
+        if self.curriculum_type == "rand":
+            hard_neg = np.random.choice([0, 1], p=[0.5, 0.5])
         if hard_neg: # sample hard similar intent or AST based negatives.
             # anchor, pos, neg = self._retrieve_best_triplet(
             #     NL=self.data[item]["intent"], 
             #     PL=self.data[item]["snippet"],
             #     use_AST=self.use_AST,
             # )
-            anchor, pos, neg = self._retrieve_best_triplet(
+            anchor, pos, neg, hard_neg = self._retrieve_best_triplet(
                 NL=self.data[item][0], PL=self.data[item][1],
                 use_AST=self.use_AST, backup_neg=self.data[item][2], # required if no AST based candidates available.
             )
