@@ -88,49 +88,8 @@ for key, value in signatures.items():
 fn_names = list(fn_names)
 builtin_fn_names = ["abs", "aiter","all", "any", "anext", "ascii", "bin", "bool", "breakpoint", "bytearray", "bytes", "callable", "chr", "classmethod", "compile", "complex", "delattr", "dict", "dir", "divmod", "enumerate", "eval", "exec", "filter", "float", "format", "frozenset", "getattr", "globals", "hasattr", "hash", "help", "hex", "id", "input", "int", "isinstance", "issubclass", "iter", "len", "list", "locals", "map", "max", "memoryview", "min", "next", "object", "oct", "open", "ord", "pow", "print", "property", "range", "repr", "reversed", "round", "set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super", "tuple", "type", "vars", "zip", "__import__"]
 fn_names.extend(builtin_fn_names)
-# class for capturing negative example generation rules.
-@dataclass(frozen=False)
+# base class for capturing generation rules.
 class RuleFilter:
-    rule1:bool=False
-    rule2:bool=False
-    rule3:bool=False
-    rule4:bool=False
-    rule5:bool=False
-    rule6:bool=False
-    rule7:bool=False
-    rule8:bool=False
-    rule9:bool=False
-    rule10:bool=False
-    rule11:bool=False
-    rule12:bool=False
-    rule13:bool=False
-    rule14:bool=False
-    rule15:bool=False
-    rule16:bool=False
-    rule17:bool=False
-    rule18:bool=False
-    rule1_metadata:str="Library function substitution"
-    rule2_metadata:str="List comprehension to set comprehension"
-    rule3_metadata:str="Set comprehension to list comprehension"
-    rule4_metadata:str="Change `int`/`float` constant to `str`"
-    rule5_metadata:str="Flip boolean constants"
-    rule6_metadata:str="Flip comparators: == to !=, < to >=, > to <=, 'is' to 'is not', 'in' to 'not in' and vice versa for each case"
-    rule7_metadata:str="Swap 'And', 'Or' boolean operators"
-    rule8_metadata:str="Replace function call with identifier having the same name as the function"
-    rule9_metadata:str="Replace If-Else statement with if's body"
-    rule10_metadata:str="Swap function arguments"
-    rule11_metadata:str="Replace If-Else statement with else's body"
-    rule12_metadata:str="Change `str` constant to `int`"
-    rule13_metadata:str="Change `str` constant to `float`"
-    rule14_metadata:str="Replace variables with each other"
-    rule15_metadata:str="Division-by-zero error introduced"
-    rule16_metadata:str="Flip unary operators"
-    rule17_metadata:str="Replace function call with pass"
-    rule18_metadata:str="ValueMisuse: In non tuple assignments, replace arithmetic expressions (BinOp)/numeric (Num) values with negative of the value"
-    random_fn_sub:bool=True
-    recursive_sub:bool=True
-    fn_choose_index:int=0
-
     def RecursiveSub(self):
         self.recursive_sub = True
         return self
@@ -210,23 +169,13 @@ class RuleFilter:
 
     @classmethod
     def AllowAll(cls):
-        return RuleFilter(
-            rule1=True, rule2=True, rule3=True, rule4=True,
-            rule5=True, rule6=True, rule7=True, rule8=True,
-            rule9=True, rule10=True, rule11=True, rule12=True,
-            rule13=True, rule14=True, rule15=True, rule16=True,
-            rule17=True, rule18=True,
-        )
+        args = {f"rule{i+1}":True for i in range(len(self))}
+        return RuleFilter(**args)
 
     @classmethod
     def BlockAll(cls):
-        return RuleFilter(
-            rule1=False, rule2=False, rule3=False, rule4=False,
-            rule5=False, rule6=False, rule7=False, rule8=False,
-            rule9=False, rule10=False, rule11=False, rule12=False, 
-            rule13=False, rule14=False, rule15=False, rule16=False,
-            rule17=False, rule18=False,
-        )
+        args = {f"rule{i+1}":False for i in range(len(self))}
+        return RuleFilter(**args)
 
     def __call__(self, index: int):
         return getattr(self, f"rule{index}")
@@ -241,9 +190,52 @@ class RuleFilter:
             if getattr(self, f"rule{i+1}"): 
                 print(f"\x1b[32;1m{i+1}. "+metadata+" (Allow)\x1b[0m")
             else: print(f"\x1b[31;1m{i+1}. "+metadata+" (Block)\x1b[0m")
+# class for capturing negative example generation rules.
+@dataclass(frozen=False)
+class NegRuleFilter(RuleFilter):
+    rule1:bool=False
+    rule2:bool=False
+    rule3:bool=False
+    rule4:bool=False
+    rule5:bool=False
+    rule6:bool=False
+    rule7:bool=False
+    rule8:bool=False
+    rule9:bool=False
+    rule10:bool=False
+    rule11:bool=False
+    rule12:bool=False
+    rule13:bool=False
+    rule14:bool=False
+    rule15:bool=False
+    rule16:bool=False
+    rule17:bool=False
+    rule18:bool=False
+    rule1_metadata:str="Library function substitution"
+    rule2_metadata:str="List comprehension to set comprehension"
+    rule3_metadata:str="Set comprehension to list comprehension"
+    rule4_metadata:str="Change `int`/`float` constant to `str`"
+    rule5_metadata:str="Flip boolean constants"
+    rule6_metadata:str="Flip comparators: == to !=, < to >=, > to <=, 'is' to 'is not', 'in' to 'not in' and vice versa for each case"
+    rule7_metadata:str="Swap 'And', 'Or' boolean operators"
+    rule8_metadata:str="Replace function call with identifier having the same name as the function"
+    rule9_metadata:str="Replace If-Else statement with if's body"
+    rule10_metadata:str="Swap function arguments"
+    rule11_metadata:str="Replace If-Else statement with else's body"
+    rule12_metadata:str="Change `str` constant to `int`"
+    rule13_metadata:str="Change `str` constant to `float`"
+    rule14_metadata:str="VarMisuse: Replace variables with each other"
+    rule15_metadata:str="Division-by-zero error introduced"
+    rule16_metadata:str="Flip unary operators"
+    rule17_metadata:str="Replace function call with None"
+    rule18_metadata:str="ValueMisuse: In non tuple assignments, replace arithmetic expressions (BinOp)/numeric (Num) values with negative of the value"
+    random_fn_sub:bool=True
+    recursive_sub:bool=True
+    fn_choose_index:int=0
+    
 # class for capturing positive example generation rules.
 @dataclass(frozen=False)
-class PosRuleFilter(RuleFilter)
+class PosRuleFilter(RuleFilter):
     rule1:bool=False
     rule2:bool=False
     rule3:bool=False
@@ -352,7 +344,7 @@ class PerturbAst(ast.NodeTransformer):
         super(PerturbAst, self).__init__(*args, **kwargs)
         self.var_to_node = {}
         if rule_filter is None:
-            self.rule_filter = RuleFilter.AllowAll()
+            self.rule_filter = NegRuleFilter.AllowAll()
         else: self.rule_filter = rule_filter
         self.use_rules = {}
         self.rule1_search_cache = {}
@@ -622,7 +614,7 @@ class PerturbAst(ast.NodeTransformer):
         tree: _ast.Module = ast.parse(bytes(code, "utf8")) # get parsed AST.
         valid_rules: List[str] = self.collect_applicable_rules(tree) # find list of applicable rules.
         # NOTE: if no rules applicable, then FAIL SILENTLY
-        if valid_rules == []: return [code]
+        if valid_rules == []: return []
         # give less preference to rule1 as it can lead to the most number of candidates.
         # this is done to prevent bias towards the rule1.
         valid_rules = sorted(valid_rules, reverse=True)
@@ -983,7 +975,7 @@ class PerturbAst(ast.NodeTransformer):
             # do only top level function substitution.
             return node
         if self.rule_filter(17):
-            node = _ast.Pass()
+            node = _ast.NameConstant(None)
             self.applied_rules.add("rule17")
         if self.rule_filter(8):
             node = _ast.Name(
@@ -1054,7 +1046,7 @@ def serialize_tree(tree):
     return content.strip("\n")
 
 def perturb_codes(CODES: List[str], verbose: bool=False) -> List[dict]:
-    rule_filter = RuleFilter.AllowAll()
+    rule_filter = NegRuleFilter.AllowAll()
     rule_filter.recursive_sub = True
     rule_filter.show()
     data_gen = PerturbAst(rule_filter=rule_filter)
@@ -1067,7 +1059,7 @@ def perturb_codes(CODES: List[str], verbose: bool=False) -> List[dict]:
     return ops
 
 def perturb_test(code: str, rule_index: int=1) -> None:
-    rule_filter = RuleFilter.OneHot(rule_index).RecursiveSub().SmartFnSub(0)
+    rule_filter = NegRuleFilter.OneHot(rule_index).RecursiveSub().SmartFnSub(0)
     rule_filter.show()
     data_gen = PerturbAst(rule_filter=rule_filter)
     data_gen.init()

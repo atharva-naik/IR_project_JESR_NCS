@@ -4,19 +4,28 @@
 import torch
 import numpy as np
 import torch.nn as nn
+import torch.nn.functional as F
+from models.losses import cos_dist
 from collections import defaultdict
         
 # rule category wise accuracy.
 class RuleWiseAccuracy:
-    def __init__(self, margin: int=1):
+    def __init__(self, use_scl: bool=False, margin: int=1):
+        self.reset()
+        self.margin = margin
+        self.use_scl = use_scl
+        # if self.use_scl: self.margin = 0
+    def reset(self):
         self.counts = defaultdict(lambda:0)
         self.matches = defaultdict(lambda:0)
-        self.margin = margin
-        self.pdist = nn.PairwiseDistance()
         
     def update(self, anchor, pos, neg, rule_ids):
-        pos = self.pdist(anchor, pos).cpu()
-        neg = self.pdist(anchor, neg).cpu()
+        # if self.use_scl:
+            # pos = -torch.diag(anchor @ pos.T).cpu() # cos_dist(anchor, pos).cpu()
+            # neg = -torch.diag(anchor @ neg.T).cpu() # cos_dist(anchor, neg).cpu()            
+        # else:
+        pos = F.pairwise_distance(anchor, pos).cpu()
+        neg = F.pairwise_distance(anchor, neg).cpu()
         matches = (neg-pos>self.margin)
         for ind, r in enumerate(rule_ids): # print(matches[ind])
             self.counts[r] += 1 
@@ -34,12 +43,12 @@ class RuleWiseAccuracy:
         return acc
 
 class TripletAccuracy:
-    def __init__(self, margin: int=1):
-        self.pdist = nn.PairwiseDistance()
+    def __init__(self, use_scl: bool=False, margin: int=1):
         self.margin = margin
         self.reset()
+        self.use_scl = use_scl
         self.last_batch_acc = None
-        
+        # if self.use_scl: self.margin = 0
     def reset(self):
         self.count = 0
         self.tot = 0
@@ -52,8 +61,12 @@ class TripletAccuracy:
         """mask can be a boolean or integer tensor."""
         batch_tot = 0
         batch_count = 0
-        pos = self.pdist(anchor, pos).cpu()
-        neg = self.pdist(anchor, neg).cpu()
+        # if self.use_scl:
+            # pos = -torch.diag(anchor @ pos.T).cpu() # cos_dist(anchor, pos).cpu()
+            # neg = -torch.diag(anchor @ neg.T).cpu() # cos_dist(anchor, neg).cpu()
+        # else:
+        pos = F.pairwise_distance(anchor, pos).cpu()
+        neg = F.pairwise_distance(anchor, neg).cpu()
         # print(pos, neg)
         # print("shapes:", pos.shape, neg.shape)
         if mask is not None:

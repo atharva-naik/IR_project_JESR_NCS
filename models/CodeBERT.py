@@ -16,16 +16,18 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import AdamW
 from typing import Union, List
+import torch.nn.functional as F
 from datautils import read_jsonl
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
-from models.metrics import TripletAccuracy, RuleWiseAccuracy, recall_at_k
-from sklearn.metrics import label_ranking_average_precision_score as MRR
-from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
 from datautils.parser import remove_comments_and_docstrings
-
+from sklearn.metrics import label_ranking_average_precision_score as MRR
+from models.metrics import TripletAccuracy, RuleWiseAccuracy, recall_at_k
+from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
+from models.losses import scl_loss, TripletMarginWithDistanceLoss, cos_dist, cos_cdist, cos_csim
 # set logging level of transformers.
+torch.autograd.set_detect_anomaly(True)
 transformers.logging.set_verbosity_error()
 # seed
 random.seed(0)
@@ -50,6 +52,7 @@ def get_args():
     # parser.add_argument("-ter", "--test_rel", action="store_true", help="")
     # parser.add_argument("-tr", "--train_rel", action="store_true", help="")
     parser.add_argument("-scl", "--use_scl", action="store_true", help="use selectively contrastive learning")
+    parser.add_argument("-ccl", "--use_ccl", action="store_true", help="use code contrastive loss for hard negatives")
     parser.add_argument("-lr", "--lr", type=float, default=1e-5, help="learning rate for training (defaults to 1e-5)")
     parser.add_argument("-te", "--test", action="store_true", help="flag to do testing")
     parser.add_argument("-t", "--train", action="store_true", help="flag to do training")
@@ -61,22 +64,40 @@ def get_args():
                         help="path to dictionary containing similar intents corresponding to a given intent")
     parser.add_argument("-pcp", "--perturbed_codes_path", type=str, default=None, 
                         help="path to dictionary containing AST perturbed codes corresponding to a given code")
+    parser.add_argument("-ccpp", "--code_code_pairs_path", type=str, default=None, 
+                        help="path to code-code pairs for CodeRetriever's unimodal objective")
     parser.add_argument("-w", "--warmup_steps", type=int, default=3000, help="no. of warmup steps (soft negatives only during warmup)")
     parser.add_argument("-p", "--p", type=int, default=2, help="the p used in mastering rate")
     parser.add_argument("-beta", "--beta", type=float, default=0.01, help="the beta used in the von-Mises fisher sampling")
     parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
+    parser.add_argument("-crb", "--code_retriever_baseline", action="store_true", help="use CodeRetriever objective")
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
                         help="dynamic sampling based on similar intents")
     parser.add_argument("-nc", "--no_curriculum", action="store_true", help="turn of curriclum (only hard negatives)")
-    parser.add_argument("-ct", "--curr_type", type=str, default="mr", choices=['mr', 'rand', 'lp', 'exp'],
+    parser.add_argument("-uce", "--use_cross_entropy", action="store_true", help="use cross entropy loss instead of triplet margin loss")
+    parser.add_argument("-ct", "--curr_type", type=str, default="mr", choices=['mr', 'rand', 'lp', 'exp', 'hard', "soft"],
                         help="""type of curriculum (listed below): 
                              1) mr: mastering rate based curriculum 
                              2) rand: equal prob. of hard & soft -ves
                              3) lp: learning progress based curriculum
-                             4) exp: exponential decay with steps/epochs""")
+                             4) exp: exponential decay with steps/epochs
+                             5) hard: hard negatives only
+                             6) soft: soft negatives only""")
+    parser.add_argument("-igwr", "--ignore_worst_rules", action='store_true',
+                        help="ignore the 6 worst/easiest perturbation rules")
+    parser.add_argument("-discr", "--use_disco_rules", action='store_true',
+                        help="use the rules outlined in/inspired by the DISCO paper (9)")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
+    args = parser.parse_args()
+    if args.use_cross_entropy and args.curr_type not in ["soft", "hard"]:
+        args.curr_type = "hard"
+    if args.use_ccl: args.curr_type = "hard"
+    assert not(args.use_ccl and args.use_cross_entropy), "conflicting objectives selected: CCL and CE CL"
+    assert not(args.use_ccl and args.code_retriever_baseline), "conflicting objectives selected: CCL and CodeRetriever"
+    if args.code_retriever_baseline: # only use soft negative for CodeRetriever
+        args.curr_type = "soft"
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
-    return parser.parse_args()
+    return args
 
 # TripletMarginWithDistanceLoss for custom design function.
 class CodeDataset(Dataset):
@@ -671,14 +692,20 @@ class CodeBERTripletNet(nn.Module):
     def __init__(self, model_path: str="microsoft/codebert-base", 
                  tok_path: str="microsoft/codebert-base", **args):
         super(CodeBERTripletNet, self).__init__()
+        self.pdist = nn.PairwiseDistance()
         self.config = {}
         self.config["model_path"] = model_path
         self.config["tok_path"] = tok_path
-        
         margin = args.get("margin", 1)
         dist_fn_deg = args.get("dist_fn_deg", 2)
+        self.ignore_worst_rules = args.get("ignore_worst_rules", False)
+        self.ignore_non_disco_rules = args.get("use_disco_rules", False)
+        self.code_retriever_baseline = args.get("code_retriever_baseline", False)
+        self.config["ignore_worst_rules"] = self.ignore_worst_rules
+        self.config["use_disco_rules"] = self.ignore_non_disco_rules
         self.config["margin"] = margin
         self.config["dist_fn_deg"] = dist_fn_deg
+        self.config["code_retriever_baseline"] = self.code_retriever_baseline
         print(f"loading pretrained CodeBERT embedding model from {model_path}")
         start = time.time()
         self.embed_model = RobertaModel.from_pretrained(model_path)
@@ -691,8 +718,20 @@ class CodeBERTripletNet(nn.Module):
         self.config["lr"] = lr
         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
         self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
-        print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
-        self.loss_fn = nn.TripletMarginLoss(margin=margin, p=dist_fn_deg, reduction="none")
+        # print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
+        self.use_cross_entropy = args.get("use_cross_entropy", False)
+        self.use_ccl = args.get("use_ccl", False)
+        self.use_scl = args.get("use_scl", False)
+        self.dropout1 = nn.Dropout(0.1)
+        self.dropout2 = nn.Dropout(0.1)
+        self.ce_loss = nn.CrossEntropyLoss()
+        # elif self.use_scl: self.loss_fn = TripletMarginWithDistanceLoss(
+        #     margin=margin, distance_function=cos_dist,
+        # )
+        self.loss_fn = nn.TripletMarginLoss(
+            margin=margin, p=dist_fn_deg, 
+            reduction="none",
+        )
         self.config["optimizer"] = f"{self.optimizer}"
         self.config["loss_fn"] = f"{self.loss_fn}"
         
@@ -711,6 +750,10 @@ class CodeBERTripletNet(nn.Module):
                                    use_tqdm=True, device_id=device)
         # score and rank documents.
         cand_mat = torch.stack(cand_mat)
+        # if self.use_scl: 
+        scores = -(query_mat @ cand_mat.T)
+        # scores = cos_cdist(query_mat, cand_mat)
+        #else: \
         scores = torch.cdist(query_mat, cand_mat, p=2)
         doc_ranks = scores.argsort(axis=1)
         recall_at_5 = recall_at_k(labels, doc_ranks.tolist(), k=5)
@@ -726,7 +769,7 @@ class CodeBERTripletNet(nn.Module):
         
     def val(self, valloader: DataLoader, epoch_i: int=0, epochs: int=0, device="cuda:0"):
         self.eval()
-        val_acc = TripletAccuracy()
+        val_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
         batch_losses = []
         pbar = tqdm(enumerate(valloader), total=len(valloader), 
                     desc=f"val: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
@@ -817,7 +860,10 @@ class CodeBERTripletNet(nn.Module):
         exp_name = args.get("exp_name", "experiment")
         device_id = args.get("device_id", "cuda:0")
         batch_size = args.get("batch_size", 32)
-        use_scl = args.get("use_scl", False)
+        use_scl = self.use_scl
+        use_ccl = self.use_ccl
+        if use_scl: print("\x1b[34;1musing selectively contrastive loss\x1b[0m")
+        if use_ccl: print("\x1b[34;1musing code contrastive loss\x1b[0m")
         epochs = args.get("epochs", 5)
         beta = args.get("beta", 0.01) # NEW
         p = args.get("p") # NEW
@@ -827,6 +873,7 @@ class CodeBERTripletNet(nn.Module):
         
         use_AST = args.get("use_AST", False)
         sim_intents_path = args.get("sim_intents_path")
+        code_code_pairs_path = args.get("code_code_pairs_path")
         perturbed_codes_path = args.get("perturbed_codes_path")
         intent_level_dynamic_sampling = args.get("intent_level_dynamic_sampling", False)
         
@@ -860,13 +907,21 @@ class CodeBERTripletNet(nn.Module):
                 assert perturbed_codes_path is not None, "Missing path to dictionary containing perturbed codes corresponding to a given code snippet"
                 perturbed_codes = json.load(open(perturbed_codes_path))
             # creat the data loaders.
-            trainset = DynamicTriplesDataset(
-                train_path, "codebert", device=device_id, beta=beta, warmup_steps=warmup_steps,
-                sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
-                tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, curriculum_type=curriculum_type,
-                max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
-                batch_size=batch_size, num_epochs=epochs,
-            )
+            if self.code_retriever_baseline:
+                from datautils import CodeRetrieverDataset
+                trainset = CodeRetrieverDataset(
+                    train_path, code_code_path=code_code_pairs_path, model_name="codebert", tokenizer=self.tokenizer,
+                    max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+                )
+            else:
+                trainset = DynamicTriplesDataset(
+                    train_path, "codebert", device=device_id, beta=beta, warmup_steps=warmup_steps,
+                    sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
+                    tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, curriculum_type=curriculum_type,
+                    max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+                    batch_size=batch_size, num_epochs=epochs, ignore_worst_rules=self.ignore_worst_rules,
+                    ignore_non_disco_rules=self.ignore_non_disco_rules,
+                )
             # trainset = DynamicTriplesDataset(
             #     train_path, "codebert", sim_intents_map=sim_intents_map,
             #     perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
@@ -901,8 +956,8 @@ class CodeBERTripletNet(nn.Module):
             print(self.config)
             json.dump(self.config, f)
         print(f"saved config to {config_path}")
-        
-        if SHUFFLE_BATCH_DEBUG_SETTING: #TODO: remove this. Used only for a temporary experiment.
+        if SHUFFLE_BATCH_DEBUG_SETTING and not(self.code_retriever_baseline): 
+            #TODO: remove this. Used only for a temporary experiment.
             from datautils import batch_shuffle_collate_fn_codebert
             trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size,
                                      collate_fn=batch_shuffle_collate_fn_codebert)
@@ -915,17 +970,24 @@ class CodeBERTripletNet(nn.Module):
             "log_steps": [],
             "summary": [],
         } 
-        rule_wise_acc = RuleWiseAccuracy(margin=1)
-        train_soft_neg_acc = TripletAccuracy(margin=1)
-        train_hard_neg_acc = TripletAccuracy(margin=1)
+        rule_wise_acc = RuleWiseAccuracy(margin=1, use_scl=self.use_scl)
+        if not(self.use_cross_entropy or self.code_retriever_baseline):
+            train_soft_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
+            train_hard_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
+        else: 
+            train_acc = 0
+            train_u_acc = 0
+            train_tot = 0
         best_val_acc = 0
         for epoch_i in range(epochs):
             self.train()
             batch_losses = []
             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
-            train_soft_neg_acc.reset()
-            train_hard_neg_acc.reset()
+            rule_wise_acc.reset()
+            if not(self.use_cross_entropy):
+                train_soft_neg_acc.reset()
+                train_hard_neg_acc.reset()
             for step, batch in pbar:
                 if do_dynamic_negative_sampling:
                     batch = dynamic_negative_sampling(
@@ -937,52 +999,120 @@ class CodeBERTripletNet(nn.Module):
                 anchor_title = (batch[0].to(device), batch[1].to(device))
                 pos_snippet = (batch[2].to(device), batch[3].to(device))
                 neg_snippet = (batch[4].to(device), batch[5].to(device))
-                anchor_text_emb, pos_code_emb, neg_code_emb = self(anchor_title, pos_snippet, neg_snippet)
+                anchor_text_emb, pos_code_emb, neg_code_emb = self(
+                    anchor_title, pos_snippet, neg_snippet
+                )
+                N = len(batch[0])
                 if hasattr(trainset, "update"):
-                    train_soft_neg_acc.update(
-                        anchor_text_emb, pos_code_emb, 
-                        neg_code_emb, (batch[-1]==0).cpu(),
-                    )
-                    train_hard_neg_acc.update(
-                        anchor_text_emb, pos_code_emb, 
-                        neg_code_emb, (batch[-1]!=0).cpu(),
-                    )
-                    HARD_ACC = f" ha:{100*train_hard_neg_acc.get():.2f}"
-                    trainset.update(
-                        train_soft_neg_acc.last_batch_acc,
-                        train_hard_neg_acc.last_batch_acc,
-                    )
-                    MIX_STEP = trainset.mix_step()
-
+                    if not(self.use_cross_entropy):
+                        train_soft_neg_acc.update(
+                            anchor_text_emb, pos_code_emb, 
+                            neg_code_emb, (batch[-1]==0).cpu(),
+                        )
+                        train_hard_neg_acc.update(
+                            anchor_text_emb, pos_code_emb, 
+                            neg_code_emb, (batch[-1]!=0).cpu(),
+                        )
+                        trainset.update(
+                            train_soft_neg_acc.last_batch_acc,
+                            train_hard_neg_acc.last_batch_acc,
+                        )
+                        HARD_ACC = f" ha:{100*train_hard_neg_acc.get():.2f}"
+                        MIX_STEP = trainset.mix_step()
                     if use_scl:
-                        hard_loss = self.loss_fn(anchor_text_emb, torch.zeros_like(
-                                                 pos_code_emb), neg_code_emb)
-                        soft_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
-                        batch[-1] = batch[-1].to(device)
-                        batch_loss = (batch[-1]*hard_loss + (~batch[-1])*soft_loss).mean()
-                    else: batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb).mean()
+                        batch_loss = scl_loss(
+                            anchor_text_emb, pos_code_emb, 
+                            neg_code_emb, lamb=1, device=device,
+                            loss_fn=self.loss_fn,
+                        ).mean()
+                        pd_ap = F.pairwise_distance(anchor_text_emb, pos_code_emb).mean().item()
+                        pd_an = F.pairwise_distance(anchor_text_emb, neg_code_emb).mean().item()
+                        pd_ap_an_info = f" ap:{pd_ap:.3f} an:{pd_an:.3f}"
+                        # hard_loss = self.loss_fn(anchor_text_emb, torch.zeros_like(
+                        #                          pos_code_emb), neg_code_emb)
+                        # soft_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb)
+                        # batch[-1] = batch[-1].to(device)
+                        # batch_loss = (batch[-1]*hard_loss + (~batch[-1])*soft_loss).mean()
+                    elif self.use_cross_entropy:
+                        d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
+                        d_an = torch.cdist(anchor_text_emb, neg_code_emb)
+                        scores = -torch.cat((d_ap, d_an), axis=-1)
+                        target = torch.as_tensor(range(N)).to(device)
+                        batch_loss = self.ce_loss(scores, target)
+                        preds = scores.argmax(dim=-1)
+                        train_acc += (preds == target).sum().item()
+                        train_tot += N
+                        batch_loss_str = f"bl:{batch_loss:.3f}"
+                        metric_str = f"a:{(100*train_acc/train_tot):.2f}"
+                    elif self.code_retriever_baseline:
+                        d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
+                        d_pn = torch.cdist(pos_code_emb, neg_code_emb)
+                        target = torch.as_tensor(range(N)).to(device)
+                        unimodal_loss = self.ce_loss(-d_ap, target)
+                        bimodal_loss = self.ce_loss(-d_pn, target)
+                        batch_loss = unimodal_loss + bimodal_loss
+                        b_preds = (-d_ap).argmax(dim=-1)
+                        u_preds = (-d_an).argmax(dim=-1)
+                        train_acc += (b_preds == target).sum().item()
+                        train_u_acc += (u_preds == target).sum().item()
+                        train_tot += N
+                        metric_str = f"ba:{(100*train_acc/train_tot):.2f} ua:{(100*train_u_acc/train_tot):.2f}"
+                        batch_loss_str = f"bl:{batch_loss:.3f}={unimodal_loss:.3f}u+{bimodal_loss:.3f}b"
+                    else:
+                        # pd_ap = F.pairwise_distance(anchor_text_emb, pos_code_emb)
+                        # pd_an = F.pairwise_distance(anchor_text_emb, neg_code_emb)
+                        # hard_neg_ctr = (pd_ap > pd_an).sum().item()
+                        # pd_ap_an_info = f" ap:{pd_ap.mean().item():.3f} an:{pd_an.mean().item():.3f} {hard_neg_ctr}/{batch_size}"
+                        if self.use_ccl: # use code contrastive loss (by default all negatives are hard negatives)
+                            """the self distance (diagonal terms) in d_pp will always be zero
+                            the cross distance is always positive so a code is always more similar to itself
+                            than other codes. To overcome this we can add a margin term (a diagonal matrix) 
+                            to d_pp to make sure the pos_code_emb has at least distance equal to this margin
+                            compared to any other negative. Here we take this margin to be the same as the 
+                            margin for the triplet margin loss."""
+                            # margin = self.config["margin"]*torch.eye(N).to(device)
+                            S_pp = cos_csim(self.dropout1(pos_code_emb), self.dropout2(pos_code_emb))
+                            S_pn = cos_csim(self.dropout1(pos_code_emb), neg_code_emb)
+                            # scores = -torch.cat((d_pp+margin, d_pn), axis=-1)
+                            scores = torch.cat((S_pp, S_pn), axis=-1)
+                            target = torch.as_tensor(range(N)).to(device)
+                            soft_margin_loss = self.loss_fn(anchor_text_emb, pos_code_emb, 
+                                                            pos_code_emb[torch.randperm(N)]).mean()
+                            # hard_margin_loss = self.loss_fn(anchor_text_emb, pos_code_emb, 
+                            #                                 neg_code_emb).mean()
+                            ccl_loss = self.ce_loss(scores, target)
+                            batch_loss = soft_margin_loss + ccl_loss
+                            batch_loss_str = f"bl:{batch_loss:.3f}={soft_margin_loss:.3f}+{ccl_loss:.3f}"
+                            # batch_loss = soft_margin_loss + hard_margin_loss + ccl_loss
+                            # batch_loss_str = f"bl:{batch_loss:.3f}={soft_margin_loss:.3f}+{hard_margin_loss:.3f}+{ccl_loss:.3f}"
+                        else: 
+                            batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb).mean()
+                            batch_loss_str = f"bl:{batch_loss:.3f}"
                     rule_wise_acc.update(anchor_text_emb, pos_code_emb, 
                                          neg_code_emb, batch[-1].cpu().tolist())
-                    pbar.set_description(
-                        f"T e:{epoch_i+1}/{epochs} {MIX_STEP}bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} a:{100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
-                    )
+                    if self.use_cross_entropy or self.code_retriever_baseline:
+                        pbar.set_description(f"T e:{epoch_i+1}/{epochs} bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} {metric_str}")
+                    else: 
+                        pbar.set_description(
+                            f"T e:{epoch_i+1}/{epochs} {MIX_STEP}{batch_loss_str} l:{np.mean(batch_losses):.3f} a:{100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
+                        )
                 else: 
                     train_soft_neg_acc.update(
                         anchor_text_emb, 
                         pos_code_emb, neg_code_emb
                     )
                     batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb).mean()
-                    pbar.set_description(f"T e:{epoch_i+1}/{epochs} bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} a:{100*train_soft_neg_acc.get():.2f}")
+                    pbar.set_description(f"T e:{epoch_i+1}/{epochs} {batch_loss_str} l:{np.mean(batch_losses):.3f} a:{100*train_soft_neg_acc.get():.2f}")
                 batch_loss.backward()
                 self.optimizer.step() 
                 self.zero_grad()
                 batch_losses.append(batch_loss.item())
                 # pbar.set_description(f"train: epoch: {epoch_i+1}/{epochs} batch_loss: {batch_loss:.3f} loss: {np.mean(batch_losses):.3f} acc: {100*train_acc.get():.2f}")
                 # if step == 5: break # DEBUG
-                if (step+1) % VALID_STEPS == 0:
+                if ((step+1) % VALID_STEPS == 0) or ((step+1) == len(trainloader)):
                     # validate current model
                     print(rule_wise_acc())
-                    print(rule_wise_acc.counts)
+                    print(dict(rule_wise_acc.counts))
                     if intent_level_dynamic_sampling or use_AST:
                         s = time.time()
                         val_acc = self.val_ret(valset, device=device)
@@ -992,8 +1122,8 @@ class CodeBERTripletNet(nn.Module):
                     else:
                         val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
                                                      epochs=epochs, device=device)
-                    # save model only after warmup is complete.
-                    if val_acc > best_val_acc and trainset.warmup_steps == 0:
+                    # save model only after warmup is complete (for MR curriculum).
+                    if val_acc > best_val_acc and (trainset.warmup_steps == 0 or self.curr_type != "mr"):
                         print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
                         best_val_acc = val_acc
                         torch.save(self.state_dict(), save_path)
@@ -1001,11 +1131,14 @@ class CodeBERTripletNet(nn.Module):
                     train_metrics["log_steps"].append({
                         "train_batch_losses": batch_losses, 
                         "train_loss": np.mean(batch_losses), 
-                        "train_soft_neg_acc": 100*train_soft_neg_acc.get(),
-                        "train_hard_neg_acc": 100*train_hard_neg_acc.get(),
                         "val_loss": val_loss,
                         "val_acc": 100*val_acc,
                     })
+                    if self.use_cross_entropy:
+                        train_metrics["train_acc"] = 100*train_acc/train_tot
+                    else:
+                        train_metrics["train_soft_neg_acc"] = 100*train_soft_neg_acc.get()
+                        train_metrics["train_hard_neg_acc"] = 100*train_hard_neg_acc.get()
                     metrics_path = os.path.join(exp_name, "train_metrics.json")
                     print(f"saving metrics to {metrics_path}")
                     with open(metrics_path, "w") as f:
@@ -1016,7 +1149,8 @@ class CodeBERTripletNet(nn.Module):
 #                 print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
 #                 best_val_acc = val_acc
 #                 torch.save(self.state_dict(), save_path)
-                
+            if self.code_retriever_baseline:
+                self.trainset.reset()
 #             train_metrics["epochs"].append({
 #                 "train_batch_losses": batch_losses, 
 #                 "train_loss": np.mean(batch_losses), 
@@ -1041,8 +1175,7 @@ def main(args):
                               dynamic_negative_sampling=args.dynamic_negative_sampling,
                               sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
                               intent_level_dynamic_sampling=args.intent_level_dynamic_sampling,
-                              no_curriculum=args.no_curriculum, curriculum_type=args.curr_type,
-                              use_scl=args.use_scl)
+                              no_curriculum=args.no_curriculum, curriculum_type=args.curr_type)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")

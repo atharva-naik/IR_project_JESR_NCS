@@ -1,0 +1,1 @@
+python -m models.CodeBERT -t -tp data/conala-mined-100k_train.json -vp data/conala-mined-100k_val.json -en experiments/CodeBERT_CodeRetriever -d "cuda:1" -bs 48 -e 5 -ccpp data/conala-mined-100k_train_ccp.json -crb

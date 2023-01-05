@@ -143,4 +143,4 @@ experiments.zip
 
 experiments/GraphCodeBERT_dyn_neg_sample_100k/model-epoch3.pt
 CoNaLa_AST_neg_samples.json
-CoNaLa_AST_neg_samples_n.json
+CoNaLa_AST_neg_samples_n1.json
