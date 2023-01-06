@@ -701,6 +701,9 @@ class CodeBERTripletNet(nn.Module):
         self.ignore_worst_rules = args.get("ignore_worst_rules", False)
         self.ignore_non_disco_rules = args.get("use_disco_rules", False)
         self.code_retriever_baseline = args.get("code_retriever_baseline", False)
+        self.use_cross_entropy = args.get("use_cross_entropy", False)
+        self.use_ccl = args.get("use_ccl", False)
+        self.use_scl = args.get("use_scl", False)
         self.config["ignore_worst_rules"] = self.ignore_worst_rules
         self.config["use_disco_rules"] = self.ignore_non_disco_rules
         self.config["margin"] = margin
@@ -719,9 +722,6 @@ class CodeBERTripletNet(nn.Module):
         print(f"optimizer = AdamW(lr={lr}, eps={adam_eps})")
         self.optimizer = AdamW(self.parameters(), eps=adam_eps, lr=lr)
         # print(f"loss_fn = TripletMarginLoss(margin={margin}, p={dist_fn_deg})")
-        self.use_cross_entropy = args.get("use_cross_entropy", False)
-        self.use_ccl = args.get("use_ccl", False)
-        self.use_scl = args.get("use_scl", False)
         self.dropout1 = nn.Dropout(0.1)
         self.dropout2 = nn.Dropout(0.1)
         self.ce_loss = nn.CrossEntropyLoss()
@@ -906,22 +906,16 @@ class CodeBERTripletNet(nn.Module):
             if use_AST:
                 assert perturbed_codes_path is not None, "Missing path to dictionary containing perturbed codes corresponding to a given code snippet"
                 perturbed_codes = json.load(open(perturbed_codes_path))
-            # creat the data loaders.
-            if self.code_retriever_baseline:
-                from datautils import CodeRetrieverDataset
-                trainset = CodeRetrieverDataset(
-                    train_path, code_code_path=code_code_pairs_path, model_name="codebert", tokenizer=self.tokenizer,
-                    max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
-                )
-            else:
-                trainset = DynamicTriplesDataset(
-                    train_path, "codebert", device=device_id, beta=beta, warmup_steps=warmup_steps,
-                    sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
-                    tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, curriculum_type=curriculum_type,
-                    max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
-                    batch_size=batch_size, num_epochs=epochs, ignore_worst_rules=self.ignore_worst_rules,
-                    ignore_non_disco_rules=self.ignore_non_disco_rules,
-                )
+            # create the data loaders.
+            trainset = DynamicTriplesDataset(
+                train_path, "codebert", device=device_id, beta=beta, warmup_steps=warmup_steps,
+                sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
+                tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, curriculum_type=curriculum_type,
+                max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+                batch_size=batch_size, num_epochs=epochs, ignore_worst_rules=self.ignore_worst_rules,
+                ignore_non_disco_rules=self.ignore_non_disco_rules,
+            )
+            valset = ValRetDataset(val_path)
             # trainset = DynamicTriplesDataset(
             #     train_path, "codebert", sim_intents_map=sim_intents_map,
             #     perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
@@ -929,7 +923,6 @@ class CodeBERTripletNet(nn.Module):
             #     padding="max_length", return_tensors="pt", 
             #     add_special_tokens=True, truncation=True,
             # )
-            valset = ValRetDataset(val_path)
             # valset = DynamicTriplesDataset(
             #     val_path, "codebert", model=self, val=True, 
             #     tokenizer=self.tokenizer, max_length=100, 
@@ -941,6 +934,13 @@ class CodeBERTripletNet(nn.Module):
             self.config["trainset.delta"] = trainset.soft_master_rate.delta # related to mastering rate.
             self.config["trainset.beta"] = trainset.beta # related to hard negative sampling.
             self.config["trainset.p"] = trainset.soft_master_rate.p # related to mastering rate.
+        elif self.code_retriever_baseline:
+            from datautils import CodeRetrieverDataset
+            trainset = CodeRetrieverDataset(
+                train_path, code_code_path=code_code_pairs_path, model_name="codebert", tokenizer=self.tokenizer,
+                max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+            )
+            valset = ValRetDataset(val_path)
         else:
             trainset = TriplesDataset(train_path, tokenizer=self.tokenizer,
                                       truncation=True, padding="max_length",
@@ -985,7 +985,7 @@ class CodeBERTripletNet(nn.Module):
             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             rule_wise_acc.reset()
-            if not(self.use_cross_entropy):
+            if not(self.use_cross_entropy or self.code_retriever_baseline):
                 train_soft_neg_acc.reset()
                 train_hard_neg_acc.reset()
             for step, batch in pbar:
@@ -1003,8 +1003,8 @@ class CodeBERTripletNet(nn.Module):
                     anchor_title, pos_snippet, neg_snippet
                 )
                 N = len(batch[0])
-                if hasattr(trainset, "update"):
-                    if not(self.use_cross_entropy):
+                if hasattr(trainset, "update") or isinstance(trainset, CodeRetrieverDataset):
+                    if not(self.use_cross_entropy or self.code_retriever_baseline):
                         train_soft_neg_acc.update(
                             anchor_text_emb, pos_code_emb, 
                             neg_code_emb, (batch[-1]==0).cpu(),
@@ -1052,7 +1052,7 @@ class CodeBERTripletNet(nn.Module):
                         bimodal_loss = self.ce_loss(-d_pn, target)
                         batch_loss = unimodal_loss + bimodal_loss
                         b_preds = (-d_ap).argmax(dim=-1)
-                        u_preds = (-d_an).argmax(dim=-1)
+                        u_preds = (-d_pn).argmax(dim=-1)
                         train_acc += (b_preds == target).sum().item()
                         train_u_acc += (u_preds == target).sum().item()
                         train_tot += N
@@ -1090,7 +1090,7 @@ class CodeBERTripletNet(nn.Module):
                             batch_loss_str = f"bl:{batch_loss:.3f}"
                     rule_wise_acc.update(anchor_text_emb, pos_code_emb, 
                                          neg_code_emb, batch[-1].cpu().tolist())
-                    if self.use_cross_entropy or self.code_retriever_baseline:
+                    if (self.use_cross_entropy or self.code_retriever_baseline):
                         pbar.set_description(f"T e:{epoch_i+1}/{epochs} bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} {metric_str}")
                     else: 
                         pbar.set_description(
@@ -1113,7 +1113,7 @@ class CodeBERTripletNet(nn.Module):
                     # validate current model
                     print(rule_wise_acc())
                     print(dict(rule_wise_acc.counts))
-                    if intent_level_dynamic_sampling or use_AST:
+                    if intent_level_dynamic_sampling or use_AST or self.code_retriever_baseline:
                         s = time.time()
                         val_acc = self.val_ret(valset, device=device)
                         print(f"validated in {time.time()-s}s")
@@ -1123,9 +1123,9 @@ class CodeBERTripletNet(nn.Module):
                         val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
                                                      epochs=epochs, device=device)
                     # save model only after warmup is complete (for MR curriculum).
-                    if val_acc > best_val_acc and (trainset.warmup_steps == 0 or self.curr_type != "mr"):
-                        print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
+                    if val_acc > best_val_acc and (not(hasattr(trainset, "warmup_steps")) or trainset.warmup_steps == 0):
                         best_val_acc = val_acc
+                        print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
                         torch.save(self.state_dict(), save_path)
 
                     train_metrics["log_steps"].append({
@@ -1134,8 +1134,10 @@ class CodeBERTripletNet(nn.Module):
                         "val_loss": val_loss,
                         "val_acc": 100*val_acc,
                     })
-                    if self.use_cross_entropy:
+                    if (self.use_cross_entropy or self.code_retriever_baseline):
                         train_metrics["train_acc"] = 100*train_acc/train_tot
+                        if self.code_retriever_baseline:
+                            train_metrics["train_u_acc"] = 100*train_u_acc/train_tot
                     else:
                         train_metrics["train_soft_neg_acc"] = 100*train_soft_neg_acc.get()
                         train_metrics["train_hard_neg_acc"] = 100*train_hard_neg_acc.get()
@@ -1150,7 +1152,7 @@ class CodeBERTripletNet(nn.Module):
 #                 best_val_acc = val_acc
 #                 torch.save(self.state_dict(), save_path)
             if self.code_retriever_baseline:
-                self.trainset.reset()
+                trainset.reset()
 #             train_metrics["epochs"].append({
 #                 "train_batch_losses": batch_losses, 
 #                 "train_loss": np.mean(batch_losses), 
@@ -1175,7 +1177,8 @@ def main(args):
                               dynamic_negative_sampling=args.dynamic_negative_sampling,
                               sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
                               intent_level_dynamic_sampling=args.intent_level_dynamic_sampling,
-                              no_curriculum=args.no_curriculum, curriculum_type=args.curr_type)
+                              no_curriculum=args.no_curriculum, curriculum_type=args.curr_type,
+                              code_code_pairs_path=args.code_code_pairs_path)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
     
     print(f"saving metrics to {metrics_path}")

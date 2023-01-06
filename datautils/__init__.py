@@ -1279,6 +1279,7 @@ class CodeRetrieverDataset(AllModelsDataset):
         self.code_pairs = json.load(open(code_code_path))
         self.train_data = copy.deepcopy(self.data)
         self.data = create_apn_from_ccp_ncp(self.train_data, self.code_pairs)
+        print(self.data[0])
         
     def reset(self):
         """reset code pairs"""
