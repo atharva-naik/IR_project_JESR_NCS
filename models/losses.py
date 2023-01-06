@@ -21,7 +21,7 @@ def cos_csim(x, y):
     y: batch_size x emb_dim"""
     x_norm = x.norm(dim=-1, p=2).unsqueeze(dim=-1)
     y_norm = y.norm(dim=-1, p=2).unsqueeze(dim=-1)
-    return (x @ y.T)/(x_norm * y_norm)
+    return (x/x_norm @ (y/y_norm).T)
 
 def triplet_margin_with_distance_loss(anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor, *,
                                       distance_function: Optional[Callable[[torch.Tensor, torch.Tensor], torch.Tensor]] = None,
