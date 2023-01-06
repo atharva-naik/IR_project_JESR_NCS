@@ -88,6 +88,7 @@ def get_args():
     parser.add_argument("-discr", "--use_disco_rules", action='store_true',
                         help="use the rules outlined in/inspired by the DISCO paper (9)")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
+    parser.add_argument("-csim", "--use_csim", action="store_true", help="cosine similarity instead of euclidean distance")
     args = parser.parse_args()
     if args.use_cross_entropy and args.curr_type not in ["soft", "hard"]:
         args.curr_type = "hard"
@@ -704,6 +705,7 @@ class CodeBERTripletNet(nn.Module):
         self.use_cross_entropy = args.get("use_cross_entropy", False)
         self.use_ccl = args.get("use_ccl", False)
         self.use_scl = args.get("use_scl", False)
+        self.use_csim = args.get("use_csim", False)
         self.config["ignore_worst_rules"] = self.ignore_worst_rules
         self.config["use_disco_rules"] = self.ignore_non_disco_rules
         self.config["margin"] = margin
@@ -754,7 +756,10 @@ class CodeBERTripletNet(nn.Module):
         scores = -(query_mat @ cand_mat.T)
         # scores = cos_cdist(query_mat, cand_mat)
         #else: \
-        scores = torch.cdist(query_mat, cand_mat, p=2)
+        if self.use_csim:
+            scores = -cos_csim(query_mat, cand_mat)
+        else:
+            scores = torch.cdist(query_mat, cand_mat, p=2)
         doc_ranks = scores.argsort(axis=1)
         recall_at_5 = recall_at_k(labels, doc_ranks.tolist(), k=5)
         
@@ -1045,11 +1050,18 @@ class CodeBERTripletNet(nn.Module):
                         batch_loss_str = f"bl:{batch_loss:.3f}"
                         metric_str = f"a:{(100*train_acc/train_tot):.2f}"
                     elif self.code_retriever_baseline:
-                        d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
-                        d_pn = torch.cdist(pos_code_emb, neg_code_emb)
+                        if self.use_csim:
+                            d_ap = -cos_csim(anchor_text_emb, pos_code_emb)
+                            d_pn = -cos_csim(pos_code_emb, neg_code_emb)
+                        else:
+                            d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
+                            d_pn = torch.cdist(pos_code_emb, neg_code_emb)
+                        # margin = self.config['margin']*torch.eye(N).to(device)
                         target = torch.as_tensor(range(N)).to(device)
                         unimodal_loss = self.ce_loss(-d_ap, target)
                         bimodal_loss = self.ce_loss(-d_pn, target)
+                        # unimodal_loss = self.ce_loss(-(d_ap+margin), target)
+                        # bimodal_loss = self.ce_loss(-(d_pn+margin), target)
                         batch_loss = unimodal_loss + bimodal_loss
                         b_preds = (-d_ap).argmax(dim=-1)
                         u_preds = (-d_pn).argmax(dim=-1)
@@ -1151,8 +1163,7 @@ class CodeBERTripletNet(nn.Module):
 #                 print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
 #                 best_val_acc = val_acc
 #                 torch.save(self.state_dict(), save_path)
-            if self.code_retriever_baseline:
-                trainset.reset()
+            if self.code_retriever_baseline: trainset.reset()
 #             train_metrics["epochs"].append({
 #                 "train_batch_losses": batch_losses, 
 #                 "train_loss": np.mean(batch_losses), 
