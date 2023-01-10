@@ -810,6 +810,15 @@ class AllModelsDataset(Dataset):
         dfg = new_DFG 
         
         return code_tokens, dfg
+    
+    def _graphcodebert_proc_text(self, nl: str):
+        nl_tokens = self.tokenizer.tokenize(nl)[:self.tok_args["nl_length"]-2]
+        nl_tokens = [self.tokenizer.cls_token]+nl_tokens+[self.tokenizer.sep_token]
+        nl_ids = self.tokenizer.convert_tokens_to_ids(nl_tokens)
+        padding_length = self.tok_args["nl_length"] - len(nl_ids)
+        nl_ids += [self.tokenizer.pad_token_id]*padding_length 
+        
+        return nl_ids
         
     def _retrieve_best_triplet(self, NL: str, PL: str, use_AST: bool, 
                                batch_size: int=48, stochastic=True,
@@ -896,7 +905,7 @@ class AllModelsDataset(Dataset):
     def _graphcodebert_code_encode(self, code_and_dfg: tuple):
         # pos
         code_tokens, dfg = code_and_dfg
-        code_tokens=[self.self.tokenizer.tokenize('@ '+x)[1:] if idx!=0 else self.self.tokenizer.tokenize(x) for idx,x in enumerate(code_tokens)]
+        code_tokens=[self.tokenizer.tokenize('@ '+x)[1:] if idx!=0 else self.tokenizer.tokenize(x) for idx,x in enumerate(code_tokens)]
         ori2cur_pos={}
         ori2cur_pos[-1]=(0,0)
         for i in range(len(code_tokens)):
@@ -904,16 +913,16 @@ class AllModelsDataset(Dataset):
         code_tokens=[y for x in code_tokens for y in x]  
         # truncating
         code_tokens=code_tokens[:self.tok_args["code_length"]+self.tok_args["data_flow_length"]-2-min(len(dfg),self.tok_args["data_flow_length"])]
-        code_tokens =[self.self.tokenizer.cls_token]+code_tokens+[self.self.tokenizer.sep_token]
-        code_ids =  self.self.tokenizer.convert_tokens_to_ids(code_tokens)
-        position_idx = [i+self.self.tokenizer.pad_token_id + 1 for i in range(len(code_tokens))]
+        code_tokens =[self.tokenizer.cls_token]+code_tokens+[self.tokenizer.sep_token]
+        code_ids =  self.tokenizer.convert_tokens_to_ids(code_tokens)
+        position_idx = [i+self.tokenizer.pad_token_id + 1 for i in range(len(code_tokens))]
         dfg=dfg[:self.tok_args["code_length"]+self.tok_args["data_flow_length"]-len(code_tokens)]
         code_tokens+=[x[0] for x in dfg]
         position_idx+=[0 for x in dfg]
-        code_ids+=[self.self.tokenizer.unk_token_id for x in dfg]
+        code_ids+=[self.tokenizer.unk_token_id for x in dfg]
         padding_length=self.tok_args["code_length"]+self.tok_args["data_flow_length"]-len(code_ids)
-        position_idx+=[self.self.tokenizer.pad_token_id]*padding_length
-        code_ids+=[self.self.tokenizer.pad_token_id]*padding_length    
+        position_idx+=[self.tokenizer.pad_token_id]*padding_length
+        code_ids+=[self.tokenizer.pad_token_id]*padding_length    
         # reindex
         reverse_index={}
         for idx,x in enumerate(dfg):
@@ -922,7 +931,7 @@ class AllModelsDataset(Dataset):
             dfg[idx]=x[:-1]+([reverse_index[i] for i in x[-1] if i in reverse_index],)    
         dfg_to_dfg=[x[-1] for x in dfg]
         dfg_to_code=[ori2cur_pos[x[1]] for x in dfg]
-        length=len([self.self.tokenizer.cls_token])
+        length=len([self.tokenizer.cls_token])
         dfg_to_code=[(x[0]+length,x[1]+length) for x in dfg_to_code] 
         # calculate graph-guided masked function
         attn_mask=np.zeros((self.tok_args["code_length"]+self.tok_args["data_flow_length"],
@@ -1299,4 +1308,17 @@ class CodeRetrieverDataset(AllModelsDataset):
         elif self.model_name == "graphcodebert":
             return self._graphcodebert_getitem(anchor, pos, neg, False)
         elif self.model_name == "unixcoder":
-            return self._unixcoder_getitem(anchor, pos, soft_neg, False)
+            return self._unixcoder_getitem(anchor, pos, soft_neg, False)       
+
+class UniBiHardNegDataset(AllModelsDataset):
+    """a (anchor): NL
+    a+ : NL similar to a (>1, need a means to select 1) (not directly used as it is not a part of the dataset, only used to derive candidate hard negatives)
+    p: PL corresponding to NL
+    p+: other PLs associated with a (>1, need a means to select 1)
+    n: PLs associated with a+, PLs derived by perturbations (>1, need a means to select 1)
+    d_ap: pairwise distances: soft negatives bimodal
+    d_an: pairwise distances: hard negatives bimodal
+    d_pp+: pairwise distances: soft negatives unimodal
+    d_pn:  pairwise distances: hard negatives unimodal"""
+    def __init__(self, ):
+        passw

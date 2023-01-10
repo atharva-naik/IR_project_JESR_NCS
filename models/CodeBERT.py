@@ -132,9 +132,8 @@ class CodeDataset(Dataset):
         else:
             return [code]
         
-        
 class ValRetDataset(Dataset):
-    # JUST an engineering related class to convert NL-PL pairs to retrieval setting.
+    """JUST a convenience class to convert NL-PL pairs to retrieval setting."""
     def __init__(self, path: str):
         super(ValRetDataset, self).__init__()
         self.data = json.load(open(path))
@@ -753,13 +752,11 @@ class CodeBERTripletNet(nn.Module):
         # score and rank documents.
         cand_mat = torch.stack(cand_mat)
         # if self.use_scl: 
-        scores = -(query_mat @ cand_mat.T)
+        # scores = -(query_mat @ cand_mat.T)
         # scores = cos_cdist(query_mat, cand_mat)
         #else: \
-        if self.use_csim:
-            scores = -cos_csim(query_mat, cand_mat)
-        else:
-            scores = torch.cdist(query_mat, cand_mat, p=2)
+        if self.use_csim: scores = -cos_csim(query_mat, cand_mat)
+        else: scores = torch.cdist(query_mat, cand_mat, p=2)
         doc_ranks = scores.argsort(axis=1)
         recall_at_5 = recall_at_k(labels, doc_ranks.tolist(), k=5)
         
@@ -980,9 +977,9 @@ class CodeBERTripletNet(nn.Module):
             train_soft_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
             train_hard_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
         else: 
+            train_tot = 0
             train_acc = 0
             train_u_acc = 0
-            train_tot = 0
         best_val_acc = 0
         for epoch_i in range(epochs):
             self.train()

@@ -6,6 +6,7 @@ import torch
 import argparse
 import numpy as np
 from typing import *
+from models.losses import cos_csim
 from sklearn.metrics import ndcg_score as NDCG
 from models.metrics import TripletAccuracy, recall_at_k 
 from sklearn.metrics import label_ranking_average_precision_score as MRR
@@ -30,7 +31,7 @@ def get_tok_path(model_name: str) -> str:
 def test_ood_performance(triplet_net, model_name: str, query_paths: List[str], 
                          cand_paths: List[str], args: argparse.Namespace,
                          dataset_names: List[str]=["CoNaLa", "External Knowledge", "Web Query", "CodeSearchNet"]):
-    # do only code retrieval with l2 distance as distance function
+    """do only code retrieval with l2 distance as distance function"""
     device = args.device_id if torch.cuda.is_available() else "cpu"
     ckpt_path = os.path.join(args.exp_name, "model.pt")
     print(f"loading checkpoint (state dict) from {ckpt_path}")
@@ -59,7 +60,7 @@ def test_ood_performance(triplet_net, model_name: str, query_paths: List[str],
         queries = [i["query"] for i in queries_and_cand_labels]
         labels = [i["docs"] for i in queries_and_cand_labels]
         # distance function to be used.
-        dist_fn ="l2_dist"
+        dist_fn = "l2_dist"
         # assert dist_fn in ["l2_dist", "inner_prod"]
         # encode queries.
         print(f"encoding {len(queries)} queries:")
@@ -74,7 +75,9 @@ def test_ood_performance(triplet_net, model_name: str, query_paths: List[str],
                                           use_tqdm=True, device_id=device)
         # score and rank documents.
         cand_mat = torch.stack(cand_mat)
-        scores = torch.cdist(query_mat, cand_mat, p=2)
+        if args.use_csim:
+            scores = torch.cdist(query_mat, cand_mat, p=2)
+        else: scores = -cos_csim(query_mat, cand_mat)
         doc_ranks = scores.argsort(axis=1)
         doc_ranks_path = os.path.join(args.exp_name, 
                          f"{dataset_name} Doc Ranks.json")
@@ -89,14 +92,12 @@ def test_ood_performance(triplet_net, model_name: str, query_paths: List[str],
         # compute LRAP.
         lrap_GT = np.zeros((len(queries), len(candidates)))
         for i in range(len(labels)):
-            for j in labels[i]:
-                lrap_GT[i][j] = 1
+            for j in labels[i]: lrap_GT[i][j] = 1
         # compute micro average and average best label candidate rank
         label_ranks = []
         avg_rank = 0
         avg_best_rank = 0 
-        N = 0
-        M = 0
+        N, M = 0, 0
         for i, rank_list in enumerate(doc_ranks):
             rank_list = rank_list.tolist()
             # if dist_func == "inner_prod": rank_list = rank_list.tolist()[::-1]

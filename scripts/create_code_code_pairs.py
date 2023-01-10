@@ -19,9 +19,36 @@ def create_code_code_pairs(data: List[dict]) -> List[Tuple[str, str]]:
 
     return code_pairs
 
+def create_code_synsets(data: List[dict]) -> Tuple[Dict[str, List[Tuple[str, int]]], Dict[str, str]]:
+    code_synsets = defaultdict(lambda:[])
+    code_to_intent = {} # key calculation map.
+    for rec in data:
+        code_synsets[rec['intent']].append((
+            rec['snippet'], rec['prob']
+        ))
+        code_to_intent[rec['snippet']] = rec['intent']
+
+    return code_synsets, code_to_intent
+
+class CodeSynsets:
+    def __init__(self, path: str):
+        self.path = path
+        with open(path) as f: data = json.load(f)
+        self.code_synsets = data['code_synsets']
+        self.code_to_intent = data['code_to_intent']
+        
+    def __getitem__(self, code: str):
+        intent = self.code_to_intent[code]
+        return self.code_synsets[intent]
+    
+# main method.
 if __name__ == "__main__":
     train_data = json.load(open("./data/conala-mined-100k_train.json"))
-    code_pairs = create_code_code_pairs(train_data)
+    # code_pairs = create_code_code_pairs(train_data)
+    code_synsets, code_to_intent = create_code_synsets(train_data)
     # code-code pairs.
-    with open("./data/conala-mined-100k_train_ccp.json", "w") as f:
-        json.dump(code_pairs, f, indent=4)
+    with open("./data/conala-mined-100k_train_csyn.json", "w") as f:
+        json.dump({
+            "code_synsets": code_synsets,
+            "code_to_intent": code_to_intent,
+        }, f, indent=4)

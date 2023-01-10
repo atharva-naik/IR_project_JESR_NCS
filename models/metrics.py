@@ -8,8 +8,8 @@ import torch.nn.functional as F
 from models.losses import cos_dist
 from collections import defaultdict
         
-# rule category wise accuracy.
 class RuleWiseAccuracy:
+    """rule category wise accuracy."""
     def __init__(self, use_scl: bool=False, margin: int=1):
         self.reset()
         self.margin = margin
@@ -43,6 +43,8 @@ class RuleWiseAccuracy:
         return acc
 
 class TripletAccuracy:
+    """Triplet accuracy: 1 if the anchor is more similar to the 
+    +ve than -ve (successfully separates triplet), 0 otherwise"""
     def __init__(self, use_scl: bool=False, margin: int=1):
         self.margin = margin
         self.reset()
