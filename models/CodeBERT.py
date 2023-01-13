@@ -75,6 +75,8 @@ def get_args():
     parser.add_argument("-beta", "--beta", type=float, default=0.01, help="the beta used in the von-Mises fisher sampling")
     parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
     parser.add_argument("-crb", "--code_retriever_baseline", action="store_true", help="use CodeRetriever objective")
+    parser.add_argument("-crml", "--code_retriever_ml_loss", action="store_true", help="use triplet margin loss with CodeRetriever objective")
+    parser.add_argument("-crsu", "--code_retriever_skip_unimodal", action="store_true", help="skip the unimodal loss in the CodeRetriever objective")
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
                         help="dynamic sampling based on similar intents")
     parser.add_argument("-nc", "--no_curriculum", action="store_true", help="turn of curriclum (only hard negatives)")
@@ -668,7 +670,9 @@ class CodeBERTripletNet(nn.Module):
 
         self.ignore_worst_rules = args.get("ignore_worst_rules", False)
         self.ignore_non_disco_rules = args.get("use_disco_rules", False)
+        self.code_retriever_ml_loss = args.get("code_retriever_ml_loss", False)
         self.code_retriever_baseline = args.get("code_retriever_baseline", False)
+        self.code_retriever_skip_unimodal = args.get("code_retriever_skip_unimodal", False)
         self.use_cross_entropy = args.get("use_cross_entropy", False)
         self.use_ccl = args.get("use_ccl", False)
         self.use_scl = args.get("use_scl", False)
@@ -698,7 +702,9 @@ class CodeBERTripletNet(nn.Module):
             margin=margin, p=dist_fn_deg, 
             reduction="none",
         )
+        self.config["code_retriever_skip_unimodal"] = self.code_retriever_skip_unimodal
         self.config["code_retriever_baseline"] = self.code_retriever_baseline
+        self.config["code_retriever_ml_loss"] = self.code_retriever_ml_loss
         self.config["ignore_worst_rules"] = self.ignore_worst_rules
         self.config["use_cross_entropy"] = self.use_cross_entropy
         self.config["use_disco_rules"] = self.ignore_non_disco_rules
@@ -1042,25 +1048,39 @@ class CodeBERTripletNet(nn.Module):
                         batch_loss_str = f"bl:{batch_loss:.3f}={soft_hard_ce_loss}ce+{soft_ml_loss}ml"
                         metric_str = f"a:{(100*train_acc/train_tot):.2f}" # soft neg accuracy.
                     elif self.code_retriever_baseline:
-                        if self.use_csim:
-                            d_ap = -cos_csim(anchor_text_emb, pos_code_emb)
-                            d_pn = -cos_csim(pos_code_emb, neg_code_emb)
+                        if self.code_retriever_ml_loss:
+                            if not(self.code_retriever_skip_unimodal):
+                                unimodal_loss = self.loss_fn(anchor_text_emb, pos_code_emb, 
+                                                             pos_code_emb[torch.randperm(N)]).mean()
+                            bimodal_loss = self.loss_fn(pos_code_emb, neg_code_emb, 
+                                                        neg_code_emb[torch.randperm(N)]).mean()
                         else:
-                            d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
-                            d_pn = torch.cdist(pos_code_emb, neg_code_emb)
-                        # margin = self.config['margin']*torch.eye(N).to(device)
-                        target = torch.as_tensor(range(N)).to(device)
-                        unimodal_loss = self.ce_loss(-d_ap, target)
-                        bimodal_loss = self.ce_loss(-d_pn, target)
+                            if self.use_csim:
+                                d_ap = -cos_csim(anchor_text_emb, pos_code_emb)
+                                if not(self.code_retriever_skip_unimodal):
+                                    d_pn = -cos_csim(pos_code_emb, neg_code_emb)
+                            else:
+                                d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
+                                if not(self.code_retriever_skip_unimodal):
+                                    d_pn = torch.cdist(pos_code_emb, neg_code_emb)
+                            # margin = self.config['margin']*torch.eye(N).to(device)
+                            target = torch.as_tensor(range(N)).to(device)
+                            if not(self.code_retriever_skip_unimodal):
+                                unimodal_loss = self.ce_loss(-d_pn, target)
+                            bimodal_loss = self.ce_loss(-d_ap, target)
                         # unimodal_loss = self.ce_loss(-(d_ap+margin), target)
                         # bimodal_loss = self.ce_loss(-(d_pn+margin), target)
-                        batch_loss = unimodal_loss + bimodal_loss
-                        b_preds = (-d_ap).argmax(dim=-1)
-                        u_preds = (-d_pn).argmax(dim=-1)
-                        train_acc += (b_preds == target).sum().item()
-                        train_u_acc += (u_preds == target).sum().item()
-                        train_tot += N
-                        metric_str = f"ba:{(100*train_acc/train_tot):.2f} ua:{(100*train_u_acc/train_tot):.2f}"
+                        if self.code_retriever_skip_unimodal:
+                            batch_loss = bimodal_loss
+                        else: batch_loss = unimodal_loss + bimodal_loss
+                        if self.code_retriever_ml_loss: metric_str = ""
+                        else:
+                            b_preds = (-d_ap).argmax(dim=-1)
+                            u_preds = (-d_pn).argmax(dim=-1)
+                            train_acc += (b_preds == target).sum().item()
+                            train_u_acc += (u_preds == target).sum().item()
+                            train_tot += N
+                            metric_str = f"ba:{(100*train_acc/train_tot):.2f} ua:{(100*train_u_acc/train_tot):.2f}"
                         batch_loss_str = f"bl:{batch_loss:.3f}={unimodal_loss:.3f}u+{bimodal_loss:.3f}b"
                     else:
                         # pd_ap = F.pairwise_distance(anchor_text_emb, pos_code_emb)
@@ -1140,9 +1160,9 @@ class CodeBERTripletNet(nn.Module):
                         "val_loss": val_loss,
                         "val_acc": 100*val_acc,
                     })
-                    if (self.use_cross_entropy or self.code_retriever_baseline):
+                    if (self.use_cross_entropy or self.code_retriever_baseline and not(self.code_retriever_ml_loss)):
                         train_metrics["train_acc"] = 100*train_acc/train_tot
-                        if self.code_retriever_baseline:
+                        if self.code_retriever_baseline and not(self.code_retriever_ml_loss) and not(self.code_retriever_skip_unimodal):
                             train_metrics["train_u_acc"] = 100*train_u_acc/train_tot
                     elif self.comb_exp:
                         train_metrics["train_acc"] = 100*train_acc/train_tot
