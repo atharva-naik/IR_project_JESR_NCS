@@ -2,14 +2,153 @@
 # some common utilites.
 import os
 import json
+import time
 import torch
 import argparse
 import numpy as np
 from typing import *
+from tqdm import tqdm
 from models.losses import cos_csim
+from torch.utils.data import DataLoader
 from sklearn.metrics import ndcg_score as NDCG
-from models.metrics import TripletAccuracy, recall_at_k 
+from datautils import DiscoDataset, ValRetDataset
+from models.metrics import TripletAccuracy, recall_at_k, RuleWiseAccuracy
 from sklearn.metrics import label_ranking_average_precision_score as MRR
+
+VALID_STEPS = 501
+def fit_disco(triplet_net, model_name: str, **args):
+    train_path = args.get("train_path")
+    val_path = args.get("val_path")
+    assert train_path is not None, "missing training data (`train_path`)"
+    assert val_path is not None, "missing validation data (`val_path`)"
+    perturbed_codes_path = args.get("perturbed_codes_path")
+    exp_name = args.get("exp_name", "experiment")
+    save_path = os.path.join(exp_name, "model.pt")
+    device_id = args.get("device_id", "cuda:0")
+    batch_size = args.get("batch_size", 32)
+    epochs = args.get("epochs", 5)
+    device = device_id if torch.cuda.is_available() else "cpu"
+    # create experiment folder.
+    os.makedirs(exp_name, exist_ok=True)
+    # save params to config file.
+    triplet_net.config["disco_baseline"] = True
+    triplet_net.config["batch_size"] = batch_size
+    triplet_net.config["train_path"] = train_path
+    triplet_net.config["device_id"] = device_id
+    triplet_net.config["exp_name"] = exp_name
+    triplet_net.config["val_path"] = val_path
+    triplet_net.config["epochs"] = epochs
+
+    print(f"model will be saved at {save_path}")
+    print(f"moving model to {device}")
+    triplet_net.embed_model.to(device)
+    assert perturbed_codes_path is not None, msg.format("perturbed codes", "code snippet")
+    perturbed_codes = json.load(open(perturbed_codes_path))
+    # create the datasets and data loaders.
+    if model_name == "codebert":
+        trainset = DiscoDataset(
+            train_path, perturbed_codes=perturbed_codes, model_name=model_name, tokenizer=triplet_net.tokenizer,
+            max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+        )
+    elif model_name == "graphcodebert":
+        trainset = DiscoDataset(
+            train_path, perturbed_codes=perturbed_codes, model_name=model_name, 
+            tokenizer=triplet_net.tokenizer, nl_length=100, code_length=100, data_flow_length=64,
+        )
+    elif model_name == "unixcoder":
+        trainset = DiscoDataset(
+            train_path, perturbed_codes=perturbed_codes, model_name=model_name, 
+            tokenizer=triplet_net.tokenizer, max_length=100, padding=True,
+        )
+    valset = ValRetDataset(val_path)
+    config_path = os.path.join(exp_name, "config.json") # path to config file
+    with open(config_path, "w") as f: # save config file.
+        print(triplet_net.config)
+        json.dump(triplet_net.config, f)
+    print(f"saved config to {config_path}")
+    trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size)
+    train_metrics = {"log_steps": [], "summary": []} 
+    # rule wise triplet accuracies.
+    rule_wise_acc = RuleWiseAccuracy(margin=1)
+    # bimodal, cross entropy/classification accuracy.
+    train_tot = 0
+    train_acc = 0
+    best_val_acc = 0
+    for epoch_i in range(epochs):
+        triplet_net.train()
+        batch_losses = []
+        pbar = tqdm(enumerate(trainloader), total=len(trainloader),
+                    desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
+        # reset triplet accuracies.
+        rule_wise_acc.reset() 
+        for step, batch in pbar:
+            triplet_net.train()
+            if model_name == "codebert":
+                anchor_title = (batch[0].to(device), batch[1].to(device))
+                pos_snippet = (batch[2].to(device), batch[3].to(device))
+                neg_snippet = (batch[4].to(device), batch[5].to(device))
+            elif model_name == "graphcodebert":
+                anchor_title = batch[6].to(device)
+                pos_snippet = (batch[0].to(device), batch[1].to(device), batch[2].to(device))
+                neg_snippet = (batch[3].to(device), batch[4].to(device), batch[5].to(device))
+            elif model_name == "unixcoder":
+                anchor_title = batch[0].to(device)
+                pos_snippet = batch[1].to(device)
+                neg_snippet = batch[2].to(device)
+            anchor_text_emb, pos_code_emb, neg_code_emb = triplet_net(
+                anchor_title, pos_snippet, neg_snippet
+            )
+            N = len(batch[0])
+            d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
+            d_an = torch.cdist(anchor_text_emb, neg_code_emb)
+            scores = -torch.cat((d_ap, d_an), axis=-1)
+            target = torch.as_tensor(range(N)).to(device)
+            batch_loss = triplet_net.ce_loss(scores, target) # CE bimodal loss.
+            batch_loss.backward() # compute gradients.
+            triplet_net.optimizer.step() # take optimization step.
+            triplet_net.zero_grad() # clear gradients
+            batch_losses.append(batch_loss.item()) # collect batch losses.
+
+            # update metrics.
+            train_tot += N
+            preds = scores.argmax(dim=-1)
+            train_acc += (preds == target).sum().item()
+            rule_wise_acc.update(anchor_text_emb, pos_code_emb, 
+                                 neg_code_emb, batch[-1].tolist())
+            # batch loss string (show values of various losses)
+            batch_loss_str = f"bl:{batch_loss:.3f}"
+            # show metrics
+            metric_str = f"{(100*train_acc/train_tot):.2f}"
+            pbar.set_description(f"T e:{epoch_i+1}/{epochs} {batch_loss_str} l:{np.mean(batch_losses):.3f} {metric_str}")
+            # if step == 5: break # DEBUG
+            if ((step+1) % VALID_STEPS == 0) or ((step+1) == len(trainloader)):
+                # validate current model
+                print(rule_wise_acc())
+                print(dict(rule_wise_acc.counts))
+                s = time.time()
+                val_acc = triplet_net.val_ret(valset, device=device)
+                print(f"validated in {time.time()-s}s")
+                print(f"recall@5 = {100*val_acc:.3f}")
+                val_loss = None
+                # save model only after warmup is complete (for MR curriculum).
+                if val_acc > best_val_acc and (not(hasattr(trainset, "warmup_steps")) or trainset.warmup_steps == 0):
+                    best_val_acc = val_acc
+                    print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
+                    torch.save(triplet_net.state_dict(), save_path)
+
+                train_metrics["log_steps"].append({
+                    "train_batch_losses": batch_losses, 
+                    "train_loss": np.mean(batch_losses), 
+                    "val_loss": val_loss,
+                    "val_acc": 100*val_acc,
+                })
+                train_metrics["train_acc"] = 100*train_acc/train_tot
+                metrics_path = os.path.join(exp_name, "train_metrics.json")
+                print(f"saving metrics to {metrics_path}")
+                with open(metrics_path, "w") as f:
+                    json.dump(train_metrics, f)
+
+    return train_metrics
 
 def get_tok_path(model_name: str) -> str:
     assert model_name in ["codebert", "graphcodebert", "unixcoder"]

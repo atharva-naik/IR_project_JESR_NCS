@@ -17,15 +17,15 @@ from tqdm import tqdm
 from torch.optim import AdamW
 from typing import Union, List
 import torch.nn.functional as F
-from datautils import read_jsonl
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
 from transformers import RobertaModel, RobertaTokenizer
 from datautils.parser import remove_comments_and_docstrings
 from sklearn.metrics import label_ranking_average_precision_score as MRR
 from models.metrics import TripletAccuracy, RuleWiseAccuracy, recall_at_k
-from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
+from models import test_ood_performance, get_tok_path, dynamic_negative_sampling, fit_disco
 from models.losses import scl_loss, TripletMarginWithDistanceLoss, cos_dist, cos_cdist, cos_csim
+from datautils import read_jsonl, ValRetDataset, UniBiHardNegDataset, DynamicTriplesDataset, CodeRetrieverDataset, batch_shuffle_collate_fn_codebert
 # set logging level of transformers.
 torch.autograd.set_detect_anomaly(True)
 transformers.logging.set_verbosity_error()
@@ -47,6 +47,8 @@ def get_args():
     parser.add_argument("-q", "--queries_path", type=str, default="query_and_candidates.json", help="path to queries (to test retrieval)")
     parser.add_argument("-en", "--exp_name", type=str, default="triplet_CodeBERT_rel_thresh", help="experiment name (will be used as folder name)")
     parser.add_argument("-d", "--device_id", type=str, default="cpu", help="device string (GPU) for doing training/testing")
+    parser.add_argument("-als", "--all_losses_setting", action="store_true", help="use all possible losses")
+    parser.add_argument("-disco", "--disco_baseline", action="store_true", help="use DISCO training procedure")
     # parser.add_argument("-tec", "--test_cls", action="store_true", help="")
     # parser.add_argument("-tc", "--train_cls", action="store_true", help="")
     # parser.add_argument("-ter", "--test_rel", action="store_true", help="")
@@ -64,6 +66,8 @@ def get_args():
                         help="path to dictionary containing similar intents corresponding to a given intent")
     parser.add_argument("-pcp", "--perturbed_codes_path", type=str, default=None, 
                         help="path to dictionary containing AST perturbed codes corresponding to a given code")
+    parser.add_argument("-csp", "--code_syns_path", type=str, default=None, 
+                        help="path to code synsets for all losses setting")
     parser.add_argument("-ccpp", "--code_code_pairs_path", type=str, default=None, 
                         help="path to code-code pairs for CodeRetriever's unimodal objective")
     parser.add_argument("-w", "--warmup_steps", type=int, default=3000, help="no. of warmup steps (soft negatives only during warmup)")
@@ -88,6 +92,7 @@ def get_args():
     parser.add_argument("-discr", "--use_disco_rules", action='store_true',
                         help="use the rules outlined in/inspired by the DISCO paper (9)")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
+    parser.add_argument("-cexp", "--comb_exp", action="store_true", help="experimenal combined loss setting")
     parser.add_argument("-csim", "--use_csim", action="store_true", help="cosine similarity instead of euclidean distance")
     args = parser.parse_args()
     if args.use_cross_entropy and args.curr_type not in ["soft", "hard"]:
@@ -131,45 +136,6 @@ class CodeDataset(Dataset):
                     code["attention_mask"][0]]
         else:
             return [code]
-        
-class ValRetDataset(Dataset):
-    """JUST a convenience class to convert NL-PL pairs to retrieval setting."""
-    def __init__(self, path: str):
-        super(ValRetDataset, self).__init__()
-        self.data = json.load(open(path))
-        posts = {} # query to candidate map.
-        cands = {} # unique candidates
-        tot = 0
-        for rec in self.data:
-            intent = rec["intent"]
-            snippet = rec["snippet"]
-            if snippet not in cands:
-                cands[snippet] = tot
-                tot += 1
-            try: posts[intent][snippet] = None
-            except KeyError: posts[intent] = {snippet: None}
-        self._cands = list(cands.keys())
-        self._queries = list(posts.keys())
-        self._labels = []
-        for query, candidates in posts.items():
-            self._labels.append([])
-            for cand in candidates.keys():
-                self._labels[-1].append(cands[cand])
-
-    def __len__(self):
-        return len(self.data)
-    
-    def get_queries(self):
-        return self._queries
-    
-    def get_candidates(self):
-        return self._cands
-    
-    def get_labels(self):
-        return self._labels
-        
-    def __getitem__(self, i: int):
-        return self.data[i]
         
         
 class TextDataset(Dataset):
@@ -696,8 +662,10 @@ class CodeBERTripletNet(nn.Module):
         self.config = {}
         self.config["model_path"] = model_path
         self.config["tok_path"] = tok_path
+
         margin = args.get("margin", 1)
         dist_fn_deg = args.get("dist_fn_deg", 2)
+
         self.ignore_worst_rules = args.get("ignore_worst_rules", False)
         self.ignore_non_disco_rules = args.get("use_disco_rules", False)
         self.code_retriever_baseline = args.get("code_retriever_baseline", False)
@@ -705,11 +673,8 @@ class CodeBERTripletNet(nn.Module):
         self.use_ccl = args.get("use_ccl", False)
         self.use_scl = args.get("use_scl", False)
         self.use_csim = args.get("use_csim", False)
-        self.config["ignore_worst_rules"] = self.ignore_worst_rules
-        self.config["use_disco_rules"] = self.ignore_non_disco_rules
-        self.config["margin"] = margin
-        self.config["dist_fn_deg"] = dist_fn_deg
-        self.config["code_retriever_baseline"] = self.code_retriever_baseline
+        self.comb_exp = args.get("comb_exp", False)
+        
         print(f"loading pretrained CodeBERT embedding model from {model_path}")
         start = time.time()
         self.embed_model = RobertaModel.from_pretrained(model_path)
@@ -733,8 +698,18 @@ class CodeBERTripletNet(nn.Module):
             margin=margin, p=dist_fn_deg, 
             reduction="none",
         )
+        self.config["code_retriever_baseline"] = self.code_retriever_baseline
+        self.config["ignore_worst_rules"] = self.ignore_worst_rules
+        self.config["use_cross_entropy"] = self.use_cross_entropy
+        self.config["use_disco_rules"] = self.ignore_non_disco_rules
+        self.config["dist_fn_deg"] = dist_fn_deg
         self.config["optimizer"] = f"{self.optimizer}"
+        self.config["comb_exp"] = self.comb_exp
+        self.config["use_csim"] = self.use_csim
         self.config["loss_fn"] = f"{self.loss_fn}"
+        self.config["use_scl"] = self.use_scl
+        self.config["use_ccl"] = self.use_ccl
+        self.config["margin"] = margin
         
     def val_ret(self, valset: Dataset, device="cuda:0"):
         self.eval()
@@ -900,7 +875,6 @@ class CodeBERTripletNet(nn.Module):
         sim_intents_map = {}
         perturbed_codes = {}
         if intent_level_dynamic_sampling or use_AST:
-            from datautils import DynamicTriplesDataset
             if intent_level_dynamic_sampling:
                 assert sim_intents_path is not None, "Missing path to dictionary containing similar intents corresponding to an intent"
                 sim_intents_map = json.load(open(sim_intents_path))
@@ -937,7 +911,6 @@ class CodeBERTripletNet(nn.Module):
             self.config["trainset.beta"] = trainset.beta # related to hard negative sampling.
             self.config["trainset.p"] = trainset.soft_master_rate.p # related to mastering rate.
         elif self.code_retriever_baseline:
-            from datautils import CodeRetrieverDataset
             trainset = CodeRetrieverDataset(
                 train_path, code_code_path=code_code_pairs_path, model_name="codebert", tokenizer=self.tokenizer,
                 max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
@@ -960,7 +933,6 @@ class CodeBERTripletNet(nn.Module):
         print(f"saved config to {config_path}")
         if SHUFFLE_BATCH_DEBUG_SETTING and not(self.code_retriever_baseline): 
             #TODO: remove this. Used only for a temporary experiment.
-            from datautils import batch_shuffle_collate_fn_codebert
             trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size,
                                      collate_fn=batch_shuffle_collate_fn_codebert)
             valloader = DataLoader(valset, shuffle=False, batch_size=batch_size,
@@ -973,13 +945,14 @@ class CodeBERTripletNet(nn.Module):
             "summary": [],
         } 
         rule_wise_acc = RuleWiseAccuracy(margin=1, use_scl=self.use_scl)
-        if not(self.use_cross_entropy or self.code_retriever_baseline):
+        if self.comb_exp:
+            print("\x1b[34;1m990 combined experiment\x1b[0m")
+            train_tot = 0; train_acc = 0
+            train_hard_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
+        elif not(self.use_cross_entropy or self.code_retriever_baseline):
             train_soft_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
             train_hard_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
-        else: 
-            train_tot = 0
-            train_acc = 0
-            train_u_acc = 0
+        else: train_tot = 0; train_acc = 0; train_u_acc = 0
         best_val_acc = 0
         for epoch_i in range(epochs):
             self.train()
@@ -987,9 +960,11 @@ class CodeBERTripletNet(nn.Module):
             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             rule_wise_acc.reset()
-            if not(self.use_cross_entropy or self.code_retriever_baseline):
-                train_soft_neg_acc.reset()
-                train_hard_neg_acc.reset()
+            if self.comb_exp: 
+                print("\x1b[34;1m1004 combined experiment\x1b[0m")
+                train_tot = 0; train_acc = 0; train_hard_neg_acc.reset()
+            elif not(self.use_cross_entropy or self.code_retriever_baseline):
+                train_soft_neg_acc.reset(); train_hard_neg_acc.reset()
             for step, batch in pbar:
                 if do_dynamic_negative_sampling:
                     batch = dynamic_negative_sampling(
@@ -1006,7 +981,13 @@ class CodeBERTripletNet(nn.Module):
                 )
                 N = len(batch[0])
                 if hasattr(trainset, "update") or isinstance(trainset, CodeRetrieverDataset):
-                    if not(self.use_cross_entropy or self.code_retriever_baseline):
+                    if self.comb_exp:
+                        train_hard_neg_acc.update(
+                            anchor_text_emb, pos_code_emb, 
+                            neg_code_emb, (batch[-1]!=0).cpu(),
+                        )
+                        HARD_ACC = f" ha:{100*train_hard_neg_acc.get():.2f}"
+                    elif not(self.use_cross_entropy or self.code_retriever_baseline):
                         train_soft_neg_acc.update(
                             anchor_text_emb, pos_code_emb, 
                             neg_code_emb, (batch[-1]==0).cpu(),
@@ -1046,6 +1027,20 @@ class CodeBERTripletNet(nn.Module):
                         train_tot += N
                         batch_loss_str = f"bl:{batch_loss:.3f}"
                         metric_str = f"a:{(100*train_acc/train_tot):.2f}"
+                    elif self.comb_exp: # assuming hard curriculum.
+                        d_ap = torch.cdist(anchor_text_emb, pos_code_emb)
+                        d_an = torch.cdist(anchor_text_emb, neg_code_emb)
+                        scores = -torch.cat((d_ap, d_an), axis=-1)
+                        target = torch.as_tensor(range(N)).to(device)
+                        soft_hard_ce_loss = self.ce_loss(scores, target) # CE loss
+                        soft_ml_loss = self.loss_fn(anchor_text_emb, pos_code_emb, 
+                                                    pos_code_emb[torch.randperm(N)]).mean() # margin based loss
+                        batch_loss = soft_hard_ce_loss + soft_ml_loss
+                        preds = scores.argmax(dim=-1)
+                        train_acc += (preds == target).sum().item()
+                        train_tot += N
+                        batch_loss_str = f"bl:{batch_loss:.3f}={soft_hard_ce_loss}ce+{soft_ml_loss}ml"
+                        metric_str = f"a:{(100*train_acc/train_tot):.2f}" # soft neg accuracy.
                     elif self.code_retriever_baseline:
                         if self.use_csim:
                             d_ap = -cos_csim(anchor_text_emb, pos_code_emb)
@@ -1101,6 +1096,8 @@ class CodeBERTripletNet(nn.Module):
                                          neg_code_emb, batch[-1].cpu().tolist())
                     if (self.use_cross_entropy or self.code_retriever_baseline):
                         pbar.set_description(f"T e:{epoch_i+1}/{epochs} bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} {metric_str}")
+                    elif self.comb_exp:
+                        pbar.set_description(f"T e:{epoch_i+1}/{epochs} bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} {metric_str}{HARD_ACC}")
                     else: 
                         pbar.set_description(
                             f"T e:{epoch_i+1}/{epochs} {MIX_STEP}{batch_loss_str} l:{np.mean(batch_losses):.3f} a:{100*train_soft_neg_acc.get():.2f}{HARD_ACC}"
@@ -1147,6 +1144,9 @@ class CodeBERTripletNet(nn.Module):
                         train_metrics["train_acc"] = 100*train_acc/train_tot
                         if self.code_retriever_baseline:
                             train_metrics["train_u_acc"] = 100*train_u_acc/train_tot
+                    elif self.comb_exp:
+                        train_metrics["train_acc"] = 100*train_acc/train_tot
+                        train_metrics["train_hard_neg_acc"] = 100*train_hard_neg_acc.get()
                     else:
                         train_metrics["train_soft_neg_acc"] = 100*train_soft_neg_acc.get()
                         train_metrics["train_hard_neg_acc"] = 100*train_hard_neg_acc.get()
@@ -1169,6 +1169,174 @@ class CodeBERTripletNet(nn.Module):
 #                 "val_acc": 100*val_acc,
 #             })
         return train_metrics
+
+    def fit_unibi_hardneg(self, train_path: str, val_path: str, **args):
+        """fit the model on data having hard negatives using unimodal+bimodal losses"""
+        exp_name = args.get("exp_name", "experiment")
+        device_id = args.get("device_id", "cuda:0")
+        batch_size = args.get("batch_size", 32)
+        epochs = args.get("epochs", 5)
+        # use_curriculum = not(args.get("no_curriculum", False))
+        # curriculum_type = args.get("curriculum_type", "mr")
+        # warmup_steps = args.get("warmup_steps", 3000)
+        # beta = args.get("beta", 0.01)
+        # p = args.get("p")
+        code_syns_path = args.get("code_syns_path")
+        sim_intents_path = args.get("sim_intents_path")
+        perturbed_codes_path = args.get("perturbed_codes_path")
+        device = device_id if torch.cuda.is_available() else "cpu"
+        save_path = os.path.join(exp_name, "model.pt")
+        os.makedirs(exp_name, exist_ok=True) # create experiment folder.
+        # save params to config file.
+        self.config["uni_bi_hard_neg"] = True
+        self.config["batch_size"] = batch_size
+        self.config["train_path"] = train_path
+        self.config["device_id"] = device_id
+        self.config["exp_name"] = exp_name
+        self.config["val_path"] = val_path
+        self.config["epochs"] = epochs
+        print(f"model will be saved at {save_path}")
+        print(f"moving model to {device}")
+        self.embed_model.to(device)
+        sim_intents_map = {}
+        perturbed_codes = {}
+        # msg = "Missing path to dictionary containing {} corresponding to a given {}"
+        # assert sim_intents_path is not None, msg.format("similar intents", "intent")
+        if sim_intents_path is not None:
+            sim_intents_map = json.load(open(sim_intents_path))
+        # assert perturbed_codes_path is not None, msg.format("perturbed codes", "code snippet")
+        if perturbed_codes_path is not None:
+            perturbed_codes = json.load(open(perturbed_codes_path))
+        # create the datasets and data loaders.
+        trainset = UniBiHardNegDataset(
+            train_path, code_syns_path=code_syns_path, model_name="codebert", model=self,
+            device=device_id, sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, 
+            batch_size=64, tokenizer=self.tokenizer, max_length=100, padding="max_length", 
+            return_tensors="pt", add_special_tokens=True, truncation=True,
+            # ignore_worst_rules=self.ignore_worst_rules,
+            # ignore_non_disco_rules=self.ignore_non_disco_rules,
+        )
+        valset = ValRetDataset(val_path)
+        # self.config["trainset.warmup_steps"] = trainset.warmup_steps # no. of warmup steps before commencing training.
+        # self.config["trainset.epsilon"] = trainset.epsilon # related to mastering rate.
+        # self.config["trainset.delta"] = trainset.soft_master_rate.delta # related to mastering rate.
+        # self.config["trainset.beta"] = trainset.beta # related to hard negative sampling.
+        # self.config["trainset.p"] = trainset.soft_master_rate.p # related to mastering rate.
+        config_path = os.path.join(exp_name, "config.json") # path to config file
+        with open(config_path, "w") as f: print(self.config); json.dump(self.config, f) # save config file.
+        print(f"saved config to {config_path}")
+        trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size)
+        train_metrics = {"log_steps": [], "summary": []} 
+        rule_wise_acc = RuleWiseAccuracy(margin=1, use_scl=self.use_scl)
+        # bimodal, (soft+hard) cross entropy loss (classification accuracy)
+        train_ce_bi_tot = 0
+        train_ce_bi_acc = 0
+        # unimodal, (soft+hard) cross entropy loss (classification accuracy)
+        train_ce_uni_tot = 0 
+        train_ce_uni_acc = 0
+        # triplet accuracies
+        train_ml_bi_soft_acc = TripletAccuracy(margin=1) # bimodal, soft negatives, margin loss (triplet accuracy)
+        train_ml_bi_hard_acc = TripletAccuracy(margin=1) # bimodal, hard negatives, margin loss (triplet accuracy)
+        train_ml_uni_soft_acc = TripletAccuracy(margin=1) # unimodal, soft negatives, margin loss (triplet accuracy)
+        train_ml_uni_hard_acc = TripletAccuracy(margin=1) # unimodal, hard negatives, margin loss (triplet accuracy)
+        best_val_acc = 0
+        for epoch_i in range(epochs):
+            self.train()
+            batch_losses = []
+            pbar = tqdm(enumerate(trainloader), total=len(trainloader),
+                        desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
+            # reset triplet accuracies.
+            rule_wise_acc.reset()
+            train_ml_bi_soft_acc.reset()
+            train_ml_bi_hard_acc.reset()
+            train_ml_uni_soft_acc.reset()
+            train_ml_uni_hard_acc.reset()
+            for step, batch in pbar:
+                self.train()
+                vecs = []
+                for i in range(0, 8, 2):
+                    input_ids = batch[i]
+                    attn_mask = batch[i+1]
+                    vecs.append(self.embed_model(
+                        input_ids.to(device), 
+                        attn_mask.to(device),
+                    ).pooler_output)
+                # vecs: 0: a, 1: p, 2: p_, 3: n
+                N = len(batch[0])
+                pidx = torch.randperm(N) # permuted ids
+                d_ap = torch.cdist(vecs[0], vecs[1])
+                d_an = torch.cdist(vecs[0], vecs[3])
+                d_pp_ = torch.cdist(vecs[1], vecs[2]) 
+                d_pn = torch.cdist(vecs[1], vecs[3])
+                b_scores = -torch.cat((d_ap, d_an), axis=-1)
+                u_scores = -torch.cat((d_pp_, d_pn), axis=-1)
+                target = torch.as_tensor(range(N)).to(device)
+                # all 6 loss functions:
+                ce_b_loss = self.ce_loss(b_scores, target) # CE bimodal loss.
+                ce_u_loss = self.ce_loss(u_scores, target) # CE unimodal loss.
+                # ml_b_hard_loss = self.loss_fn(vecs[0], vecs[1], vecs[3]).mean()
+                # ml_u_hard_loss = self.loss_fn(vecs[1], vecs[2], vecs[3]).mean()
+                ml_b_soft_loss = self.loss_fn(vecs[0], vecs[1], vecs[1][pidx]).mean()
+                ml_u_soft_loss = self.loss_fn(vecs[1], vecs[2], vecs[2][pidx]).mean()
+                # batch_loss = ce_b_loss + ce_u_loss + ml_b_hard_loss + ml_u_hard_loss + ml_b_soft_loss + ml_u_soft_loss # total batch loss.
+                batch_loss = ce_b_loss + ce_u_loss + ml_b_soft_loss + ml_u_soft_loss
+                batch_loss.backward() # compute gradients.
+                self.optimizer.step() # take optimization step.
+                self.zero_grad() # clear gradients
+                batch_losses.append(batch_loss.item()) # collect batch losses.
+                # update metrics.
+                train_ce_bi_tot += N
+                train_ce_uni_tot += N
+                b_preds = b_scores.argmax(dim=-1)
+                u_preds = u_scores.argmax(dim=-1)
+                train_ce_bi_acc += (b_preds == target).sum().item()
+                train_ce_uni_acc += (u_preds == target).sum().item()
+                train_ml_bi_soft_acc.update(vecs[0], vecs[1], vecs[3][pidx])
+                train_ml_bi_hard_acc.update(vecs[0], vecs[1], vecs[3], (batch[-1]!=0))
+                train_ml_uni_soft_acc.update(vecs[1], vecs[2], vecs[3][pidx])
+                train_ml_uni_hard_acc.update(vecs[1], vecs[2], vecs[3], (batch[-1]!=0))
+                rule_wise_acc.update(vecs[0], vecs[1], vecs[3], batch[-1].tolist())
+                # batch loss string (show values of various losses)
+                # batch_loss_str = f"bl:{batch_loss:.2f}=ce:{ce_b_loss:.2f}b+{ce_u_loss:.2f}u|ml:{ml_b_hard_loss:.2f}bh+{ml_u_hard_loss:.2f}uh+{ml_b_soft_loss:.2f}bs+{ml_u_soft_loss:.2f}us"
+                batch_loss_str = f"bl:{batch_loss:.2f}=ce:{ce_b_loss:.2f}b+{ce_u_loss:.2f}u|ml:{ml_b_soft_loss:.2f}bs+{ml_u_soft_loss:.2f}us"
+                # show metrics
+                ce_metric_str = f"{(100*train_ce_bi_acc/train_ce_bi_tot):.2f}b,{(100*train_ce_uni_acc/train_ce_uni_tot):.2f}u"
+                ml_metric_str = f"{100*train_ml_bi_hard_acc.get():.2f}bh,{100*train_ml_uni_hard_acc.get():.2f}uh,{100*train_ml_bi_soft_acc.get():.2f}bs,{100*train_ml_uni_soft_acc.get():.2f}us"
+                metric_str = f"ce:{ce_metric_str}|ml:{ml_metric_str}"
+                pbar.set_description(f"T e:{epoch_i+1}/{epochs} {batch_loss_str} l:{np.mean(batch_losses):.3f} {metric_str}")
+                # if step == 5: break # DEBUG
+                if ((step+1) % VALID_STEPS == 0) or ((step+1) == len(trainloader)):
+                    # validate current model
+                    print(rule_wise_acc())
+                    print(dict(rule_wise_acc.counts))
+                    s = time.time()
+                    val_acc = self.val_ret(valset, device=device)
+                    print(f"validated in {time.time()-s}s")
+                    print(f"recall@5 = {100*val_acc:.3f}")
+                    val_loss = None
+                    # save model only after warmup is complete (for MR curriculum).
+                    if val_acc > best_val_acc and (not(hasattr(trainset, "warmup_steps")) or trainset.warmup_steps == 0):
+                        best_val_acc = val_acc
+                        print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
+                        torch.save(self.state_dict(), save_path)
+                    train_metrics["log_steps"].append({
+                        "train_batch_losses": batch_losses, 
+                        "train_loss": np.mean(batch_losses), 
+                        "val_loss": val_loss,
+                        "val_acc": 100*val_acc,
+                    })
+                    train_metrics["train_ce_bi_acc"] = 100*train_ce_bi_acc/train_ce_bi_tot
+                    train_metrics["train_ce_uni_acc"] = 100*train_ce_uni_acc/train_ce_uni_tot
+                    train_metrics["train_ml_bi_soft_acc"] = 100*train_ml_bi_soft_acc.get()
+                    train_metrics["train_ml_bi_hard_acc"] = 100*train_ml_bi_hard_acc.get()
+                    train_metrics["train_ml_uni_soft_acc"] = 100*train_ml_uni_soft_acc.get()
+                    train_metrics["train_ml_uni_soft_acc"] = 100*train_ml_uni_hard_acc.get()
+                    metrics_path = os.path.join(exp_name, "train_metrics.json")
+                    print(f"saving metrics to {metrics_path}")
+                    with open(metrics_path, "w") as f:
+                        json.dump(train_metrics, f)
+
+        return train_metrics
     
 def main(args):
     print("initializing model and tokenizer ..")
@@ -1176,19 +1344,22 @@ def main(args):
     print("creating model object")
     triplet_net = CodeBERTripletNet(tok_path=tok_path, **vars(args))
     print("commencing training")
-    
-    metrics = triplet_net.fit(exp_name=args.exp_name, epochs=args.epochs,
-                              perturbed_codes_path=args.perturbed_codes_path,
-                              device_id=args.device_id, val_path=args.val_path,
-                              train_path=args.train_path, batch_size=args.batch_size,
-                              beta=args.beta, p=args.p, warmup_steps=args.warmup_steps,
-                              dynamic_negative_sampling=args.dynamic_negative_sampling,
-                              sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
-                              intent_level_dynamic_sampling=args.intent_level_dynamic_sampling,
-                              no_curriculum=args.no_curriculum, curriculum_type=args.curr_type,
-                              code_code_pairs_path=args.code_code_pairs_path)
+    if args.all_losses_setting: 
+        metrics = triplet_net.fit_unibi_hardneg(**vars(args))
+    elif args.disco_baseline:
+        metrics = fit_disco(triplet_net, model_name="codebert", **vars(args))
+    else:
+        metrics = triplet_net.fit(exp_name=args.exp_name, epochs=args.epochs,
+                                  perturbed_codes_path=args.perturbed_codes_path,
+                                  device_id=args.device_id, val_path=args.val_path,
+                                  train_path=args.train_path, batch_size=args.batch_size,
+                                  beta=args.beta, p=args.p, warmup_steps=args.warmup_steps,
+                                  dynamic_negative_sampling=args.dynamic_negative_sampling,
+                                  sim_intents_path=args.sim_intents_path, use_AST=args.use_AST,
+                                  intent_level_dynamic_sampling=args.intent_level_dynamic_sampling,
+                                  no_curriculum=args.no_curriculum, curriculum_type=args.curr_type,
+                                  code_code_pairs_path=args.code_code_pairs_path)
     metrics_path = os.path.join(args.exp_name, "train_metrics.json")
-    
     print(f"saving metrics to {metrics_path}")
     with open(metrics_path, "w") as f:
         json.dump(metrics, f)

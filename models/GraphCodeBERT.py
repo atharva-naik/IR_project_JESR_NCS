@@ -13,6 +13,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import AdamW
 from typing import Union, List
+from datautils import ValRetDataset
 from tree_sitter import Language, Parser
 from sklearn.metrics import ndcg_score as NDCG
 from torch.utils.data import Dataset, DataLoader
@@ -24,7 +25,7 @@ from datautils.parser import (remove_comments_and_docstrings,
                               tree_to_token_index,
                               index_to_code_token,
                               tree_to_variable_index)
-from models import test_ood_performance, get_tok_path, dynamic_negative_sampling
+from models import test_ood_performance, get_tok_path, dynamic_negative_sampling, fit_disco
 from models.losses import scl_loss, TripletMarginWithDistanceLoss, cos_dist, cos_cdist, cos_csim
 # seed
 random.seed(0)
@@ -67,6 +68,7 @@ def get_args():
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
                         help="dynamic sampling based on similar intents")
     parser.add_argument("-uce", "--use_cross_entropy", action="store_true", help="use cross entropy loss instead of triplet margin loss")
+    parser.add_argument("-disco", "--disco_baseline", action="store_true", help="use DISCO training procedure")
     parser.add_argument("-ct", "--curr_type", type=str, default="mr", choices=['mr', 'rand', 'lp', 'exp', 'hard', "soft"],
                         help="""type of curriculum (listed below): 
                              1) mr: mastering rate based curriculum 
@@ -222,47 +224,6 @@ class CodeDataset(Dataset):
         return (torch.tensor(code_ids),
                 torch.tensor(attn_mask),
                 torch.tensor(position_idx))    
-    
-
-class ValRetDataset(Dataset):
-    # JUST an engineering related class to convert NL-PL pairs to retrieval setting.
-    def __init__(self, path: str):
-        super(ValRetDataset, self).__init__()
-        self.data = json.load(open(path))
-        posts = {} # query to candidate map.
-        cands = {} # unique candidates
-        tot = 0
-        for rec in self.data:
-            intent = rec["intent"]
-            snippet = rec["snippet"]
-            if snippet not in cands:
-                cands[snippet] = tot
-                tot += 1
-            try: posts[intent][snippet] = None
-            except KeyError: posts[intent] = {snippet: None}
-        self._cands = list(cands.keys())
-        self._queries = list(posts.keys())
-        self._labels = []
-        for query, candidates in posts.items():
-            self._labels.append([])
-            for cand in candidates.keys():
-                self._labels[-1].append(cands[cand])
-
-    def __len__(self):
-        return len(self.data)
-    
-    def get_queries(self):
-        return self._queries
-    
-    def get_candidates(self):
-        return self._cands
-    
-    def get_labels(self):
-        return self._labels
-        
-    def __getitem__(self, i: int):
-        return self.data[i]
-    
     
 class TextDataset(Dataset):
     def __init__(self, texts: str, tokenizer: Union[str, None, RobertaTokenizer]=None, **tok_args):
@@ -865,8 +826,8 @@ class GraphCodeBERTripletNet(nn.Module):
         elif self.code_retriever_baseline:
             from datautils import CodeRetrieverDataset
             trainset = CodeRetrieverDataset(
-                train_path, code_code_path=code_code_pairs_path, model_name="graphcodebert", tokenizer=self.tokenizer,
-                nl_length=100, code_length=100, data_flow_length=64,
+                train_path, code_code_path=code_code_pairs_path, model_name="graphcodebert", 
+                tokenizer=self.tokenizer, nl_length=100, code_length=100, data_flow_length=64,
                 # max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
             )
             valset = ValRetDataset(val_path)
@@ -889,7 +850,7 @@ class GraphCodeBERTripletNet(nn.Module):
             json.dump(self.config, f)
         print(f"saved config to {config_path}")
         
-        if SHUFFLE_BATCH_DEBUG_SETTING: #TODO: remove this. Used only for a temporary experiment.
+        if SHUFFLE_BATCH_DEBUG_SETTING  and not(self.code_retriever_baseline): #TODO: remove this. Used only for a temporary experiment.
             from datautils import batch_shuffle_collate_fn_graphcodebert
             trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size,
                                      collate_fn=batch_shuffle_collate_fn_graphcodebert)
@@ -1063,7 +1024,7 @@ class GraphCodeBERTripletNet(nn.Module):
                         val_acc, val_loss = self.val(valloader, epoch_i=epoch_i, 
                                                      epochs=epochs, device=device)
                     # save model only after warmup is complete.
-                    if val_acc > best_val_acc and trainset.warmup_steps == 0:
+                    if val_acc > best_val_acc and (not(hasattr(trainset, "warmup_steps")) or trainset.warmup_steps == 0):
                         print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
                         best_val_acc = val_acc
                         torch.save(self.state_dict(), save_path)
@@ -1097,7 +1058,9 @@ def main(args):
     triplet_net = GraphCodeBERTripletNet(tok_path=tok_path, **vars(args))
     if args.train:
         print("commencing training")
-        metrics = triplet_net.fit(**vars(args))
+        if args.disco_baseline:
+            metrics = fit_disco(triplet_net, model_name="graphcodebert", **vars(args))
+        else: metrics = triplet_net.fit(**vars(args))
         metrics_path = os.path.join(args.exp_name, "train_metrics.json")
         print(f"saving metrics to {metrics_path}")
         with open(metrics_path, "w") as f:

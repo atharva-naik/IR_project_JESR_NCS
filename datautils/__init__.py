@@ -16,6 +16,7 @@ import torch.nn.functional as F
 from collections import defaultdict
 from transformers import RobertaTokenizer
 from torch.utils.data import Dataset, DataLoader
+from scripts.create_code_code_pairs import CodeSynsets
 
 # list of available models. 
 WORST_RULES_LIST = ["rule1", "rule3", "rule8", "rule11", "rule13", "rule17"] # the worst 6 rules
@@ -884,9 +885,9 @@ class AllModelsDataset(Dataset):
         
     def _unixcoder_getitem(self, anchor: str, pos: str, neg: str, hard_neg: bool):
         # special tokens are added by default.
-        anchor = self.model.embed_model.tokenize([anchor], **self.tok_args)[0]
-        pos = self.model.embed_model.tokenize([pos], **self.tok_args)[0]
-        neg = self.model.embed_model.tokenize([neg], **self.tok_args)[0]
+        anchor = self.tokenizer([anchor], **self.tok_args)[0]
+        pos = self.tokenizer([pos], **self.tok_args)[0]
+        neg = self.tokenizer([neg], **self.tok_args)[0]
         # print(anchor)
         return [torch.tensor(anchor), 
                 torch.tensor(pos), 
@@ -1145,7 +1146,47 @@ class DynamicTriplesDataset(AllModelsDataset):
             return self._graphcodebert_getitem(anchor, pos, neg, hard_neg)
         elif self.model_name == "unixcoder":
             return self._unixcoder_getitem(anchor, pos, neg, hard_neg)
+
+# Retrieval based validation.
+class ValRetDataset(Dataset):
+    """JUST a convenience class to convert NL-PL pairs to retrieval setting."""
+    def __init__(self, path: str):
+        super(ValRetDataset, self).__init__()
+        self.data = json.load(open(path))
+        posts = {} # query to candidate map.
+        cands = {} # unique candidates
+        tot = 0
+        for rec in self.data:
+            intent = rec["intent"]
+            snippet = rec["snippet"]
+            if snippet not in cands:
+                cands[snippet] = tot
+                tot += 1
+            try: posts[intent][snippet] = None
+            except KeyError: posts[intent] = {snippet: None}
+        self._cands = list(cands.keys())
+        self._queries = list(posts.keys())
+        self._labels = []
+        for query, candidates in posts.items():
+            self._labels.append([])
+            for cand in candidates.keys():
+                self._labels[-1].append(cands[cand])
+
+    def __len__(self):
+        return len(self.data)
+    
+    def get_queries(self):
+        return self._queries
+    
+    def get_candidates(self):
+        return self._cands
+    
+    def get_labels(self):
+        return self._labels
         
+    def __getitem__(self, i: int):
+        return self.data[i]
+    
 # QuadruplesDataset: (NL, PL, soft_neg PL, hard_neg PL)
 class QuadruplesDataset(AllModelsDataset):
     def __init__(self, path: str, model_name: str, model=None, tokenizer=None,
@@ -1275,6 +1316,17 @@ def create_apn_from_ccp_ncp(data: List[dict], code_code_pairs: List[Tuple[str, s
     # print(ctr)
     return apn
 
+def create_app_from_csyn_ncp(data: List[dict], code_synsets) -> List[Tuple[str, str, str]]:
+    """create A,P,P+ triples from code-code synsets and nl-code pairs."""
+    app, ctr = [], 0
+    for rec in data:
+        a = rec["intent"]
+        p = rec["snippet"]
+        p_ = code_synsets.pick_lex(p)
+        app.append((a, p, p_))
+
+    return app
+
 # dataset class for CodeRetriever objective based training.
 class CodeRetrieverDataset(AllModelsDataset):
     def __init__(self, nl_code_path: str, code_code_path: str, 
@@ -1295,8 +1347,8 @@ class CodeRetrieverDataset(AllModelsDataset):
         self.data = create_apn_from_ccp_ncp(self.train_data, self.code_pairs)
         
     def __getitem__(self, item: int):
-        # combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
-        # if curriculum is turned off then just use hard negatives all the time.
+        """combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
+        if curriculum is turned off then just use hard negatives all the time."""
         anchor = self.data[item][0]
         pos = self.data[item][1]
         neg = self.data[item][2]
@@ -1308,8 +1360,9 @@ class CodeRetrieverDataset(AllModelsDataset):
         elif self.model_name == "graphcodebert":
             return self._graphcodebert_getitem(anchor, pos, neg, False)
         elif self.model_name == "unixcoder":
-            return self._unixcoder_getitem(anchor, pos, soft_neg, False)       
+            return self._unixcoder_getitem(anchor, pos, neg, False)       
 
+# Unimodal-Bimodal and hard negatives.
 class UniBiHardNegDataset(AllModelsDataset):
     """a (anchor): NL
     a+ : NL similar to a (>1, need a means to select 1) (not directly used as it is not a part of the dataset, only used to derive candidate hard negatives)
@@ -1320,5 +1373,206 @@ class UniBiHardNegDataset(AllModelsDataset):
     d_an: pairwise distances: hard negatives bimodal
     d_pp+: pairwise distances: soft negatives unimodal
     d_pn:  pairwise distances: hard negatives unimodal"""
-    def __init__(self, ):
-        passw
+    def __init__(self, nl_code_path: str, code_syns_path: str, 
+                 model_name: str, tokenizer=None, model=None, 
+                 sim_intents_map: dict={}, perturbed_codes: dict={}, 
+                 batch_size: int=64, device: str="cuda:0", **tok_args):
+        super(UniBiHardNegDataset, self).__init__(
+            path=nl_code_path, model_name=model_name,
+            tokenizer=tokenizer, **tok_args,
+        )
+        self.pdist = nn.PairwiseDistance()
+        self.model = model
+        self.device = device
+        self.batch_size = batch_size
+        self.nl_code_path = nl_code_path
+        self.code_syns_path = code_syns_path
+        self.sim_intents_map = sim_intents_map
+        self.perturbed_codes = perturbed_codes
+        # create a mapping of NL to all associated PLs. 
+        self.intent_to_code = {}
+        for rec in self.data:
+            try: intent = rec["intent"]
+            except TypeError: intent = rec[0]
+            try: snippet = rec["snippet"]
+            except TypeError: snippet = rec[1]
+            try: self.intent_to_code[intent].append(snippet)
+            except KeyError: self.intent_to_code[intent] = [snippet]
+            
+        self.code_synsets = CodeSynsets(code_syns_path)
+        self.train_data = copy.deepcopy(self.data)
+        self.data = create_app_from_csyn_ncp(
+            self.train_data, 
+            self.code_synsets,
+        )
+        
+    def _get_hard_negs(self, NL: str, PL: str) -> Tuple[List[str], List[int]]:
+        rindex = 0
+        code_cands: List[str] = []
+        rule_cands: List[int] = []
+        for tup in self.perturbed_codes.get(PL,[]): # codes from AST.
+            # if self.ignore_worst_rules and tup[1] in WORST_RULES_LIST: continue
+            # elif self.ignore_non_disco_rules and tup[1] in DISCO_IGNORE_LIST: continue
+            rule_index = int(tup[1].replace("rule",""))
+            code_cands.append(tup[0])
+            rule_cands.append(rule_index)
+        sim_intents: List[str] = self.sim_intents_map.get(NL,[])
+        for intent, _ in sim_intents:
+            code_cands += self.intent_to_code[intent]
+            rule_cands += [-1]*len(self.intent_to_code[intent])
+            
+        return code_cands, rule_cands
+    
+    def _sample_soft_neg(self, intent: str):
+        """sample a soft negative: first sample a random intent then sample a random negative"""
+        sampled_intent = intent
+        while sampled_intent == intent:
+            sampled_intent = random.sample(list(self.intent_to_code.keys()), k=1)[0]
+        return random.sample(self.intent_to_code[sampled_intent], k=1)[0]
+    
+    def __getitem__(self, item: int):
+        """combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder"""
+        a = self._proc_text(self.data[item][0]) # a
+        p = self._proc_code(self.data[item][1]) # p
+        p_ = self._proc_code(self.data[item][2]) # p+
+        neg_code_cands, neg_rule_cands = self._get_hard_negs(
+            NL=self.data[item][0],
+            PL=self.data[item][1],
+        )
+        if len(neg_code_cands) == 0:
+            n = self._proc_code(self._sample_soft_neg(a))
+            r = torch.as_tensor(0)
+        elif len(neg_code_cands) == 1:
+            n = self._proc_code(neg_code_cands[0])
+            r = torch.as_tensor(neg_rule_cands[0])
+        else:
+            self.model.eval()
+            with torch.no_grad():
+                enc_text = torch.stack(self.model.encode_emb(
+                    [a], mode="text", 
+                    device_id=self.device,
+                    batch_size=self.batch_size,
+                )) # 1 x hidden_size
+                enc_code = torch.stack(self.model.encode_emb(
+                    neg_code_cands, mode="code",
+                    batch_size=self.batch_size,
+                    device_id=self.device,
+                )) # num_cands x hidden_size
+                enc_text = enc_text.repeat(len(enc_code), 1) # num_cands x hidden_size
+            i = self.pdist(enc_text, enc_code).argmin().cpu().item()
+            n = self._proc_code(neg_code_cands[i])
+            r = torch.as_tensor(neg_rule_cands[i])
+        
+        if self.model_name == "codebert":
+            return self._codebert_getitem(a, p, p_, n, r)
+        elif self.model_name == "graphcodebert":
+            return self._graphcodebert_getitem(a, p, p_, n, r)
+        elif self.model_name == "unixcoder":
+            return self._unixcoder_getitem(a, p, p_, n, r)
+        
+    def _codebert_getitem(self, a, p, p_, n, rindex: int):
+        # special tokens are added by default.
+        a = self.tokenizer(a, **self.tok_args)
+        p = self.tokenizer(p, **self.tok_args)
+        p_ = self.tokenizer(p_, **self.tok_args)
+        n = self.tokenizer(n, **self.tok_args)
+        return [
+            a["input_ids"][0], a["attention_mask"][0], 
+            p["input_ids"][0], p["attention_mask"][0],
+            p_["input_ids"][0], p_["attention_mask"][0],
+            n["input_ids"][0], n["attention_mask"][0], 
+            rindex,
+        ]
+
+    def _unixcoder_getitem(self, a, p, p_, n, rindex: int):
+        # special tokens are added by default.
+        a = self.tokenizer([a], **self.tok_args)[0]
+        p = self.tokenizer([p], **self.tok_args)[0]
+        p_ = self.tokenizer([p_], **self.tok_args)[0]
+        n = self.tokenize([n], **self.tok_args)[0]
+        # print(anchor)
+        return [torch.tensor(a), 
+                torch.tensor(p), 
+                torch.tensor(p_),
+                torch.tensor(n),
+                rindex] 
+
+    def _graphcodebert_getitem(self, a, p, p_, n, rindex: int):
+        nl_ids = self._graphcodebert_proc_text(nl=a) # nl
+        pos_code_ids, pos_attn_mask, pos_position_idx = self._graphcodebert_code_encode(code_and_dfg=p) # pos
+        _pos_code_ids, _pos_attn_mask, _pos_position_idx = self._graphcodebert_code_encode(code_and_dfg=p_) # soft neg
+        neg_code_ids, neg_attn_mask, neg_position_idx = self._graphcodebert_code_encode(code_and_dfg=n) # hard neg
+
+        return [
+                torch.tensor(pos_code_ids),
+                torch.tensor(pos_attn_mask),
+                torch.tensor(pos_position_idx),
+                torch.tensor(_pos_code_ids),
+                torch.tensor(_pos_attn_mask),
+                torch.tensor(_pos_position_idx),
+                torch.tensor(neg_code_ids),
+                torch.tensor(neg_attn_mask),
+                torch.tensor(neg_position_idx),
+                torch.tensor(nl_ids), rindex,
+               ]
+    
+# dataset class for CodeRetriever objective based training.
+class DiscoDataset(AllModelsDataset):
+    def __init__(self, path: str, model_name: str, tokenizer=None, 
+                 perturbed_codes: dict={}, **tok_args):
+        # the dataset pointed to the path should contain the NL-PL pairs.
+        super(DiscoDataset, self).__init__(
+            path=path, model_name=model_name,
+            tokenizer=tokenizer, **tok_args,
+        )
+        self.data_path = path
+        triples = []
+        self.intent_to_code = {}
+        for rec in self.data:
+            try: intent = rec["intent"]
+            except TypeError: intent = rec[0]
+            try: snippet = rec["snippet"]
+            except TypeError: snippet = rec[1]
+            try: self.intent_to_code[intent].append(snippet)
+            except KeyError: self.intent_to_code[intent] = [snippet]
+        
+        for rec in self.data:
+            a = rec["intent"]
+            p = rec["snippet"]
+            hard_negs = perturbed_codes[p]
+            for n,r in hard_negs: 
+                if r in DISCO_IGNORE_LIST: continue
+                r = int(r.replace("rule",""))
+                triples.append((a,p,n,r))
+            if len(hard_negs) == 0: 
+                n = self._sample_soft_neg(a)
+                triples.append((a,p,n,0))
+        self.data = triples
+        
+    def _sample_soft_neg(self, intent: str):
+        """sample a soft negative: first sample a random intent then sample a random negative"""
+        sampled_intent = intent
+        while sampled_intent == intent:
+            sampled_intent = random.sample(list(self.intent_to_code.keys()), k=1)[0]
+        return random.sample(self.intent_to_code[sampled_intent], k=1)[0]
+        
+    def reset(self):
+        """reset code pairs"""
+        self.data = create_apn_from_ccp_ncp(self.train_data, self.code_pairs)
+        
+    def __getitem__(self, item: int):
+        """combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
+        if curriculum is turned off then just use hard negatives all the time."""
+        anchor = self.data[item][0]
+        pos = self.data[item][1]
+        neg = self.data[item][2]
+        rindex = self.data[item][3]
+        anchor = self._proc_text(anchor)
+        pos = self._proc_code(pos)
+        neg = self._proc_code(neg)
+        if self.model_name == "codebert":
+            return self._codebert_getitem(anchor, pos, neg, rindex)
+        elif self.model_name == "graphcodebert":
+            return self._graphcodebert_getitem(anchor, pos, neg, rindex)
+        elif self.model_name == "unixcoder":
+            return self._unixcoder_getitem(anchor, pos, neg, rindex)
