@@ -25,7 +25,8 @@ from sklearn.metrics import label_ranking_average_precision_score as MRR
 from models.metrics import TripletAccuracy, RuleWiseAccuracy, recall_at_k
 from models import test_ood_performance, get_tok_path, dynamic_negative_sampling, fit_disco
 from models.losses import scl_loss, TripletMarginWithDistanceLoss, cos_dist, cos_cdist, cos_csim
-from datautils import read_jsonl, ValRetDataset, UniBiHardNegDataset, DynamicTriplesDataset, CodeRetrieverDataset, batch_shuffle_collate_fn_codebert
+from datautils import read_jsonl, ValRetDataset, UniBiHardNegDataset, DynamicTriplesDataset, CodeRetrieverDataset, \
+CodeRetrieverTriplesDataset, CodeRetrieverQuadsDataset, CodeRetrieverQuintsDataset, batch_shuffle_collate_fn_codebert
 # set logging level of transformers.
 torch.autograd.set_detect_anomaly(True)
 transformers.logging.set_verbosity_error()
@@ -75,6 +76,9 @@ def get_args():
     parser.add_argument("-beta", "--beta", type=float, default=0.01, help="the beta used in the von-Mises fisher sampling")
     parser.add_argument("-ast", "--use_AST", action="store_true", help="use AST perturbed negative samples")
     parser.add_argument("-crb", "--code_retriever_baseline", action="store_true", help="use CodeRetriever objective")
+    parser.add_argument("-crq", "--code_retriever_quad", action="store_true", help="use CodeRetriever objective with quads")
+    parser.add_argument("-crq5", "--code_retriever_quint", action="store_true", help="use CodeRetriever objective with quints")
+    parser.add_argument("-crt", "--code_retriever_triplets", action="store_true", help="use CodeRetriever bimodal objective with random triplets")
     parser.add_argument("-crml", "--code_retriever_ml_loss", action="store_true", help="use triplet margin loss with CodeRetriever objective")
     parser.add_argument("-crsu", "--code_retriever_skip_unimodal", action="store_true", help="skip the unimodal loss in the CodeRetriever objective")
     parser.add_argument("-idns", "--intent_level_dynamic_sampling", action="store_true", 
@@ -104,6 +108,8 @@ def get_args():
     assert not(args.use_ccl and args.code_retriever_baseline), "conflicting objectives selected: CCL and CodeRetriever"
     if args.code_retriever_baseline: # only use soft negative for CodeRetriever
         args.curr_type = "soft"
+    if args.code_retriever_triplets:
+        args.code_retriever_skip_unimodal = True
     # parser.add_argument("-cp", "--ckpt_path", type=str, default="triplet_CodeBERT_rel_thresh/model.pt")
     return args
 
@@ -672,6 +678,7 @@ class CodeBERTripletNet(nn.Module):
         self.ignore_non_disco_rules = args.get("use_disco_rules", False)
         self.code_retriever_ml_loss = args.get("code_retriever_ml_loss", False)
         self.code_retriever_baseline = args.get("code_retriever_baseline", False)
+        self.code_retriever_triplets = args.get("code_retriever_triplets", False)
         self.code_retriever_skip_unimodal = args.get("code_retriever_skip_unimodal", False)
         self.use_cross_entropy = args.get("use_cross_entropy", False)
         self.use_ccl = args.get("use_ccl", False)
@@ -703,6 +710,7 @@ class CodeBERTripletNet(nn.Module):
             reduction="none",
         )
         self.config["code_retriever_skip_unimodal"] = self.code_retriever_skip_unimodal
+        self.config["code_retriever_triplets"] = self.code_retriever_triplets
         self.config["code_retriever_baseline"] = self.code_retriever_baseline
         self.config["code_retriever_ml_loss"] = self.code_retriever_ml_loss
         self.config["ignore_worst_rules"] = self.ignore_worst_rules
@@ -917,10 +925,17 @@ class CodeBERTripletNet(nn.Module):
             self.config["trainset.beta"] = trainset.beta # related to hard negative sampling.
             self.config["trainset.p"] = trainset.soft_master_rate.p # related to mastering rate.
         elif self.code_retriever_baseline:
-            trainset = CodeRetrieverDataset(
-                train_path, code_code_path=code_code_pairs_path, model_name="codebert", tokenizer=self.tokenizer,
-                max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
-            )
+            if self.code_retriever_triplets:
+                trainset = CodeRetrieverTriplesDataset(
+                    train_path, model_name="codebert", tokenizer=self.tokenizer,
+                    max_length=100, padding="max_length", return_tensors="pt", 
+                    add_special_tokens=True, truncation=True,
+                )
+            else:
+                trainset = CodeRetrieverDataset(
+                    train_path, code_code_path=code_code_pairs_path, model_name="codebert", tokenizer=self.tokenizer,
+                    max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+                )
             valset = ValRetDataset(val_path)
         else:
             trainset = TriplesDataset(train_path, tokenizer=self.tokenizer,
@@ -952,7 +967,6 @@ class CodeBERTripletNet(nn.Module):
         } 
         rule_wise_acc = RuleWiseAccuracy(margin=1, use_scl=self.use_scl)
         if self.comb_exp:
-            print("\x1b[34;1m990 combined experiment\x1b[0m")
             train_tot = 0; train_acc = 0
             train_hard_neg_acc = TripletAccuracy(margin=1, use_scl=self.use_scl)
         elif not(self.use_cross_entropy or self.code_retriever_baseline):
@@ -966,9 +980,7 @@ class CodeBERTripletNet(nn.Module):
             pbar = tqdm(enumerate(trainloader), total=len(trainloader),
                         desc=f"train: epoch: {epoch_i+1}/{epochs} batch_loss: 0 loss: 0 acc: 0")
             rule_wise_acc.reset()
-            if self.comb_exp: 
-                print("\x1b[34;1m1004 combined experiment\x1b[0m")
-                train_tot = 0; train_acc = 0; train_hard_neg_acc.reset()
+            if self.comb_exp: train_tot = 0; train_acc = 0; train_hard_neg_acc.reset()
             elif not(self.use_cross_entropy or self.code_retriever_baseline):
                 train_soft_neg_acc.reset(); train_hard_neg_acc.reset()
             for step, batch in pbar:
@@ -982,11 +994,15 @@ class CodeBERTripletNet(nn.Module):
                 anchor_title = (batch[0].to(device), batch[1].to(device))
                 pos_snippet = (batch[2].to(device), batch[3].to(device))
                 neg_snippet = (batch[4].to(device), batch[5].to(device))
-                anchor_text_emb, pos_code_emb, neg_code_emb = self(
-                    anchor_title, pos_snippet, neg_snippet
-                )
+                if self.code_retriever_skip_unimodal and not(self.code_retriever_triplets):
+                    anchor_text_emb = self.embed_model(*anchor_title).pooler_output
+                    pos_code_emb = self.embed_model(*pos_snippet).pooler_output
+                else:
+                    anchor_text_emb, pos_code_emb, neg_code_emb = self(
+                        anchor_title, pos_snippet, neg_snippet
+                    )
                 N = len(batch[0])
-                if hasattr(trainset, "update") or isinstance(trainset, CodeRetrieverDataset):
+                if hasattr(trainset, "update") or isinstance(trainset, (CodeRetrieverDataset, CodeRetrieverTriplesDataset)):
                     if self.comb_exp:
                         train_hard_neg_acc.update(
                             anchor_text_emb, pos_code_emb, 
@@ -1054,6 +1070,25 @@ class CodeBERTripletNet(nn.Module):
                                                              pos_code_emb[torch.randperm(N)]).mean()
                             bimodal_loss = self.loss_fn(pos_code_emb, neg_code_emb, 
                                                         neg_code_emb[torch.randperm(N)]).mean()
+                        elif self.code_retriever_triplets:
+                            # if USE_DROPOUT_NEGS:
+                            #     d_ap = torch.cat((torch.cdist(
+                            #                       self.dropout1(anchor_text_emb), 
+                            #                       self.dropout2(pos_code_emb)), 
+                            #                       torch.cdist(
+                            #                       self.dropout1(anchor_text_emb), 
+                            #                       self.dropout2(neg_code_emb))), axis=-1)
+                                # d_ap = torch.cat((torch.cdist(anchor_text_emb, pos_code_emb), 
+                                #                   torch.cdist(anchor_text_emb, neg_code_emb), 
+                                #                   torch.cdist(anchor_text_emb, self.dropout1(
+                                #                   neg_code_emb))), axis=-1)
+                            # else:
+                            d_ap = torch.cat((torch.cdist(anchor_text_emb, pos_code_emb), 
+                                              torch.cdist(anchor_text_emb, neg_code_emb)), 
+                                              axis=-1)
+                            target = torch.as_tensor(range(N)).to(device)
+                            bimodal_loss = self.ce_loss(-d_ap, target)
+                            batch_loss = bimodal_loss
                         else:
                             if self.use_csim:
                                 d_ap = -cos_csim(anchor_text_emb, pos_code_emb)
@@ -1076,12 +1111,17 @@ class CodeBERTripletNet(nn.Module):
                         if self.code_retriever_ml_loss: metric_str = ""
                         else:
                             b_preds = (-d_ap).argmax(dim=-1)
-                            u_preds = (-d_pn).argmax(dim=-1)
+                            if not(self.code_retriever_skip_unimodal):
+                                u_preds = (-d_pn).argmax(dim=-1)
+                                train_u_acc += (u_preds == target).sum().item()
                             train_acc += (b_preds == target).sum().item()
-                            train_u_acc += (u_preds == target).sum().item()
                             train_tot += N
+                        if self.code_retriever_skip_unimodal:
+                            metric_str = f"ba:{(100*train_acc/train_tot):.2f}"
+                            batch_loss_str = f"bl:{bimodal_loss:.3f}"
+                        else: 
                             metric_str = f"ba:{(100*train_acc/train_tot):.2f} ua:{(100*train_u_acc/train_tot):.2f}"
-                        batch_loss_str = f"bl:{batch_loss:.3f}={unimodal_loss:.3f}u+{bimodal_loss:.3f}b"
+                            batch_loss_str = f"bl:{batch_loss:.3f}={unimodal_loss:.3f}u+{bimodal_loss:.3f}b"
                     else:
                         # pd_ap = F.pairwise_distance(anchor_text_emb, pos_code_emb)
                         # pd_an = F.pairwise_distance(anchor_text_emb, neg_code_emb)
@@ -1112,8 +1152,9 @@ class CodeBERTripletNet(nn.Module):
                         else: 
                             batch_loss = self.loss_fn(anchor_text_emb, pos_code_emb, neg_code_emb).mean()
                             batch_loss_str = f"bl:{batch_loss:.3f}"
-                    rule_wise_acc.update(anchor_text_emb, pos_code_emb, 
-                                         neg_code_emb, batch[-1].cpu().tolist())
+                    if not(self.code_retriever_skip_unimodal):
+                        rule_wise_acc.update(anchor_text_emb, pos_code_emb, 
+                                             neg_code_emb, batch[-1].cpu().tolist())
                     if (self.use_cross_entropy or self.code_retriever_baseline):
                         pbar.set_description(f"T e:{epoch_i+1}/{epochs} bl:{batch_loss:.3f} l:{np.mean(batch_losses):.3f} {metric_str}")
                     elif self.comb_exp:
@@ -1167,7 +1208,7 @@ class CodeBERTripletNet(nn.Module):
                     elif self.comb_exp:
                         train_metrics["train_acc"] = 100*train_acc/train_tot
                         train_metrics["train_hard_neg_acc"] = 100*train_hard_neg_acc.get()
-                    else:
+                    elif not(self.code_retriever_ml_loss):
                         train_metrics["train_soft_neg_acc"] = 100*train_soft_neg_acc.get()
                         train_metrics["train_hard_neg_acc"] = 100*train_hard_neg_acc.get()
                     metrics_path = os.path.join(exp_name, "train_metrics.json")
@@ -1188,6 +1229,199 @@ class CodeBERTripletNet(nn.Module):
 #                 "val_loss": val_loss,
 #                 "val_acc": 100*val_acc,
 #             })
+        return train_metrics
+
+    def fit_code_retriever_quint(self, train_path: str, val_path: str, **args):
+        """fit the model on data having hard negatives using CodeRetriever like bimodal losses"""
+        exp_name = args.get("exp_name", "experiment")
+        device_id = args.get("device_id", "cuda:0")
+        batch_size = args.get("batch_size", 32)
+        epochs = args.get("epochs", 5)
+        device = device_id if torch.cuda.is_available() else "cpu"
+        save_path = os.path.join(exp_name, "model.pt")
+        os.makedirs(exp_name, exist_ok=True) # create experiment folder.
+        # save params to config file.
+        self.config["batch_size"] = batch_size
+        self.config["train_path"] = train_path
+        self.config["device_id"] = device_id
+        self.config["exp_name"] = exp_name
+        self.config["val_path"] = val_path
+        self.config["epochs"] = epochs
+        print(f"model will be saved at {save_path}")
+        print(f"moving model to {device}")
+        self.embed_model.to(device)
+        # create the datasets and data loaders.
+        trainset = CodeRetrieverQuintsDataset(
+            train_path, model_name="codebert", tokenizer=self.tokenizer, 
+            max_length=100, padding="max_length", return_tensors="pt", 
+            add_special_tokens=True, truncation=True,
+        )
+        valset = ValRetDataset(val_path)
+        config_path = os.path.join(exp_name, "config.json")
+        with open(config_path, "w") as f: 
+            print(self.config)
+            json.dump(self.config, f) # save config file.
+        print(f"saved config to {config_path}")
+        trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size)
+        train_metrics = {"log_steps": [], "summary": []} 
+        # bimodal, soft cross entropy loss (classification accuracy)
+        train_tot = 0
+        train_acc = 0
+        best_val_acc = 0
+        for epoch_i in range(epochs):
+            self.train()
+            batch_losses = []
+            pbar = tqdm(enumerate(trainloader), total=len(trainloader),
+                        desc=f"train: epoch: {epoch_i+1}/{epochs}")
+            for step, batch in pbar:
+                self.train()
+                vecs = []
+                for i in range(0, 10, 2):
+                    input_ids = batch[i]
+                    attn_mask = batch[i+1]
+                    vecs.append(self.embed_model(
+                        input_ids.to(device), 
+                        attn_mask.to(device),
+                    ).pooler_output)
+                # vecs: 0: a, 1: p, 2: n1, 3: n2
+                N = len(batch[0])
+                d_ap = torch.cdist(vecs[0], vecs[1])
+                d_an1 = torch.cdist(vecs[0], vecs[2])
+                d_an2 = torch.cdist(vecs[0], vecs[3]) 
+                d_an3 = torch.cdist(vecs[0], vecs[4])
+                scores = -torch.cat((d_ap, d_an1, d_an2, d_an3), axis=-1)
+                target = torch.as_tensor(range(N)).to(device)
+                batch_loss = self.ce_loss(scores, target) # CE bimodal loss.
+                batch_loss.backward() # compute gradients.
+                self.optimizer.step() # take optimization step.
+                self.zero_grad() # clear gradients
+                batch_losses.append(batch_loss.item()) # collect batch losses.
+                train_tot += N # update metrics.
+                preds = scores.argmax(dim=-1)
+                train_acc += (preds == target).sum().item()
+                batch_loss_str = f"bl:{batch_loss:.2f}" # batch loss string (show values of various losses)
+                metric_str = f"a:{100*train_acc/train_tot:.3f}" # show metrics
+                pbar.set_description(f"T e:{epoch_i+1}/{epochs} {batch_loss_str} l:{np.mean(batch_losses):.3f} {metric_str}")
+                if ((step+1) % VALID_STEPS == 0) or ((step+1) == len(trainloader)):
+                    # validate current model
+                    s = time.time()
+                    val_acc = self.val_ret(valset, device=device)
+                    print(f"validated in {time.time()-s}s")
+                    print(f"recall@5 = {100*val_acc:.3f}")
+                    val_loss = None
+                    # save model only after warmup is complete (for MR curriculum).
+                    if val_acc > best_val_acc and (not(hasattr(trainset, "warmup_steps")) or trainset.warmup_steps == 0):
+                        best_val_acc = val_acc
+                        print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
+                        torch.save(self.state_dict(), save_path)
+                    train_metrics["log_steps"].append({
+                        "train_batch_losses": batch_losses, 
+                        "train_loss": np.mean(batch_losses), 
+                        "val_loss": val_loss,
+                        "val_acc": 100*val_acc,
+                    })
+                    train_metrics["train_acc"] = 100*train_acc/train_tot
+                    metrics_path = os.path.join(exp_name, "train_metrics.json")
+                    print(f"saving metrics to {metrics_path}")
+                    with open(metrics_path, "w") as f:
+                        json.dump(train_metrics, f)
+
+        return train_metrics
+    
+    def fit_code_retriever_quad(self, train_path: str, val_path: str, **args):
+        """fit the model on data having hard negatives using CodeRetriever like bimodal losses"""
+        exp_name = args.get("exp_name", "experiment")
+        device_id = args.get("device_id", "cuda:0")
+        batch_size = args.get("batch_size", 32)
+        epochs = args.get("epochs", 5)
+        device = device_id if torch.cuda.is_available() else "cpu"
+        save_path = os.path.join(exp_name, "model.pt")
+        os.makedirs(exp_name, exist_ok=True) # create experiment folder.
+        # save params to config file.
+        self.config["batch_size"] = batch_size
+        self.config["train_path"] = train_path
+        self.config["device_id"] = device_id
+        self.config["exp_name"] = exp_name
+        self.config["val_path"] = val_path
+        self.config["epochs"] = epochs
+        print(f"model will be saved at {save_path}")
+        print(f"moving model to {device}")
+        self.embed_model.to(device)
+        # create the datasets and data loaders.
+        trainset = CodeRetrieverQuadsDataset(
+            train_path, model_name="codebert", tokenizer=self.tokenizer, 
+            max_length=100, padding="max_length", return_tensors="pt", 
+            add_special_tokens=True, truncation=True,
+        )
+        valset = ValRetDataset(val_path)
+        config_path = os.path.join(exp_name, "config.json")
+        with open(config_path, "w") as f: 
+            print(self.config)
+            json.dump(self.config, f) # save config file.
+        print(f"saved config to {config_path}")
+        trainloader = DataLoader(trainset, shuffle=True, batch_size=batch_size)
+        train_metrics = {"log_steps": [], "summary": []} 
+        # bimodal, soft cross entropy loss (classification accuracy)
+        train_tot = 0
+        train_acc = 0
+        best_val_acc = 0
+        for epoch_i in range(epochs):
+            self.train()
+            batch_losses = []
+            pbar = tqdm(enumerate(trainloader), total=len(trainloader),
+                        desc=f"train: epoch: {epoch_i+1}/{epochs}")
+            for step, batch in pbar:
+                self.train()
+                vecs = []
+                for i in range(0, 8, 2):
+                    input_ids = batch[i]
+                    attn_mask = batch[i+1]
+                    vecs.append(self.embed_model(
+                        input_ids.to(device), 
+                        attn_mask.to(device),
+                    ).pooler_output)
+                # vecs: 0: a, 1: p, 2: n1, 3: n2
+                N = len(batch[0])
+                d_ap = torch.cdist(vecs[0], vecs[1])
+                d_an1 = torch.cdist(vecs[0], vecs[2])
+                d_an2 = torch.cdist(vecs[0], vecs[3]) 
+                scores = -torch.cat((d_ap, d_an1, d_an2), axis=-1)
+                target = torch.as_tensor(range(N)).to(device)
+                batch_loss = self.ce_loss(scores, target) # CE bimodal loss.
+                batch_loss.backward() # compute gradients.
+                self.optimizer.step() # take optimization step.
+                self.zero_grad() # clear gradients
+                batch_losses.append(batch_loss.item()) # collect batch losses.
+                train_tot += N # update metrics.
+                preds = scores.argmax(dim=-1)
+                train_acc += (preds == target).sum().item()
+                batch_loss_str = f"bl:{batch_loss:.2f}" # batch loss string (show values of various losses)
+                metric_str = f"a:{100*train_acc/train_tot:.3f}" # show metrics
+                pbar.set_description(f"T e:{epoch_i+1}/{epochs} {batch_loss_str} l:{np.mean(batch_losses):.3f} {metric_str}")
+                if ((step+1) % VALID_STEPS == 0) or ((step+1) == len(trainloader)):
+                    # validate current model
+                    s = time.time()
+                    val_acc = self.val_ret(valset, device=device)
+                    print(f"validated in {time.time()-s}s")
+                    print(f"recall@5 = {100*val_acc:.3f}")
+                    val_loss = None
+                    # save model only after warmup is complete (for MR curriculum).
+                    if val_acc > best_val_acc and (not(hasattr(trainset, "warmup_steps")) or trainset.warmup_steps == 0):
+                        best_val_acc = val_acc
+                        print(f"saving best model till now with val_acc: {val_acc} at {save_path}")
+                        torch.save(self.state_dict(), save_path)
+                    train_metrics["log_steps"].append({
+                        "train_batch_losses": batch_losses, 
+                        "train_loss": np.mean(batch_losses), 
+                        "val_loss": val_loss,
+                        "val_acc": 100*val_acc,
+                    })
+                    train_metrics["train_acc"] = 100*train_acc/train_tot
+                    metrics_path = os.path.join(exp_name, "train_metrics.json")
+                    print(f"saving metrics to {metrics_path}")
+                    with open(metrics_path, "w") as f:
+                        json.dump(train_metrics, f)
+
         return train_metrics
 
     def fit_unibi_hardneg(self, train_path: str, val_path: str, **args):
@@ -1368,6 +1602,10 @@ def main(args):
         metrics = triplet_net.fit_unibi_hardneg(**vars(args))
     elif args.disco_baseline:
         metrics = fit_disco(triplet_net, model_name="codebert", **vars(args))
+    elif args.code_retriever_quad:
+        metrics = triplet_net.fit_code_retriever_quad(**vars(args))
+    elif args.code_retriever_quint:
+        metrics = triplet_net.fit_code_retriever_quint(**vars(args))
     else:
         metrics = triplet_net.fit(exp_name=args.exp_name, epochs=args.epochs,
                                   perturbed_codes_path=args.perturbed_codes_path,

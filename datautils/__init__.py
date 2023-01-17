@@ -1360,7 +1360,239 @@ class CodeRetrieverDataset(AllModelsDataset):
         elif self.model_name == "graphcodebert":
             return self._graphcodebert_getitem(anchor, pos, neg, False)
         elif self.model_name == "unixcoder":
-            return self._unixcoder_getitem(anchor, pos, neg, False)       
+            return self._unixcoder_getitem(anchor, pos, neg, False)  
+        
+# dataset class for CodeRetriever objective based training with triples and without unimodal loss.
+class CodeRetrieverTriplesDataset(AllModelsDataset):
+    def __init__(self, nl_code_path: str, model_name: str, 
+                 tokenizer=None, **tok_args):
+        super(CodeRetrieverTriplesDataset, self).__init__(
+            path=nl_code_path, model_name=model_name,
+            tokenizer=tokenizer, **tok_args,
+        )
+        self.nl_code_path = nl_code_path
+        # create a mapping of NL to all associated PLs. 
+        self.intent_to_code = {}
+        for rec in self.data:
+            try: intent = rec["intent"]
+            except TypeError: intent = rec[0]
+            try: snippet = rec["snippet"]
+            except TypeError: snippet = rec[1]
+            try: self.intent_to_code[intent].append(snippet)
+            except KeyError: self.intent_to_code[intent] = [snippet]
+        
+    def reset(self): pass # just for API consistency
+
+    def _sample_soft_neg(self, intent: str):
+        """sample a soft negative: first sample a random intent then sample a random negative"""
+        sampled_intent = intent
+        while sampled_intent == intent:
+            sampled_intent = random.sample(list(self.intent_to_code.keys()), k=1)[0]
+        return random.sample(self.intent_to_code[sampled_intent], k=1)[0]
+        
+    def __getitem__(self, item: int):
+        """combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
+        if curriculum is turned off then just use hard negatives all the time."""
+        anchor = self.data[item]["intent"]
+        pos = self.data[item]["snippet"]
+        neg = self._sample_soft_neg(anchor)
+        anchor = self._proc_text(anchor)
+        pos = self._proc_code(pos)
+        neg = self._proc_code(neg)
+        if self.model_name == "codebert":
+            return self._codebert_getitem(anchor, pos, neg, False)
+        elif self.model_name == "graphcodebert":
+            return self._graphcodebert_getitem(anchor, pos, neg, False)
+        elif self.model_name == "unixcoder":
+            return self._unixcoder_getitem(anchor, pos, neg, False)
+        
+# dataset class for CodeRetriever objective based training with quads and without unimodal loss.
+class CodeRetrieverQuintsDataset(AllModelsDataset):
+    def __init__(self, path: str, model_name: str, 
+                 tokenizer=None, **tok_args):
+        super(CodeRetrieverQuintsDataset, self).__init__(
+            path=path, model_name=model_name,
+            tokenizer=tokenizer, **tok_args,
+        )
+        # create a mapping of NL to all associated PLs. 
+        self.intent_to_code = {}
+        for rec in self.data:
+            try: intent = rec["intent"]
+            except TypeError: intent = rec[0]
+            try: snippet = rec["snippet"]
+            except TypeError: snippet = rec[1]
+            try: self.intent_to_code[intent].append(snippet)
+            except KeyError: self.intent_to_code[intent] = [snippet]
+        
+    def reset(self): pass # just for API consistency
+
+    def _sample_soft_neg(self, intent: str):
+        """sample a soft negative: first sample a random intent then sample a random negative"""
+        sampled_intent = intent
+        while sampled_intent == intent:
+            sampled_intent = random.sample(list(self.intent_to_code.keys()), k=1)[0]
+        return random.sample(self.intent_to_code[sampled_intent], k=1)[0]
+                
+    def _codebert_getitem(self, a, p, n1, n2, n3):
+        # special tokens are added by default.
+        a = self.tokenizer(a, **self.tok_args)
+        p = self.tokenizer(p, **self.tok_args)
+        n1 = self.tokenizer(n1, **self.tok_args)
+        n2 = self.tokenizer(n2, **self.tok_args)
+        n3 = self.tokenizer(n3, **self.tok_args)
+        return [
+            a["input_ids"][0], a["attention_mask"][0], 
+            p["input_ids"][0], p["attention_mask"][0],
+            n1["input_ids"][0], n1["attention_mask"][0],
+            n2["input_ids"][0], n2["attention_mask"][0],
+            n3["input_ids"][0], n3["attention_mask"][0],
+        ]
+
+    def _unixcoder_getitem(self, a, p, n1, n2, n3):
+        # special tokens are added by default.
+        a = self.tokenizer([a], **self.tok_args)[0]
+        p = self.tokenizer([p], **self.tok_args)[0]
+        n1 = self.tokenizer([n1], **self.tok_args)[0]
+        n2 = self.tokenizer([n2], **self.tok_args)[0]
+        n3 = self.tokenizer([n3], **self.tok_args)[0]
+        # print(anchor)
+        return [torch.tensor(a), 
+                torch.tensor(p), 
+                torch.tensor(n1),
+                torch.tensor(n2),
+                torch.tensor(n3)] 
+
+    def _graphcodebert_getitem(self, a, p, n1, n2, n3):
+        nl_ids = self._graphcodebert_proc_text(nl=a) # nl
+        pos_code_ids, pos_attn_mask, pos_position_idx = self._graphcodebert_code_encode(code_and_dfg=p) # pos
+        neg1_code_ids, neg1_attn_mask, neg1_position_idx = self._graphcodebert_code_encode(code_and_dfg=n1) 
+        neg2_code_ids, neg2_attn_mask, neg2_position_idx = self._graphcodebert_code_encode(code_and_dfg=n2)
+        neg3_code_ids, neg3_attn_mask, neg3_position_idx = self._graphcodebert_code_encode(code_and_dfg=n3)
+
+        return [
+                torch.tensor(pos_code_ids),
+                torch.tensor(pos_attn_mask),
+                torch.tensor(pos_position_idx),
+                torch.tensor(neg1_code_ids),
+                torch.tensor(neg1_attn_mask),
+                torch.tensor(neg1_position_idx),
+                torch.tensor(neg2_code_ids),
+                torch.tensor(neg2_attn_mask),
+                torch.tensor(neg2_position_idx),
+                torch.tensor(neg3_code_ids),
+                torch.tensor(neg3_attn_mask),
+                torch.tensor(neg3_position_idx),
+                torch.tensor(nl_ids),
+               ]
+    
+    def __getitem__(self, item: int):
+        """combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
+        if curriculum is turned off then just use hard negatives all the time."""
+        anchor = self.data[item]["intent"]
+        pos = self.data[item]["snippet"]
+        neg1 = self._sample_soft_neg(anchor)
+        neg2 = self._sample_soft_neg(anchor)
+        neg3 = self._sample_soft_neg(anchor)
+        anchor = self._proc_text(anchor)
+        pos = self._proc_code(pos)
+        neg1 = self._proc_code(neg1)
+        neg2 = self._proc_code(neg2)
+        neg3 = self._proc_code(neg3)
+        if self.model_name == "codebert":
+            return self._codebert_getitem(anchor, pos, neg1, neg2, neg3)
+        elif self.model_name == "graphcodebert":
+            return self._graphcodebert_getitem(anchor, pos, neg, neg2, neg3)
+        elif self.model_name == "unixcoder":
+            return self._unixcoder_getitem(anchor, pos, neg1, neg2, neg3)
+        
+# dataset class for CodeRetriever objective based training with quads and without unimodal loss.
+class CodeRetrieverQuadsDataset(AllModelsDataset):
+    def __init__(self, path: str, model_name: str, 
+                 tokenizer=None, **tok_args):
+        super(CodeRetrieverQuadsDataset, self).__init__(
+            path=path, model_name=model_name,
+            tokenizer=tokenizer, **tok_args,
+        )
+        # create a mapping of NL to all associated PLs. 
+        self.intent_to_code = {}
+        for rec in self.data:
+            try: intent = rec["intent"]
+            except TypeError: intent = rec[0]
+            try: snippet = rec["snippet"]
+            except TypeError: snippet = rec[1]
+            try: self.intent_to_code[intent].append(snippet)
+            except KeyError: self.intent_to_code[intent] = [snippet]
+        
+    def reset(self): pass # just for API consistency
+
+    def _sample_soft_neg(self, intent: str):
+        """sample a soft negative: first sample a random intent then sample a random negative"""
+        sampled_intent = intent
+        while sampled_intent == intent:
+            sampled_intent = random.sample(list(self.intent_to_code.keys()), k=1)[0]
+        return random.sample(self.intent_to_code[sampled_intent], k=1)[0]
+                
+    def _codebert_getitem(self, a, p, p_, n):
+        # special tokens are added by default.
+        a = self.tokenizer(a, **self.tok_args)
+        p = self.tokenizer(p, **self.tok_args)
+        p_ = self.tokenizer(p_, **self.tok_args)
+        n = self.tokenizer(n, **self.tok_args)
+        return [
+            a["input_ids"][0], a["attention_mask"][0], 
+            p["input_ids"][0], p["attention_mask"][0],
+            p_["input_ids"][0], p_["attention_mask"][0],
+            n["input_ids"][0], n["attention_mask"][0],
+        ]
+
+    def _unixcoder_getitem(self, a, p, p_, n):
+        # special tokens are added by default.
+        a = self.tokenizer([a], **self.tok_args)[0]
+        p = self.tokenizer([p], **self.tok_args)[0]
+        p_ = self.tokenizer([p_], **self.tok_args)[0]
+        n = self.tokenize([n], **self.tok_args)[0]
+        # print(anchor)
+        return [torch.tensor(a), 
+                torch.tensor(p), 
+                torch.tensor(p_),
+                torch.tensor(n)] 
+
+    def _graphcodebert_getitem(self, a, p, p_, n):
+        nl_ids = self._graphcodebert_proc_text(nl=a) # nl
+        pos_code_ids, pos_attn_mask, pos_position_idx = self._graphcodebert_code_encode(code_and_dfg=p) # pos
+        _pos_code_ids, _pos_attn_mask, _pos_position_idx = self._graphcodebert_code_encode(code_and_dfg=p_) # soft neg
+        neg_code_ids, neg_attn_mask, neg_position_idx = self._graphcodebert_code_encode(code_and_dfg=n) # hard neg
+
+        return [
+                torch.tensor(pos_code_ids),
+                torch.tensor(pos_attn_mask),
+                torch.tensor(pos_position_idx),
+                torch.tensor(_pos_code_ids),
+                torch.tensor(_pos_attn_mask),
+                torch.tensor(_pos_position_idx),
+                torch.tensor(neg_code_ids),
+                torch.tensor(neg_attn_mask),
+                torch.tensor(neg_position_idx),
+                torch.tensor(nl_ids),
+               ]
+    
+    def __getitem__(self, item: int):
+        """combined get item for all 3 models: CodeBERT, GraphCodeBERT, UniXcoder.
+        if curriculum is turned off then just use hard negatives all the time."""
+        anchor = self.data[item]["intent"]
+        pos = self.data[item]["snippet"]
+        neg1 = self._sample_soft_neg(anchor)
+        neg2 = self._sample_soft_neg(anchor)
+        anchor = self._proc_text(anchor)
+        pos = self._proc_code(pos)
+        neg1 = self._proc_code(neg1)
+        neg2 = self._proc_code(neg2)
+        if self.model_name == "codebert":
+            return self._codebert_getitem(anchor, pos, neg1, neg2)
+        elif self.model_name == "graphcodebert":
+            return self._graphcodebert_getitem(anchor, pos, neg, neg2)
+        elif self.model_name == "unixcoder":
+            return self._unixcoder_getitem(anchor, pos, neg1, neg2)
 
 # Unimodal-Bimodal and hard negatives.
 class UniBiHardNegDataset(AllModelsDataset):

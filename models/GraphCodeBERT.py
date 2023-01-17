@@ -51,6 +51,7 @@ def get_args():
     parser.add_argument("-e", "--epochs", type=int, default=5, help="no. of epochs")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
     parser.add_argument("-crb", "--code_retriever_baseline", action="store_true", help="use CodeRetriever objective")
+    parser.add_argument("-crt", "--code_retriever_triplets", action="store_true", help="use CodeRetriever bimodal objective with random triplets")
     parser.add_argument("-dns", "--dynamic_negative_sampling", action="store_true", 
                         help="do dynamic negative sampling at batch level")
     parser.add_argument("-sip", "--sim_intents_path", type=str, default=None, 
