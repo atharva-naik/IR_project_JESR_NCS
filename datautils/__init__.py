@@ -20,8 +20,11 @@ from scripts.create_code_code_pairs import CodeSynsets
 
 # list of available models. 
 WORST_RULES_LIST = ["rule1", "rule3", "rule8", "rule11", "rule13", "rule17"] # the worst 6 rules
+WORST_OLD_RULES_LIST = ["rule1", "rule2", "rule3", "rule8"] # the worst 4 (out of 9 rules) according to the old system.
 DISCO_IGNORE_LIST = ["rule1", "rule2", "rule3", "rule5", "rule7", 
                      "rule8", "rule16", "rule17", "rule18"] # rules to be ignore to follow DISCO
+UNNATURAL_IGNORE_LIST = ["rule8", "rule12", "rule13", "rule14", "rule15", "rule17"]
+NEW_RULES_IGNORE_LIST = ["rule10", "rule11", "rule14", "rule15", "rule16", "rule17", "rule18"]
 MODEL_OPTIONS = ["codebert", "graphcodebert", "unixcoder"]
 #     anchor["input_ids"][0], anchor["attention_mask"][0], 
 #     pos["input_ids"][0], pos["attention_mask"][0],
@@ -728,13 +731,17 @@ class MasteringRate:
 #                )
 # NL-PL pairs dataset class.
 class AllModelsDataset(Dataset):
-    def __init__(self, path: str, model_name: str, 
-                 tokenizer=None, ignore_worst_rules: bool=False, 
-                 ignore_non_disco_rules: bool=False, **tok_args):
+    def __init__(self, path: str, model_name: str, tokenizer=None, 
+                 ignore_new_rules: bool=False, ignore_worst_rules: bool=False,
+                 ignore_non_disco_rules: bool=False, ignore_old_worst_rules: bool=False,
+                 ignore_unnatural_rules: bool=False, **tok_args):
         super(AllModelsDataset, self).__init__()
         assert model_name in MODEL_OPTIONS
         # if filename endswith jsonl:
+        self.ignore_new_rules = ignore_new_rules
         self.ignore_worst_rules = ignore_worst_rules
+        self.ignore_old_worst_rules = ignore_old_worst_rules
+        self.ignore_unnatural_rules = ignore_unnatural_rules
         self.ignore_non_disco_rules = ignore_non_disco_rules
         if path.endswith(".jsonl"):
             self.data = read_jsonl(path) # NL-PL pairs.
@@ -829,8 +836,11 @@ class AllModelsDataset(Dataset):
         rules_for_sim_intents: List[int] = []
         if use_AST: # when using AST only use AST.
             for tup in self.perturbed_codes[PL]: # codes from AST.
-                if self.ignore_worst_rules and tup[1] in WORST_RULES_LIST: continue
+                if self.ignore_new_rules and tup[1] in NEW_RULES_IGNORE_LIST: continue
+                elif self.ignore_worst_rules and tup[1] in WORST_RULES_LIST: continue
                 elif self.ignore_non_disco_rules and tup[1] in DISCO_IGNORE_LIST: continue
+                elif self.ignore_old_worst_rules and tup[1] in WORST_OLD_RULES_LIST: continue
+                elif self.ignore_unnatural_rules and tup[1] in UNNATURAL_IGNORE_LIST: continue
                 rule_index = int(tup[1].replace("rule",""))
                 codes_for_sim_intents.append(tup[0])
                 rules_for_sim_intents.append(rule_index)

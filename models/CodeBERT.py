@@ -95,6 +95,12 @@ def get_args():
                              6) soft: soft negatives only""")
     parser.add_argument("-igwr", "--ignore_worst_rules", action='store_true',
                         help="ignore the 6 worst/easiest perturbation rules")
+    parser.add_argument("-igowr", "--ignore_old_worst_rules", action='store_true',
+                        help="ignore the 4 worst/easiest perturbation rules from the old set")
+    parser.add_argument("-ignr", "--ignore_new_rules", action='store_true',
+                        help="ignore the newly created rules")
+    parser.add_argument("-igur", "--ignore_unnatural_rules", action='store_true',
+                        help="ignore unnatural rule types")
     parser.add_argument("-discr", "--use_disco_rules", action='store_true',
                         help="use the rules outlined in/inspired by the DISCO paper (9)")
     parser.add_argument("-too", "--test_ood", action="store_true", help="flat to do ood testing")
@@ -674,8 +680,11 @@ class CodeBERTripletNet(nn.Module):
         margin = args.get("margin", 1)
         dist_fn_deg = args.get("dist_fn_deg", 2)
 
+        self.ignore_new_rules = args.get("ignore_new_rules", False)
         self.ignore_worst_rules = args.get("ignore_worst_rules", False)
         self.ignore_non_disco_rules = args.get("use_disco_rules", False)
+        self.ignore_old_worst_rules = args.get("ignore_old_worst_rules", False)
+        self.ignore_unnatural_rules = args.get("ignore_unnatural_rules", False)
         self.code_retriever_ml_loss = args.get("code_retriever_ml_loss", False)
         self.code_retriever_baseline = args.get("code_retriever_baseline", False)
         self.code_retriever_triplets = args.get("code_retriever_triplets", False)
@@ -713,7 +722,10 @@ class CodeBERTripletNet(nn.Module):
         self.config["code_retriever_triplets"] = self.code_retriever_triplets
         self.config["code_retriever_baseline"] = self.code_retriever_baseline
         self.config["code_retriever_ml_loss"] = self.code_retriever_ml_loss
+        self.config["ingore_unnatural_rules"] = self.ignore_unnatural_rules
+        self.config["ignore_old_worst_rules"] = self.ignore_old_worst_rules
         self.config["ignore_worst_rules"] = self.ignore_worst_rules
+        self.config["ignore_new_rules"] = self.ignore_new_rules
         self.config["use_cross_entropy"] = self.use_cross_entropy
         self.config["use_disco_rules"] = self.ignore_non_disco_rules
         self.config["dist_fn_deg"] = dist_fn_deg
@@ -901,9 +913,11 @@ class CodeBERTripletNet(nn.Module):
                 train_path, "codebert", device=device_id, beta=beta, warmup_steps=warmup_steps,
                 sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, use_AST=use_AST, model=self, 
                 tokenizer=self.tokenizer, p=p, use_curriculum=use_curriculum, curriculum_type=curriculum_type,
-                max_length=100, padding="max_length", return_tensors="pt", add_special_tokens=True, truncation=True,
+                ignore_non_disco_rules=self.ignore_non_disco_rules, ignore_old_worst_rules=self.ignore_old_worst_rules,
+                ignore_new_rules=self.ignore_new_rules, ignore_unnatural_rules=self.ignore_unnatural_rules,
                 batch_size=batch_size, num_epochs=epochs, ignore_worst_rules=self.ignore_worst_rules,
-                ignore_non_disco_rules=self.ignore_non_disco_rules,
+                max_length=100, padding="max_length", return_tensors="pt", 
+                add_special_tokens=True, truncation=True,
             )
             valset = ValRetDataset(val_path)
             # trainset = DynamicTriplesDataset(
@@ -1467,7 +1481,7 @@ class CodeBERTripletNet(nn.Module):
             device=device_id, sim_intents_map=sim_intents_map, perturbed_codes=perturbed_codes, 
             batch_size=64, tokenizer=self.tokenizer, max_length=100, padding="max_length", 
             return_tensors="pt", add_special_tokens=True, truncation=True,
-            # ignore_worst_rules=self.ignore_worst_rules,
+            # ignore_worst_rules=self.ignore_worst_rules
             # ignore_non_disco_rules=self.ignore_non_disco_rules,
         )
         valset = ValRetDataset(val_path)

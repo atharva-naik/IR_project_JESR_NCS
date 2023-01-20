@@ -8,10 +8,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-k", "--k", type=int, default=10, help="recall@k used to find the error cases")
 # parser.add_argument("-p1", "--preds1", required=True, help="path to predictions of 1st model") # the better model.
 # parser.add_argument("-p2", "--preds2", required=True, help="path to predictions of 2nd model") # the worse model.
-parser.add_argument("-e1", "--exp1", required=True, help="name of the experiment (1st model)")
-parser.add_argument("-e2", "--exp2", required=True, help="name of the experiment (2nd model)")
+parser.add_argument("-e1", "--exp1", required=True, help="name of the experiment (1st model)") # the better model.
+parser.add_argument("-e2", "--exp2", required=True, help="name of the experiment (2nd model)") # the worse model.
 parser.add_argument("-d", "--dataset", type=str, required=True, help="the dataset")
-parser.add_argument("-m", "--model", type=str, required=True, help="the type of the model")
 args = parser.parse_args()
 
 # should be in the approved list of datasets.
@@ -33,7 +32,7 @@ exp_path1 = os.path.join("experiments", args.exp1,
                          exp_path_map[args.dataset])
 exp_path2 = os.path.join("experiments", args.exp2, 
                          exp_path_map[args.dataset])
-path = os.path.join("improvement_egs", f"{args.model}_{args.dataset}.json") 
+path = os.path.join("improvement_egs", f"{args.exp1}_minus_{args.exp2}_{args.dataset}.json") 
 k = args.k
 bmgc_wmgw = 0
 bmgw_wmgc = 0 

@@ -1,0 +1,463 @@
+[
+    [
+        "How to join mixed list (array) (with integers in it) in Python?",
+        [
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "\"\"\",\"\"\".join(l)",
+            "[''.join(str(d) for d in x) for x in L]",
+            "myList = ','.join(map(str, myList))",
+            "\"\"\":\"\"\".join(str(x) for x in b)"
+        ],
+        [
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)",
+            "[''.join(str(d) for d in x) for x in L]",
+            "[int(''.join(str(d) for d in x)) for x in L]",
+            "myList = ','.join(map(str, myList))",
+            "L = [int(''.join([str(y) for y in x])) for x in L]"
+        ],
+        [
+            "\"\"\":\"\"\".join(str(x) for x in b)"
+        ]
+    ],
+    [
+        "Python printing without commas",
+        [
+            "print('%*s : %*s' % (20, 'Python', 20, 'Very Good'))",
+            "print('{0:.0f}%'.format(1.0 / 3 * 100))",
+            "print(' '.join(map(str, l)))",
+            "print('\"{}\"'.format(word))",
+            "\"\"\"({:d} goals, ${:d})\"\"\".format(self.goals, self.penalties)"
+        ],
+        [
+            "print('%*s : %*s' % (20, 'Python', 20, 'Very Good'))",
+            "\"\"\"({:d} goals, ${:d})\"\"\".format(self.goals, self.penalties)",
+            "\"\"\"({} goals, ${})\"\"\".format(self.goals, self.penalties)",
+            "\"\"\"({0.goals} goals, ${0.penalties})\"\"\".format(self)",
+            "\"\"\" \"\"\".join(list)"
+        ],
+        [
+            "print(' '.join(map(str, l)))"
+        ]
+    ],
+    [
+        "Python: Perform an operation on each dictionary value",
+        [
+            "my_dict.update((x, y * 2) for x, y in list(my_dict.items()))",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "my_dict.update({'third_key': 1})",
+            "dict([('Name', 'Joe'), ('Age', 22)])"
+        ],
+        [
+            "res = dict((v, k) for k, v in a.items())",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "data.update(dict(a=1))",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])"
+        ],
+        [
+            "my_dict.update((x, y * 2) for x, y in list(my_dict.items()))"
+        ]
+    ],
+    [
+        "python reverse tokens in a string",
+        [
+            "print(x.rpartition('-')[0])",
+            "\"\"\"\"\"\".join(s.rsplit(',', 1))",
+            "print(x.rsplit('-', 1)[0])",
+            "\"\"\".\"\"\".join(s.split('.')[::-1])",
+            "re.findall('(.+?):(.+?)\\\\b ?', text)"
+        ],
+        [
+            "re.split('[ ](?=[A-Z])', input)",
+            "re.split('[ ](?=[A-Z]+\\\\b)', input)",
+            "re.findall('(.+?):(.+?)\\\\b ?', text)",
+            "re.findall('\\\\b(\\\\w+)d\\\\b', s)",
+            "[word for word in mystring.split() if word.startswith('$')]"
+        ],
+        [
+            "\"\"\".\"\"\".join(s.split('.')[::-1])"
+        ]
+    ],
+    [
+        "How can I combine dictionaries with the same keys in python?",
+        [
+            "data.update(a=1)",
+            "data.update(dict(a=1))",
+            "data.update({'a': 1, })",
+            "my_dict.update({'third_key': 1})",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])"
+        ],
+        [
+            "res = dict((v, k) for k, v in a.items())",
+            "data.update(dict(a=1))",
+            "print(dict(zip(LD[0], zip(*[list(d.values()) for d in LD]))))",
+            "dict([('Name', 'Joe'), ('Age', 22)])",
+            "from functools import reduce\nreduce(lambda a, b: a + b, (('aa',), ('bb',), ('cc',)))"
+        ],
+        [
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}"
+        ]
+    ],
+    [
+        "How to filter rows in pandas by regex",
+        [
+            "df.loc[df[0].str.contains('(Hel|Just)')]",
+            "df.replace({'\\n': '<br>'}, regex=True)",
+            "df[df['ids'].str.contains('ball')]",
+            "df.b.str.contains('^f')",
+            "df.groupby('A').filter(lambda x: len(x) > 1)"
+        ],
+        [
+            "df.loc[df[0].str.contains('(Hel|Just)')]",
+            "df.groupby('A').filter(lambda x: len(x) > 1)",
+            "df.dropna(subset=[1])",
+            "df[df['ids'].str.contains('ball')]",
+            "df['A'][(df['B'] > 50) & (df['C'] == 900)]"
+        ],
+        [
+            "df.b.str.contains('^f')"
+        ]
+    ],
+    [
+        "Parsing XML in Python with regex",
+        [
+            "print(soup.find('name').string)",
+            "print(re.search('>.*<', line).group(0))",
+            "re.findall('Test([\\\\d.]*\\\\d+)', text)",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "re.findall('Test([0-9.]*[0-9]+)', text)"
+        ],
+        [
+            "re.findall('(.+?):(.+?)\\\\b ?', text)",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "re.findall('\"(http.*?)\"', s, re.MULTILINE | re.DOTALL)",
+            "re.findall('\\\\((.*?)\\\\)|(\\\\w)', '(zyx)bc')",
+            "re.findall('\\\\(.*?\\\\)|\\\\w', '(zyx)bc')"
+        ],
+        [
+            "print(re.search('>.*<', line).group(0))"
+        ]
+    ],
+    [
+        "insert variable values into a string in python",
+        [
+            "\"\"\"\"\"\".join(['A', 'B', 'C', 'D'])",
+            "\"\"\"\"\"\".join(['a', 'b', 'c'])",
+            "'first string is: %s, second one is: %s' % (str1, 'geo.tif')",
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)",
+            "\"\"\":\"\"\".join(str(x) for x in b)"
+        ],
+        [
+            "\"\"\"({} goals, ${})\"\"\".format(self.goals, self.penalties)",
+            "\"\"\"({0.goals} goals, ${0.penalties})\"\"\".format(self)",
+            "\"\"\"({:d} goals, ${:d})\"\"\".format(self.goals, self.penalties)",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])",
+            "\"\"\" \"\"\".join([('%d@%d' % t) for t in l])"
+        ],
+        [
+            "'first string is: %s, second one is: %s' % (str1, 'geo.tif')"
+        ]
+    ],
+    [
+        "Splitting a string with repeated characters into a list using regex",
+        [
+            "re.split('(\\\\W+)', 'Words, words, words.')",
+            "re.split('(\\\\W+)', s)",
+            "re.findall('(.*?)\\\\[.*?\\\\]', example_str)",
+            "re.findall('Test([0-9.]*[0-9]+)', text)",
+            "[m.group(0) for m in re.finditer('(\\\\d)\\\\1*', s)]"
+        ],
+        [
+            "re.split('(\\\\W+)', 'Words, words, words.')",
+            "re.split('(\\\\W+)', s)",
+            "\"\"\"QH QD JC KD JS\"\"\".split()",
+            "re.split('[ ](?=[A-Z]+\\\\b)', input)",
+            "re.split(' +', 'hello world sample text')"
+        ],
+        [
+            "[m.group(0) for m in re.finditer('(\\\\d)\\\\1*', s)]"
+        ]
+    ],
+    [
+        "Make dictionary from list with python",
+        [
+            "dict(x[i:i + 2] for i in range(0, len(x), 2))",
+            "dict([('Name', 'Joe'), ('Age', 22)])",
+            "list(dict((x[0], x) for x in L).values())",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "print(dict(zip(LD[0], zip(*[list(d.values()) for d in LD]))))"
+        ],
+        [
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "print(dict(zip(LD[0], zip(*[list(d.values()) for d in LD]))))",
+            "list(dict((x[0], x) for x in L).values())",
+            "{i[1]: i[0] for i in list(myDictionary.items())}"
+        ],
+        [
+            "dict(x[i:i + 2] for i in range(0, len(x), 2))"
+        ]
+    ],
+    [
+        "How to sum elements in functional way",
+        [
+            "sum(sum(i) if isinstance(i, list) else i for i in L)",
+            "[sum(l[:i]) for i, _ in enumerate(l)]",
+            "sum([pair[0] for pair in list_of_pairs])",
+            "[[sum(item) for item in zip(*items)] for items in zip(*data)]",
+            "[sum(row[i] for row in array) for i in range(len(array[0]))]"
+        ],
+        [
+            "values = sum([['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']], [])",
+            "sum([pair[0] for pair in list_of_pairs])",
+            "sum(sum(i) if isinstance(i, list) else i for i in L)",
+            "[[sum(item) for item in zip(*items)] for items in zip(*data)]",
+            "print(sum(row[column] for row in data))"
+        ],
+        [
+            "[sum(l[:i]) for i, _ in enumerate(l)]"
+        ]
+    ],
+    [
+        "Casting an int to a string in Python",
+        [
+            "'ME' + str(i)",
+            "\"\"\"\"\"\".join(['a', 'b', 'c'])",
+            "int('1')",
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "\"\"\":\"\"\".join(str(x) for x in b)"
+        ],
+        [
+            "nums = [int(x) for x in intstringlist]",
+            "int()",
+            "\"\"\",\"\"\".join([str(i) for i in list_of_ints])",
+            "int('1')",
+            "my_float = float(my_string.replace(',', ''))"
+        ],
+        [
+            "'ME' + str(i)"
+        ]
+    ],
+    [
+        "Removing duplicates from list of lists in Python",
+        [
+            "level1 = map(list, level1)",
+            "[k for k, v in list(Counter(mylist).items()) if v > 1]",
+            "list(dict((x[0], x) for x in L).values())",
+            "list2 = [x for x in list1 if x != []]",
+            "list(set(source_list))"
+        ],
+        [
+            "list(set(source_list))",
+            "newlist = [v for i, v in enumerate(oldlist) if i not in removelist]",
+            "list(set(t))",
+            "list2 = [x for x in list1 if x != []]",
+            "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]"
+        ],
+        [
+            "list(dict((x[0], x) for x in L).values())"
+        ]
+    ],
+    [
+        "Tuple conversion to a string",
+        [
+            "\"\"\":\"\"\".join(str(x) for x in b)",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])",
+            "tuple(l)",
+            "\"\"\" \"\"\".join([('%d@%d' % t) for t in l])",
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)"
+        ],
+        [
+            "tuple(l)",
+            "\"\"\" \"\"\".join([('%d@%d' % (t[0], t[1])) for t in l])",
+            "len(my_tuple)",
+            "\"\"\":\"\"\".join(str(x) for x in b)",
+            "\"\"\" \"\"\".join([('%d@%d' % t) for t in l])"
+        ],
+        [
+            "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)"
+        ]
+    ],
+    [
+        "Extract IP address from an html string (python)",
+        [
+            "ip = re.findall('[0-9]+(?:\\\\.[0-9]+){3}', s)",
+            "print(soup.find(text='Address:').findNext('td').contents[0])",
+            "response = urllib.request.urlopen('http://www.example.com/')\nhtml = response.read()",
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "print(soup.find('name').string)"
+        ],
+        [
+            "re.findall('http://[^t][^s\"]+\\\\.html', document)",
+            "print(soup.find('name').string)",
+            "print(soup.find(text='Address:').findNext('td').contents[0])",
+            "response = urllib.request.urlopen('http://www.example.com/')\nhtml = response.read()",
+            "element.get_attribute('innerHTML')"
+        ],
+        [
+            "ip = re.findall('[0-9]+(?:\\\\.[0-9]+){3}', s)"
+        ]
+    ],
+    [
+        "Appending tuples to lists",
+        [
+            "a.extend(list(b))",
+            "[[sum(item) for item in zip(*items)] for items in zip(*data)]",
+            "[val for pair in zip(l1, l2) for val in pair]",
+            "b.append((a[0][0], a[0][2]))",
+            "list2.extend(list1)"
+        ],
+        [
+            "[[sum(item) for item in zip(*items)] for items in zip(*data)]",
+            "[val for pair in zip(l1, l2) for val in pair]",
+            "a.extend(list(b))",
+            "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4)])",
+            "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e',)])"
+        ],
+        [
+            "b.append((a[0][0], a[0][2]))"
+        ]
+    ],
+    [
+        "Mapping dictionary value to list",
+        [
+            "list(dict((x[0], x) for x in L).values())",
+            "[(x['x'], x['y']) for x in d]",
+            "[dct[k] for k in lst]",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "{i[1]: i[0] for i in list(myDictionary.items())}"
+        ],
+        [
+            "list(dict((x[0], x) for x in L).values())",
+            "{k: [d[k] for d in dicts] for k in dicts[0]}",
+            "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+            "{i[1]: i[0] for i in list(myDictionary.items())}",
+            "[(x['x'], x['y']) for x in d]"
+        ],
+        [
+            "[dct[k] for k in lst]"
+        ]
+    ],
+    [
+        "Append a NumPy array to a NumPy array",
+        [
+            "np.concatenate((A, B))",
+            "np.vstack((a, b))",
+            "np.array((a, b))",
+            "a.extend(b)",
+            "np.vstack((A, B))"
+        ],
+        [
+            "np.concatenate((A, B))",
+            "np.array((a, b))",
+            "numpy.array(a).reshape(-1).tolist()",
+            "numpy.array(a)[0].tolist()",
+            "np.array(zip(a.ravel(), b.ravel()), dtype='i4,i4').reshape(a.shape)"
+        ],
+        [
+            "np.vstack((a, b))"
+        ]
+    ],
+    [
+        "Get HTML Source of WebElement in Selenium WebDriver using Python",
+        [
+            "driver.execute_script('return document.documentElement.outerHTML;')",
+            "self.driver.find_element_by_css_selector('.someclass a').get_attribute('href')",
+            "element.get_attribute('innerHTML')",
+            "driver.find_element_by_link_text('Send InMail').click()",
+            "driver.find_element_by_partial_link_text('Send').click()"
+        ],
+        [
+            "driver.execute_script('return document.documentElement.outerHTML;')",
+            "self.driver.find_element_by_css_selector('.someclass a').get_attribute('href')",
+            "driver.findElement(By.linkText('Send InMail')).click()",
+            "driver.find_element_by_link_text('Send InMail').click()",
+            "driver.find_element_by_partial_link_text('Send').click()"
+        ],
+        [
+            "element.get_attribute('innerHTML')"
+        ]
+    ],
+    [
+        "Python/Numpy: Convert list of bools to unsigned int",
+        [
+            "sum(1 << i for i, b in enumerate(x) if b)",
+            "nums = [int(x) for x in intstringlist]",
+            "L = [int(''.join([str(y) for y in x])) for x in L]",
+            "[int(''.join(str(d) for d in x)) for x in L]",
+            "T2 = [map(int, x) for x in T1]"
+        ],
+        [
+            "nums = [int(x) for x in intstringlist]",
+            "numlist = [float(x) for x in numlist]",
+            "L = [int(''.join([str(y) for y in x])) for x in L]",
+            "user_list = [int(number) for number in user_input.split(',')]",
+            "int()"
+        ],
+        [
+            "sum(1 << i for i, b in enumerate(x) if b)"
+        ]
+    ],
+    [
+        "How to flatten a hetrogenous list of list into a single list in python?",
+        [
+            "level1 = map(list, level1)",
+            "[y for x in data for y in (x if isinstance(x, list) else [x])]",
+            "numpy.array(a).reshape(-1).tolist()",
+            "[''.join(str(d) for d in x) for x in L]",
+            "print('\\t'.join(map(str, list)))"
+        ],
+        [
+            "a.extend(list(b))",
+            "level1 = map(list, level1)",
+            "list(t)",
+            "[[sum(item) for item in zip(*items)] for items in zip(*data)]",
+            "print([item for item in [1, 2, 3]])"
+        ],
+        [
+            "[y for x in data for y in (x if isinstance(x, list) else [x])]"
+        ]
+    ],
+    [
+        "How to replace only part of the match with python re.sub",
+        [
+            "re.sub('\\\\bH3\\\\b', 'H1', text)",
+            "\"\"\"obama\"\"\".replace('a', '%temp%').replace('b', 'a').replace('%temp%', 'b')",
+            "re.sub('(\\\\_a)?\\\\.([^\\\\.]*)$', '_suff.\\\\2', 'long.file.name.jpg')",
+            "print('lamp, bag, mirror'.replace('bag,', ''))",
+            "text = re.sub('\\\\b(\\\\w+)( \\\\1\\\\b)+', '\\\\1', text)"
+        ],
+        [
+            "re.sub('\\\\bH3\\\\b', 'H1', text)",
+            "re.sub('i', '', 'it is icy')",
+            "\"\"\"obama\"\"\".replace('a', '%temp%').replace('b', 'a').replace('%temp%', 'b')",
+            "re.sub('\\\\D', '', 'aas30dsa20')",
+            "re.findall('\"(http.*?)\"', s, re.MULTILINE | re.DOTALL)"
+        ],
+        [
+            "re.sub('(\\\\_a)?\\\\.([^\\\\.]*)$', '_suff.\\\\2', 'long.file.name.jpg')"
+        ]
+    ],
+    [
+        "How to get the index of an integer from a list if the list contains a boolean?",
+        [
+            "try:\n    print(testlist.index(element))\nexcept ValueError:\n    pass",
+            "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)",
+            "[i for (i, x) in enumerate(testlist) if (x == 1)]",
+            "print(testlist.index(element))",
+            "for i in (i for (i, x) in enumerate(testlist) if (x == 1)):\n    pass"
+        ],
+        [
+            "try:\n    print(testlist.index(element))\nexcept ValueError:\n    pass",
+            "[index for index, item in enumerate(thelist) if item[0] == '332']",
+            "[element for element in lst if isinstance(element, int)]",
+            "print(testlist.index(element))",
+            "[i for (i, x) in enumerate(testlist) if (x == 1)]"
+        ],
+        [
+            "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)"
+        ]
+    ]
+]

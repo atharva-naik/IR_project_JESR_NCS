@@ -41,6 +41,7 @@ def load_data(neg_path: str, anchor_p_path: str) -> Tuple[Dict[int, str], Dict[i
         pos = rec["snippet"]
         neg_and_rules = code_and_perturbations[pos]
         if len(neg_and_rules) == 0: continue
+        elif len(neg_and_rules) == 1: continue # formatting mistake that we can ignore for now
         assert len(neg_and_rules[0]) == 2, "incorrectly formatted file"
         if pos not in pos_codes:
             pos_codes[pos] = i_p
@@ -64,12 +65,14 @@ def load_data(neg_path: str, anchor_p_path: str) -> Tuple[Dict[int, str], Dict[i
     
     return anchor_texts, pos_codes, neg_codes, triplet_and_rule
 
+model_ind = 2 # 0,1,2
 anchor_p_path = "data/conala-mined-100k.json"
-model_type = "graphcodebert" # "unixcoder" # codebert
-ckpt_path = "experiments/GraphCodeBERT/model.pt" # "experiments/UniXcoder/model.pt" # "experiments/CodeBERT/model.pt"
-device_id = "cuda:1"
-neg_path = "CoNaLa_AST_neg_samples_n1.json"
-tok_path = os.path.expanduser("~/graphcodebert-base-tok")#"~/unixcoder-base-tok")#"~/codebert-base-tok/")
+model_type = ["graphcodebert", "unixcoder", "codebert"][model_ind]
+ckpt_path = ["experiments/GraphCodeBERT/model.pt", "experiments/UniXcoder/model.pt", "experiments/CodeBERT/model.pt"][model_ind]
+tok_path = ["~/graphcodebert-base-tok", "~/unixcoder-base-tok", "~/codebert-base-tok"][model_ind]
+device_id = "cuda:0"
+neg_path = "CoNaLa_AST_neg_samples.json"
+tok_path = os.path.expanduser(tok_path)
 triplet_net = load_model(model_type, tok_path, 
                          ckpt_path, device_id)
 a, p, n, T = load_data(neg_path, anchor_p_path)

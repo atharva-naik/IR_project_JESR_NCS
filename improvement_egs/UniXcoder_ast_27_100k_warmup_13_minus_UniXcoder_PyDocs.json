@@ -1,0 +1,222 @@
+[
+    [
+        "Called when Expat is done parsing the document type declaration .",
+        [
+            "xmlparser.NotationDeclHandler(notationName, base, systemId, publicId)",
+            "xmlparser.EndDoctypeDeclHandler()",
+            "xml.parsers.expat.ParserCreate(namespace_separator=None)",
+            "xmlparser.AttlistDeclHandler(elname, attname, type, default, required)",
+            "xml.parsers.expat.model.XML_CQUANT_NONE"
+        ],
+        [
+            "xml.parsers.expat.ParserCreate(namespace_separator=None)",
+            "xml.parsers.expat.model.XML_CQUANT_NONE",
+            "ExpatError.lineno",
+            "xmlparser.NotationDeclHandler(notationName, base, systemId, publicId)",
+            "xmlparser.AttlistDeclHandler(elname, attname, type, default, required)"
+        ],
+        [
+            "xmlparser.EndDoctypeDeclHandler()"
+        ]
+    ],
+    [
+        "Size of the memory block in bytes (int).",
+        [
+            "struct.size",
+            "tracemalloc.get_tracemalloc_memory()",
+            "io_base.seek(offset)",
+            "trace.size",
+            "array.buffer_info()"
+        ],
+        [
+            "struct.size",
+            "tracemalloc.get_tracemalloc_memory()",
+            "array.buffer_info()",
+            "ctypes.pointer(obj)",
+            "gc.get_count()"
+        ],
+        [
+            "trace.size"
+        ]
+    ],
+    [
+        "By  default, when reading from /dev/random, getrandom() blocks if no random bytes are available, and when reading from /dev/urandom, it blocks if the entropy pool has not yet been initialized.",
+        [
+            "os.getrandom(size)",
+            "os.GRND_NONBLOCK",
+            "r_lock.acquire(block=True)",
+            "os.fwalk()",
+            "r_lock.acquire(timeout=None)"
+        ],
+        [
+            "os.getrandom(size)",
+            "r_lock.acquire(block=True)",
+            "crypt.METHOD_BLOWFISH",
+            "cgitb.enable()",
+            "r_lock.acquire(timeout=None)"
+        ],
+        [
+            "os.GRND_NONBLOCK"
+        ]
+    ],
+    [
+        "A boolean which is True for server-side sockets and False for client-side sockets.",
+        [
+            "SSLSocket.server_side",
+            "socket.SocketType",
+            "base_server.server_close()",
+            "loop.start_tls(transport, protocol, sslcontext, server_side=False)",
+            "dispatcher.create_socket(family=socket.AF_INET)"
+        ],
+        [
+            "socket.SocketType",
+            "socket.getservbyname(servicename)",
+            "asyncore.dispatcher_with_send",
+            "errno.ENOTSOCK",
+            "dispatcher.create_socket(family=socket.AF_INET)"
+        ],
+        [
+            "SSLSocket.server_side"
+        ]
+    ],
+    [
+        "Contains the Python system version, in a form usable by the version_string method and the server_version class variable.",
+        [
+            "base_http_request_handler.sys_version",
+            "mime_version_header.minor",
+            "base_server.server_close()",
+            "os.name",
+            "time.__str__()"
+        ],
+        [
+            "mime_version_header.minor",
+            "os.name",
+            "format(value, format_spec)",
+            "uuid.uuid1(clock_seq=None)",
+            "SystemError"
+        ],
+        [
+            "base_http_request_handler.sys_version"
+        ]
+    ],
+    [
+        "A helper class that has ABCMeta as its metaclass.",
+        [
+            "types.DynamicClassAttribute(fset=None)",
+            "dataclasses.field(hash=None)",
+            "abc.ABC",
+            "auto.object",
+            "dataclasses.asdict(instance)"
+        ],
+        [
+            "dataclasses.field(hash=None)",
+            "auto.object",
+            "types.DynamicClassAttribute(fset=None)",
+            "test.support.check_free_after_iterating(test, iter, cls)",
+            "profile.Profile(subcalls=True)"
+        ],
+        [
+            "abc.ABC"
+        ]
+    ],
+    [
+        "Return a bytes object of characters , extracted from the window starting at the current cursor position , or at `y` , `x` if specified .",
+        [
+            "window.instr(y, x)",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "shutil.get_terminal_size(lines))",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "window.bkgdset(ch, attr)"
+        ],
+        [
+            "window.bkgdset(ch, attr)",
+            "widget.identify_row(y)",
+            "msvcrt.ungetwch(unicode_char)",
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "textbox.stripspaces"
+        ],
+        [
+            "window.instr(y, x)"
+        ]
+    ],
+    [
+        "Format the shell environment in HTML .",
+        [
+            "cgi.print_environ()",
+            "cgi.parse(environ=os.environ)",
+            "html_diff.__init__(linejunk=None)",
+            "cgitb.enable(logdir=None, format=\"html\")",
+            "html.entities.entitydefs"
+        ],
+        [
+            "cgitb.enable(logdir=None, format=\"html\")",
+            "header.encode(\\t', maxlinelen=None)",
+            "subprocess.CREATE_NEW_CONSOLE",
+            "format(value)",
+            "html_diff.__init__(linejunk=None)"
+        ],
+        [
+            "cgi.print_environ()"
+        ]
+    ],
+    [
+        "Returns the input data that generated the current event as a string .",
+        [
+            "kevent.udata",
+            "xmlparser.GetInputContext()",
+            "source_loader.set_data(path, data)",
+            "cgi.parse(environ=os.environ)",
+            "NNTP.date()"
+        ],
+        [
+            "kevent.udata",
+            "curses.unctrl(ch)",
+            "window.bkgdset(ch, attr)",
+            "readline.remove_history_item(pos)",
+            "Cmd.ruler"
+        ],
+        [
+            "xmlparser.GetInputContext()"
+        ]
+    ],
+    [
+        "Return the decoded contents of the pointed-to file as a string :",
+        [
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "io_base.seek(offset)",
+            "Path.read_text()",
+            "io_base.readlines(hint=-1)"
+        ],
+        [
+            "bytes.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "bytearray.decode(encoding=\"utf-8\", errors=\"strict\")",
+            "io.open(file, mode='r', buffering=-1)",
+            "gzip.decompress(data)",
+            "io_base.readlines(hint=-1)"
+        ],
+        [
+            "Path.read_text()"
+        ]
+    ],
+    [
+        "Return the value ( in fractional seconds ) of a monotonic clock , i.e .",
+        [
+            "time.monotonic()",
+            "datetime.time(hour=0, microsecond=0)",
+            "timedelta.total_seconds()",
+            "datetime.timedelta(microseconds=0)",
+            "datetime.timedelta(days=0, microseconds=0)"
+        ],
+        [
+            "datetime.timedelta(microseconds=0)",
+            "datetime.timedelta(days=0, microseconds=0)",
+            "datetime.time(hour=0, microsecond=0)",
+            "timedelta.total_seconds()",
+            "datetime.timedelta(seconds=0)"
+        ],
+        [
+            "time.monotonic()"
+        ]
+    ]
+]

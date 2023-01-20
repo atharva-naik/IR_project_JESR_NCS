@@ -1,0 +1,107 @@
+[
+    [
+        "Set the line thickness to `width` or return it .",
+        [
+            "turtle.pensize(width=None)",
+            "turtle.width()",
+            "turtle.pensize()",
+            "turtle.right(angle)",
+            "turtle.rt(angle)"
+        ],
+        [
+            "shutil.get_terminal_size(lines))",
+            "curses.is_term_resized(nlines, ncols)",
+            "trace.size",
+            "window.instr(y, x)",
+            "textbox.stripspaces"
+        ],
+        [
+            "turtle.pensize()",
+            "turtle.width()",
+            "turtle.pensize(width=None)"
+        ]
+    ],
+    [
+        "Connect to the server specified when the object was created .",
+        [
+            "HTTPConnection.connect()",
+            "base_server.server_close()",
+            "asyncio.open_connection(port=None)",
+            "netrc.authenticators(host)",
+            "dispatcher.create_socket(family=socket.AF_INET)"
+        ],
+        [
+            "base_server.server_close()",
+            "Protocol.eof_received()",
+            "SSLSocket.server_side",
+            "smtpd.SMTPChannel(server, conn, addr, decode_data=False)",
+            "smtplib.LMTP(host='', port=LMTP_PORT)"
+        ],
+        [
+            "HTTPConnection.connect()"
+        ]
+    ],
+    [
+        "Connect to the given `host` and `port` .",
+        [
+            "asyncio.open_connection(port=None)",
+            "FTP.connect(host='')",
+            "socket.gethostbyname(hostname)",
+            "FTP.connect(host='', port=0)",
+            "FTP.connect()"
+        ],
+        [
+            "loop.getaddrinfo(host, port, family=0)",
+            "logging.handlers.SocketHandler(host, port)",
+            "asyncio.open_connection(port=None)",
+            "http.client.HTTPSConnection(host, blocksize=8192)",
+            "test.support.SOCK_MAX_SIZE"
+        ],
+        [
+            "FTP.connect(port=0)",
+            "FTP.connect(host='', port=0)",
+            "FTP.connect(host='')",
+            "FTP.connect()"
+        ]
+    ],
+    [
+        "Hides the window.",
+        [
+            "window.syncup()",
+            "window.instr(y, x)",
+            "subprocess.SW_HIDE",
+            "window.bkgdset(ch, attr)",
+            "turtle.onscreenclick(fun)"
+        ],
+        [
+            "window.syncup()",
+            "controller.open(url, autoraise=True)",
+            "window.instr(y, x)",
+            "window.bkgdset(ch, attr)",
+            "widget.identify_row(y)"
+        ],
+        [
+            "subprocess.SW_HIDE"
+        ]
+    ],
+    [
+        "This function takes a single argument that can be passed to the exec ( ) function , and an optional file name . With arguments `command`, `filename`.",
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "doctest.testfile(filename, optionflags=0)",
+            "profile.run(command, filename=None)",
+            "ArgumentParser.add_argument(name or flags..., action, nargs, const, default)",
+            "py_compile.compile(file, dfile=None)"
+        ],
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "py_compile.compile(file, dfile=None)",
+            "compileall.compile_path(skip_curdir=True, maxlevels=0)",
+            "compileall.compile_dir(dir, ddir=None)",
+            "loader.exec_module(module)"
+        ],
+        [
+            "profile.run(command, filename=None)"
+        ]
+    ]
+]
