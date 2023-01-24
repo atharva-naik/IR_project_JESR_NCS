@@ -1,0 +1,1122 @@
+{
+    "UX+AST": {
+        "total": [
+            0.609092640264538,
+            {
+                "ngram_match_score": 0.8192482171229749,
+                "weighted_ngram_match_score": 0.48872075535659787,
+                "syntax_match_score": 0.5829470431240342,
+                "dataflow_match_score": 0.5454545454545454
+            }
+        ],
+        "missed_preds": [
+            0.10687200900105705,
+            [
+                [
+                    "NNTP.head(file=None)"
+                ],
+                [
+                    "os.fwalk()"
+                ],
+                [
+                    "smtp_handler.getSubject(record)"
+                ],
+                [
+                    "auto.object"
+                ],
+                [
+                    "errno.EREMOTE"
+                ],
+                [
+                    "bdb.user_line(frame)"
+                ],
+                [
+                    "email_policy.refold_source"
+                ],
+                [
+                    "IMAP4.read(size)"
+                ],
+                [
+                    "fraction.__ceil__()"
+                ],
+                [
+                    "xml.parsers.expat.model.XML_CQUANT_NONE"
+                ],
+                [
+                    "http.cookiejar.DefaultCookiePolicy(netscape=True)"
+                ],
+                [
+                    "sqlite3.PARSE_DECLTYPES",
+                    "sqlite3.PARSE_COLNAMES"
+                ],
+                [
+                    "date.resolution"
+                ],
+                [
+                    "copyreg.pickle(type, function)"
+                ],
+                [
+                    "file_io.mode"
+                ],
+                [
+                    "curses.unctrl(ch)"
+                ],
+                [
+                    "stat.S_IWOTH"
+                ],
+                [
+                    "kevent.udata"
+                ],
+                [
+                    "source_loader.set_data(path, data)"
+                ],
+                [
+                    "Cmd.ruler"
+                ],
+                [
+                    "SMTP.connect(host='localhost', port=0)",
+                    "SMTP.connect(host='localhost')",
+                    "SMTP.connect(port=0)",
+                    "SMTP.connect()"
+                ],
+                [
+                    "datetime.time"
+                ],
+                [
+                    "context.logical_or(x, y)"
+                ],
+                [
+                    "datetime.fold",
+                    "time.fold"
+                ],
+                [
+                    "collections.abc.Coroutine",
+                    "calendar.LocaleTextCalendar(firstweekday=0, locale=None)"
+                ],
+                [
+                    "connection.backup(target, pages=0)",
+                    "base_http_request_handler.log_date_time_string()"
+                ],
+                [
+                    "wave.openfp(file, mode)",
+                    "sunau.openfp(file, mode)"
+                ],
+                [
+                    "auto.object",
+                    "binascii.b2a_qp(data, istext=True, header=False)"
+                ],
+                [
+                    "float.hex()",
+                    "list(d)"
+                ],
+                [
+                    "style.theme_names()",
+                    "warnings.filterwarnings(action, category=Warning)"
+                ],
+                [
+                    "WriteTransport.set_write_buffer_limits(low=None)",
+                    "WriteTransport.set_write_buffer_limits(high=None)"
+                ],
+                [
+                    "__import__(name, globals=None)",
+                    "style.theme_names()"
+                ],
+                [
+                    "xml.sax.saxutils.XMLGenerator(out=None, encoding='iso-8859-1')",
+                    "datetime.datetime(year, month, day, hour=0, second=0)"
+                ],
+                [
+                    "queue_listener.handle(record)",
+                    "html.entities.entitydefs"
+                ],
+                [
+                    "http.cookiejar.DefaultCookiePolicy(netscape=True)",
+                    "HMAC.digest()"
+                ],
+                [
+                    "multiprocessing.Condition()",
+                    "array.frombytes(s)"
+                ],
+                [
+                    "profile.Profile(subcalls=True)",
+                    "decimal.sqrt()"
+                ],
+                [
+                    "logging.handlers.TimedRotatingFileHandler(filename, when='h')",
+                    "logging.handlers.TimedRotatingFileHandler(filename, interval=1)"
+                ],
+                [
+                    "multiprocessing.get_context()",
+                    "gc.get_objects()"
+                ],
+                [
+                    "str.isspace()",
+                    "urllib.request.HTTPDefaultErrorHandler"
+                ],
+                [
+                    "turtle.onclick(fun)",
+                    "turtle.onscreenclick(fun)"
+                ],
+                [
+                    "time.replace(hour=self.hour, minute=self.minute)",
+                    "HTTPConnection.connect()"
+                ],
+                [
+                    "curses.flash()",
+                    "errno.ENOTSOCK"
+                ],
+                [
+                    "ctypes.c_ulong",
+                    "IMAP4.setannotation(mailbox, entry)"
+                ],
+                [
+                    "ZipFile.infolist()",
+                    "SMTP.login(user, password)"
+                ],
+                [
+                    "cursor.executemany(sql, seq_of_parameters)",
+                    "tracemalloc.is_tracing()"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "collections.namedtuple(typename, field_names, defaults=None)"
+                ],
+                [
+                    "array.fromfile(f, n)",
+                    "array.buffer_info()"
+                ],
+                [
+                    "email_message.replace_header(_name, _value)",
+                    "SMTP.send_message(msg, rcpt_options=())"
+                ],
+                [
+                    "counter.subtract()",
+                    "stat.ST_UID"
+                ],
+                [
+                    "copyreg.pickle(type, function)",
+                    "sqlite3.Connection"
+                ],
+                [
+                    "curses.flash()",
+                    "abc.ABC"
+                ],
+                [
+                    "turtle.onclick(fun)",
+                    "future.add_done_callback(callback)"
+                ],
+                [
+                    "HTTPPasswordMgrWithPriorAuth.update_authenticated(self, uri, is_authenticated=False)",
+                    "dis.dis(depth=None)"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "dis.dis(x=None, depth=None)"
+                ],
+                [
+                    "stat.S_IWOTH",
+                    "_thread.interrupt_main()"
+                ],
+                [
+                    "doc_test_runner.run(test)",
+                    "mailcap.findmatch(caps, MIMEtype, plist=)"
+                ],
+                [
+                    "async_exit_stack.push_async_exit(exit)",
+                    "gc.get_referrers(*objs)"
+                ],
+                [
+                    "style.theme_names()",
+                    "window.instr(y, x)"
+                ],
+                [
+                    "ZipFile.infolist()",
+                    "auto.object"
+                ],
+                [
+                    "str.join(iterable)",
+                    "dir_entry.is_file()"
+                ],
+                [
+                    "importlib.resources.read_binary(package, resource)",
+                    "base64.a85decode(b, adobe=False)"
+                ],
+                [
+                    "bdb.dispatch_return(frame, arg)",
+                    "email_message.get_content_maintype()"
+                ],
+                [
+                    "traceback.print_stack()",
+                    "modulefinder.ModuleFinder(excludes=)"
+                ],
+                [
+                    "shlex.split(s, comments=False)",
+                    "socket.gethostbyname(hostname)"
+                ],
+                [
+                    "datetime.timezone(offset)",
+                    "typing.Dict(dict, MutableMappingKT, VT)"
+                ],
+                [
+                    "FileCookieJar.revert(filename=None)",
+                    "textbox.stripspaces"
+                ],
+                [
+                    "html_diff.__init__(linejunk=None)",
+                    "controller.open(url, autoraise=True)"
+                ],
+                [
+                    "types.DynamicClassAttribute(fset=None)",
+                    "errno.ENOSYS"
+                ],
+                [
+                    "print(*objects)",
+                    "print(*objects, sep=' ', end='\\n')"
+                ],
+                [
+                    "print(*objects, end='\\n', file=sys.stdout)",
+                    "print(*objects, end='\\n')"
+                ],
+                [
+                    "http.cookiejar.DefaultCookiePolicy(netscape=True)",
+                    "locale.currency(val, international=False)"
+                ],
+                [
+                    "__import__(name, globals=None)",
+                    "ExpatError.lineno"
+                ],
+                [
+                    "ZipFile.comment",
+                    "shutil.copymode(src, dst)"
+                ],
+                [
+                    "def _remove_invalid_char(s):     \"\"\"Remove invalid and dangerous characters from a string.\"\"\"      s = ''.join([i if ord(i) >= 32 and ord(i) < 127 else '' for i in s])     s = s.translate(dict.fromkeys(map(ord, \"_%~#\\\\{}\\\":\")))     return s",
+                    "def clean_text(text):     \"\"\"Clean text before parsing.\"\"\"     # Replace a few nasty unicode characters with their ASCII equivalent     maps = {u'\u00d7': u'x', u'\u2013': u'-', u'\u2212': '-'}     for element in maps:         text = text.replace(element, maps[element])      # Replace genitives     text = re.sub(r'(?<=\\w)\\'s\\b|(?<=\\w)s\\'(?!\\w)', '  ', text)      logging.debug(u'Clean text: \"%s\"', text)      return text"
+                ],
+                [
+                    "def strip_accents(s):     \"\"\"     Strip accents to prepare for slugification.     \"\"\"     nfkd = unicodedata.normalize('NFKD', unicode(s))     return u''.join(ch for ch in nfkd if not unicodedata.combining(ch))",
+                    "def casefold_with_i_dots(text):     \"\"\"     Convert capital I's and capital dotted \u0130's to lowercase in the way     that's appropriate for Turkish and related languages, then case-fold     the rest of the letters.     \"\"\"     text = unicodedata.normalize('NFC', text).replace('\u0130', 'i').replace('I', '\u0131')     return text.casefold()"
+                ],
+                [
+                    "def check_bucket_exists(self, bucket: str) -> bool:         \"\"\"         Checks if bucket with specified name exists.         :param bucket: the bucket to be checked.         :return: true if specified bucket exists.         \"\"\"         exists = True         try:             self.s3_client.head_bucket(Bucket=bucket)         except botocore.exceptions.ClientError as e:             # If a client error is thrown, then check that it was a 404 error.             # If it was a 404 error, then the bucket does not exist.             error_code = int(e.response['Error']['Code'])             if error_code == 404:                 exists = False         return exists",
+                    "def check_for_key(self, key, bucket_name=None):         \"\"\"         Checks if a key exists in a bucket          :param key: S3 key that will point to the file         :type key: str         :param bucket_name: Name of the bucket in which the file is stored         :type bucket_name: str         \"\"\"         if not bucket_name:             (bucket_name, key) = self.parse_s3_url(key)          try:             self.get_conn().head_object(Bucket=bucket_name, Key=key)             return True         except ClientError as e:             self.log.info(e.response[\"Error\"][\"Message\"])             return False"
+                ],
+                [
+                    "def detach(self):         \"\"\"         Detach the underlying LLVM resource without disposing of it.         \"\"\"         if not self._closed:             del self._as_parameter_             self._closed = True             self._ptr = None",
+                    "def normalize_value(text):     \"\"\"     This removes newlines and multiple spaces from a string.     \"\"\"     result = text.replace('\\n', ' ')     result = re.subn('[ ]{2,}', ' ', result)[0]     return result"
+                ],
+                [
+                    "def is_list_of_states(self, arg):         \"\"\"         A list of states example -         [('x1', 'easy'), ('x2', 'hard')]          Returns         -------         True, if arg is a list of states else False.          \"\"\"         return isinstance(arg, list) and all(isinstance(i, tuple) for i in arg)",
+                    "def iget_list_column_slice(list_, start=None, stop=None, stride=None):     \"\"\" iterator version of get_list_column \"\"\"     if isinstance(start, slice):         slice_ = start     else:         slice_ = slice(start, stop, stride)     return (row[slice_] for row in list_)"
+                ],
+                [
+                    "def length(self):         \"\"\"Array of vector lengths\"\"\"         return np.sqrt(np.sum(self**2, axis=1)).view(np.ndarray)",
+                    "def _factln(num):     # type: (int) -> float     \"\"\"     Computes logfactorial regularly for tractable numbers, uses Ramanujans approximation otherwise.     \"\"\"      if num < 20:         log_factorial = log(factorial(num))     else:         log_factorial = num * log(num) - num + log(num * (1 + 4 * num * (             1 + 2 * num))) / 6.0 + log(pi) / 2      return log_factorial"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "style.theme_names()"
+                ],
+                [
+                    "time.monotonic()",
+                    "def _str_to_list(s):     \"\"\"Converts a comma separated string to a list\"\"\"     _list = s.split(\",\")     return list(map(lambda i: i.lstrip(), _list))"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "__import__(name, globals=None)"
+                ],
+                [
+                    "def address(self):         \"\"\"         Returns the name of the port that this motor is connected to.         \"\"\"         self._address, value = self.get_attr_string(self._address, 'address')         return value",
+                    "def result(self):         \"\"\" Return the result of the AMP (as a string)\"\"\"         ret = self.get('result')         if ret is not None:             ret = u(ret)         return ret"
+                ],
+                [
+                    "def index(self, item):         \"\"\" Not recommended for use on large lists due to time             complexity, but it works              -> #int list index of @item         \"\"\"         for i, x in enumerate(self.iter()):             if x == item:                 return i         return None",
+                    "def find(self, name):         \"\"\"Return the index of the toc entry with name NAME.             Return -1 for failure.\"\"\"         for i, nm in enumerate(self.data):             if nm[-1] == name:                 return i         return -1"
+                ],
+                [
+                    "def Ry_matrix(theta):     \"\"\"Rotation matrix around the Y axis\"\"\"     return np.array([         [np.cos(theta), 0, np.sin(theta)],         [0, 1, 0],         [-np.sin(theta), 0, np.cos(theta)]     ])",
+                    "def firmware_download_input_rbridge_id(self, **kwargs):         \"\"\"Auto Generated Code         \"\"\"         config = ET.Element(\"config\")         firmware_download = ET.Element(\"firmware_download\")         config = firmware_download         input = ET.SubElement(firmware_download, \"input\")         rbridge_id = ET.SubElement(input, \"rbridge-id\")         rbridge_id.text = kwargs.pop('rbridge_id')          callback = kwargs.pop('callback', self._callback)         return callback(config)"
+                ],
+                [
+                    "def to_pascal_case(s):     \"\"\"Transform underscore separated string to pascal case      \"\"\"     return re.sub(r'(?!^)_([a-zA-Z])', lambda m: m.group(1).upper(), s.capitalize())",
+                    "def csvpretty(csvfile: csvfile=sys.stdin):     \"\"\" Pretty print a CSV file. \"\"\"     shellish.tabulate(csv.reader(csvfile))"
+                ],
+                [
+                    "def spline_interpolate(x1, y1, x2):     \"\"\"     Given a function at a set of points (x1, y1), interpolate to     evaluate it at points x2.     \"\"\"     sp = Spline(x1, y1)     return sp(x2)",
+                    "def ReadTif(tifFile):         \"\"\"Reads a tif file to a 2D NumPy array\"\"\"         img = Image.open(tifFile)         img = np.array(img)         return img"
+                ],
+                [
+                    "ZipFile.infolist()",
+                    "def __split_every_n(self, n, data):         \"\"\"         \"\"\"         return [data[i:i+n] for i in range(0, len(data), n)]"
+                ],
+                [
+                    "def chunked(iterable, n):     \"\"\"Break an iterable into lists of a given length::          >>> list(chunked([1, 2, 3, 4, 5, 6, 7], 3))         [[1, 2, 3], [4, 5, 6], [7]]      If the length of ``iterable`` is not evenly divisible by ``n``, the last     returned list will be shorter.      This is useful for splitting up a computation on a large number of keys     into batches, to be pickled and sent off to worker processes. One example     is operations on rows in MySQL, which does not implement server-side     cursors properly and would otherwise load the entire dataset into RAM on     the client.          Taken from more_itertools      \"\"\"     return iter(functools.partial(take, n, iter(iterable)), [])",
+                    "def lint_file(in_file, out_file=None):     \"\"\"Helps remove extraneous whitespace from the lines of a file      :param file in_file: A readable file or file-like     :param file out_file: A writable file or file-like     \"\"\"     for line in in_file:         print(line.strip(), file=out_file)"
+                ],
+                [
+                    "def convert_timestamp(timestamp):     \"\"\"     Converts bokehJS timestamp to datetime64.     \"\"\"     datetime = dt.datetime.utcfromtimestamp(timestamp/1000.)     return np.datetime64(datetime.replace(tzinfo=None))",
+                    "def _tofloat(obj):     \"\"\"Convert to float if object is a float string.\"\"\"     if \"inf\" in obj.lower().strip():         return obj     try:         return int(obj)     except ValueError:         try:             return float(obj)         except ValueError:             return obj"
+                ],
+                [
+                    "xml.sax.saxutils.XMLGenerator(out=None, encoding='iso-8859-1')",
+                    "def isstring(value):     \"\"\"Report whether the given value is a byte or unicode string.\"\"\"     classes = (str, bytes) if pyutils.PY3 else basestring  # noqa: F821     return isinstance(value, classes)"
+                ],
+                [
+                    "def get_longest_orf(orfs):     \"\"\"Find longest ORF from the given list of ORFs.\"\"\"     sorted_orf = sorted(orfs, key=lambda x: len(x['sequence']), reverse=True)[0]     return sorted_orf",
+                    "def test3():     \"\"\"Test the multiprocess     \"\"\"     import time          p = MVisionProcess()     p.start()     time.sleep(5)     p.stop()"
+                ],
+                [
+                    "style.theme_names()",
+                    "def pstd(self, *args, **kwargs):         \"\"\" Console to STDOUT \"\"\"         kwargs['file'] = self.out         self.print(*args, **kwargs)         sys.stdout.flush()"
+                ],
+                [
+                    "def read_img(path):     \"\"\" Reads image specified by path into numpy.ndarray\"\"\"     img = cv2.resize(cv2.imread(path, 0), (80, 30)).astype(np.float32) / 255     img = np.expand_dims(img.transpose(1, 0), 0)     return img",
+                    "def resize(src, size, interpolation=cv2.INTER_LINEAR):     \"\"\"Decode image from str buffer.     Wrapper for cv2.imresize that uses mx.nd.NDArray      Parameters     ----------     src : NDArray         image in (width, height, channels)     size : tuple         target size in (width, height)     interpolation : int         same as interpolation for cv2.imresize      Returns     -------     img : NDArray         resized image     \"\"\"     hdl = NDArrayHandle()     check_call(_LIB.MXCVResize(src.handle, mx_uint(size[0]), mx_uint(size[1]),                                interpolation, ctypes.byref(hdl)))     return mx.nd.NDArray(hdl)"
+                ],
+                [
+                    "def fit(self, X):         \"\"\" Apply KMeans Clustering               X: dataset with feature vectors         \"\"\"         self.centers_, self.labels_, self.sse_arr_, self.n_iter_ = \\               _kmeans(X, self.n_clusters, self.max_iter, self.n_trials, self.tol)",
+                    "def shutdown(self):         \"\"\"         Shutdown the cluster.         \"\"\"         self.stop = True         if self.stats:             self.stats.shutDownStats()         self.join()"
+                ],
+                [
+                    "def ziptake(items_list, indexes_list):     \"\"\"     SeeAlso:         vt.ziptake     \"\"\"     return [take(list_, index_list)             for list_, index_list in zip(items_list, indexes_list)]",
+                    "def is_iterable(value):     \"\"\"must be an iterable (list, array, tuple)\"\"\"     return isinstance(value, np.ndarray) or isinstance(value, list) or isinstance(value, tuple), value"
+                ],
+                [
+                    "def S(self):         \"\"\":obj:`numpy.ndarray` : The 3x3 scaling matrix for this projection         \"\"\"         S = np.array([[self._plane_width / self._vol_width, 0, 0],                       [0, self._plane_height / self._vol_height, 0],                       [0, 0, self._depth_scale / self._vol_depth]])         return S",
+                    "def load_data(filename):     \"\"\"     :rtype : numpy matrix     \"\"\"     data = pandas.read_csv(filename, header=None, delimiter='\\t', skiprows=9)     return data.as_matrix()"
+                ],
+                [
+                    "os._exit(n)",
+                    "def str2int(string_with_int):     \"\"\" Collect digits from a string \"\"\"     return int(\"\".join([char for char in string_with_int if char in string.digits]) or 0)"
+                ],
+                [
+                    "def bitsToString(arr):   \"\"\"Returns a string representing a numpy array of 0's and 1's\"\"\"   s = array('c','.'*len(arr))   for i in xrange(len(arr)):     if arr[i] == 1:       s[i]='*'   return s",
+                    "def _saferound(value, decimal_places):     \"\"\"     Rounds a float value off to the desired precision     \"\"\"     try:         f = float(value)     except ValueError:         return ''     format = '%%.%df' % decimal_places     return format % f"
+                ],
+                [
+                    "def column(self, i):          \"\"\"from right\"\"\"         return ''.join([str(digitat2(r,i)) for r in self])",
+                    "def file_exists(original_file):     \"\"\"     Check to make sure the original file exists     \"\"\"     if original_file.startswith(\"s3://\"):         from filesystem import s3         return s3.file_exists(original_file)     else:         if not os.path.exists(original_file):             return False         if not os.path.isfile(original_file):             return False     return True"
+                ],
+                [
+                    "def _exists(self, path):         \"\"\"S3 directory is not S3Ojbect.         \"\"\"         if path.endswith('/'):             return True         return self.storage.exists(path)",
+                    "def write_tsv_line_from_list(linelist, outfp):     \"\"\"Utility method to convert list to tsv line with carriage return\"\"\"     line = '\\t'.join(linelist)     outfp.write(line)     outfp.write('\\n')"
+                ],
+                [
+                    "def SaveDataToFD(self, raw_data, fd):     \"\"\"Merge the raw data with the config file and store it.\"\"\"     for key, value in iteritems(raw_data):       # TODO(hanuszczak): Incorrect type specification for `set`.       # pytype: disable=wrong-arg-types       self.set(\"\", key, value=value)       # pytype: enable=wrong-arg-types      self.write(fd)",
+                    "def write_text(filename: str, text: str) -> None:     \"\"\"     Writes text to a file.     \"\"\"     with open(filename, 'w') as f:  # type: TextIO         print(text, file=f)"
+                ],
+                [
+                    "def unique(input_list):     \"\"\"     Return a list of unique items (similar to set functionality).      Parameters     ----------     input_list : list         A list containg some items that can occur more than once.      Returns     -------     list         A list with only unique occurances of an item.      \"\"\"     output = []     for item in input_list:         if item not in output:             output.append(item)     return output",
+                    "def normalize_unitnumber(unit_number):     \"\"\"Returns a normalized unit number, i.e. integers     Raises exception X10InvalidUnitNumber if unit number appears to be invalid     \"\"\"     try:         try:             unit_number = int(unit_number)         except ValueError:             raise X10InvalidUnitNumber('%r not a valid unit number' % unit_number)     except TypeError:         raise X10InvalidUnitNumber('%r not a valid unit number' % unit_number)     if not (1 <= unit_number <= 16):         raise X10InvalidUnitNumber('%r not a valid unit number' % unit_number)     return unit_number"
+                ],
+                [
+                    "xmlparser.AttlistDeclHandler(elname, attname, type, default, required)",
+                    "pyc_invalidation_mode.TIMESTAMP"
+                ],
+                [
+                    "def listfolder(p):     \"\"\"     generator of list folder in the path.     folders only     \"\"\"     for entry in scandir.scandir(p):         if entry.is_dir():             yield entry.name",
+                    "def get_all_files(folder):     \"\"\"     Generator that loops through all absolute paths of the files within folder      Parameters     ----------     folder: str     Root folder start point for recursive search.      Yields     ------     fpath: str     Absolute path of one file in the folders     \"\"\"     for path, dirlist, filelist in os.walk(folder):         for fn in filelist:             yield op.join(path, fn)"
+                ],
+                [
+                    "print(*objects, file=sys.stdout)",
+                    "urllib.request.URLopener(**x509)"
+                ],
+                [
+                    "dispatcher.create_socket(family=socket.AF_INET)",
+                    "def find_geom(geom, geoms):     \"\"\"     Returns the index of a geometry in a list of geometries avoiding     expensive equality checks of `in` operator.     \"\"\"     for i, g in enumerate(geoms):         if g is geom:             return i"
+                ],
+                [
+                    "def scroll_down(lines=1, file=sys.stdout):     \"\"\" Scroll the whole page down a number of lines, new lines are added to         the top.          Esc[<lines>T     \"\"\"     scroll.down(lines).write(file=file)",
+                    "def normalize_multiline(line):     \"\"\"Normalize multiline-related code that will cause syntax error.      This is for purposes of checking syntax.      \"\"\"     if line.startswith('def ') and line.rstrip().endswith(':'):         return line + ' pass'     elif line.startswith('return '):         return 'def _(): ' + line     elif line.startswith('@'):         return line + 'def _(): pass'     elif line.startswith('class '):         return line + ' pass'     elif line.startswith(('if ', 'elif ', 'for ', 'while ')):         return line + ' pass'     else:         return line"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "xml.sax.saxutils.XMLGenerator(out=None, encoding='iso-8859-1')"
+                ],
+                [
+                    "difflib.SequenceMatcher(b='')",
+                    "def sliced(seq, n):     \"\"\"Yield slices of length *n* from the sequence *seq*.          >>> list(sliced((1, 2, 3, 4, 5, 6), 3))         [(1, 2, 3), (4, 5, 6)]      If the length of the sequence is not divisible by the requested slice     length, the last slice will be shorter.          >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))         [(1, 2, 3), (4, 5, 6), (7, 8)]      This function will only work for iterables that support slicing.     For non-sliceable iterables, see :func:`chunked`.      \"\"\"     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))"
+                ],
+                [
+                    "def add_colons(s):     \"\"\"Add colons after every second digit.      This function is used in functions to prettify serials.      >>> add_colons('teststring')     'te:st:st:ri:ng'     \"\"\"     return ':'.join([s[i:i + 2] for i in range(0, len(s), 2)])",
+                    "def draw_header(self, stream, header):         \"\"\"Draw header with underline\"\"\"         stream.writeln('=' * (len(header) + 4))         stream.writeln('| ' + header + ' |')         stream.writeln('=' * (len(header) + 4))         stream.writeln()"
+                ],
+                [
+                    "def url_to_image(url):     \"\"\"     Fetch an image from url and convert it into a Pillow Image object     \"\"\"     r = requests.get(url)     image = StringIO(r.content)     return image",
+                    "cgitb.enable()"
+                ],
+                [
+                    "def backward_char(self, e): # (C-b)         u\"\"\"Move back a character. \"\"\"         self.l_buffer.backward_char(self.argument_reset)         self.finalize()",
+                    "dispatcher.create_socket(family=socket.AF_INET)"
+                ],
+                [
+                    "def rvalues(self):         \"\"\"          in reversed order         \"\"\"         tmp = self         while tmp is not None:             yield tmp.data             tmp = tmp.prev",
+                    "def get_order(self, codes):         \"\"\"Return evidence codes in order shown in code2name.\"\"\"         return sorted(codes, key=lambda e: [self.ev2idx.get(e)])"
+                ],
+                [
+                    "window.instr(y, x)",
+                    "def pause(msg=\"Press Enter to Continue...\"):     \"\"\"press to continue\"\"\"     print('\\n' + Fore.YELLOW + msg + Fore.RESET, end='')     input()"
+                ],
+                [
+                    "def as_csv(self):         \"\"\"Return a CSV representation as a string\"\"\"          from io import StringIO          s = StringIO()         w = csv.writer(s)         for row in self.rows:             w.writerow(row)          return s.getvalue()",
+                    "def fopenat(base_fd, path):     \"\"\"     Does openat read-only, then does fdopen to get a file object     \"\"\"      return os.fdopen(openat(base_fd, path, os.O_RDONLY), 'rb')"
+                ],
+                [
+                    "def build_output(self, fout):         \"\"\"Squash self.out into string.          Join every line in self.out with a new line and write the         result to the output file.         \"\"\"         fout.write('\\n'.join([s for s in self.out]))",
+                    "def series_table_row_offset(self, series):         \"\"\"         Return the number of rows preceding the data table for *series* in         the Excel worksheet.         \"\"\"         title_and_spacer_rows = series.index * 2         data_point_rows = series.data_point_offset         return title_and_spacer_rows + data_point_rows"
+                ],
+                [
+                    "style.theme_names()",
+                    "warnings.filterwarnings(action, category=Warning)"
+                ],
+                [
+                    "def imdecode(image_path):     \"\"\"Return BGR image read by opencv\"\"\"     import os     assert os.path.exists(image_path), image_path + ' not found'     im = cv2.imread(image_path)     return im",
+                    "def out(self, output, newline=True):         \"\"\"Outputs a string to the console (stdout).\"\"\"         click.echo(output, nl=newline)"
+                ],
+                [
+                    "http.cookiejar.DefaultCookiePolicy(netscape=True)",
+                    "def upcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to upper case.\"\"\"     return [ tt.upper() for tt in map(_ustr,t) ]"
+                ],
+                [
+                    "ZipFile.comment",
+                    "def predictive_probability_multistate(M_c, X_L_list, X_D_list, Y, Q):     \"\"\"     Returns the predictive probability, averaged over each sample.     \"\"\"     logprobs = [float(predictive_probability(M_c, X_L, X_D, Y, Q))         for X_L, X_D in zip(X_L_list, X_D_list)]     return logmeanexp(logprobs)"
+                ],
+                [
+                    "def check_new_version_available(this_version):     \"\"\"     Checks if a newer version of Zappa is available.      Returns True is updateable, else False.      \"\"\"     import requests      pypi_url = 'https://pypi.python.org/pypi/Zappa/json'     resp = requests.get(pypi_url, timeout=1.5)     top_version = resp.json()['info']['version']      return this_version != top_version",
+                    "def compare(a, b):     \"\"\"      Compare items in 2 arrays. Returns sum(abs(a(i)-b(i)))     \"\"\"     s=0     for i in range(len(a)):         s=s+abs(a[i]-b[i])     return s"
+                ],
+                [
+                    "def full_like(array, value, dtype=None):     \"\"\" Create a shared memory array with the same shape and type as a given array, filled with `value`.     \"\"\"     shared = empty_like(array, dtype)     shared[:] = value     return shared",
+                    "def background_thread():     \"\"\"Example of how to send server generated events to clients.\"\"\"     count = 0     while True:         socketio.sleep(10)         count += 1         socketio.emit('my_response',                       {'data': 'Server generated event', 'count': count},                       namespace='/test')"
+                ],
+                [
+                    "def files_have_same_point_format_id(las_files):     \"\"\" Returns true if all the files have the same points format id     \"\"\"     point_format_found = {las.header.point_format_id for las in las_files}     return len(point_format_found) == 1",
+                    "def get_number(s, cast=int):     \"\"\"     Try to get a number out of a string, and cast it.     \"\"\"     import string     d = \"\".join(x for x in str(s) if x in string.digits)     return cast(d)"
+                ],
+                [
+                    "def round_to_float(number, precision):     \"\"\"Round a float to a precision\"\"\"     rounded = Decimal(str(floor((number + precision / 2) // precision))                       ) * Decimal(str(precision))     return float(rounded)",
+                    "source_loader.set_data(path, data)"
+                ],
+                [
+                    "datetime.fold",
+                    "def _str_to_list(s):     \"\"\"Converts a comma separated string to a list\"\"\"     _list = s.split(\",\")     return list(map(lambda i: i.lstrip(), _list))"
+                ]
+            ]
+        ],
+        "does_better": [
+            0.748722937886235,
+            {
+                "ngram_match_score": 0.9972564899273824,
+                "weighted_ngram_match_score": 0.5664652102088519,
+                "syntax_match_score": 0.6246305418719211,
+                "dataflow_match_score": 0.8065395095367848
+            }
+        ],
+        "does_worse": [
+            0.1395451229249424,
+            {
+                "ngram_match_score": 0.012131466707034015,
+                "weighted_ngram_match_score": 0.009400192307910709,
+                "syntax_match_score": 0.2178988326848249,
+                "dataflow_match_score": 0.31875
+            }
+        ]
+    },
+    "UX+CR": {
+        "total": [
+            0.5797448613294423,
+            {
+                "ngram_match_score": 0.788802081785019,
+                "weighted_ngram_match_score": 0.46759273611203245,
+                "syntax_match_score": 0.565739570164349,
+                "dataflow_match_score": 0.4968450572563683
+            }
+        ],
+        "missed_preds": [
+            0.09471012428897782,
+            [
+                [
+                    "NNTP.head(file=None)"
+                ],
+                [
+                    "os.fwalk()"
+                ],
+                [
+                    "auto.object"
+                ],
+                [
+                    "errno.EREMOTE"
+                ],
+                [
+                    "bdb.user_line(frame)"
+                ],
+                [
+                    "email_policy.refold_source"
+                ],
+                [
+                    "fraction.__ceil__()"
+                ],
+                [
+                    "turtle.pensize()",
+                    "turtle.width()",
+                    "turtle.pensize(width=None)"
+                ],
+                [
+                    "xml.parsers.expat.model.XML_CQUANT_NONE"
+                ],
+                [
+                    "sqlite3.PARSE_DECLTYPES",
+                    "sqlite3.PARSE_COLNAMES"
+                ],
+                [
+                    "HTTPConnection.connect()"
+                ],
+                [
+                    "date.resolution"
+                ],
+                [
+                    "copyreg.pickle(type, function)"
+                ],
+                [
+                    "FTP.connect(port=0)",
+                    "FTP.connect(host='', port=0)",
+                    "FTP.connect(host='')",
+                    "FTP.connect()"
+                ],
+                [
+                    "file_io.mode"
+                ],
+                [
+                    "curses.unctrl(ch)"
+                ],
+                [
+                    "kevent.udata"
+                ],
+                [
+                    "source_loader.set_data(path, data)"
+                ],
+                [
+                    "SMTP.connect(host='localhost', port=0)",
+                    "SMTP.connect(host='localhost')",
+                    "SMTP.connect(port=0)",
+                    "SMTP.connect()"
+                ],
+                [
+                    "subprocess.SW_HIDE"
+                ],
+                [
+                    "profile.run(command, filename=None)"
+                ],
+                [
+                    "datetime.time"
+                ],
+                [
+                    "datetime.fold",
+                    "time.fold"
+                ],
+                [
+                    "calendar.LocaleTextCalendar(firstweekday=0, locale=None)",
+                    "importlib.util.cache_from_source(path, debug_override=None, optimization=None)"
+                ],
+                [
+                    "window.bkgdset(ch, attr)",
+                    "trace.size"
+                ],
+                [
+                    "connection.backup(target, pages=0)",
+                    "base_http_request_handler.log_date_time_string()"
+                ],
+                [
+                    "turtle.bgpic(picname=None)",
+                    "compileall.compile_dir(dir, ddir=None)"
+                ],
+                [
+                    "style.theme_names()",
+                    "dis.Bytecode(x, first_line=None)"
+                ],
+                [
+                    "modulefinder.ModuleFinder(excludes=)",
+                    "traceback.print_stack()"
+                ],
+                [
+                    "xmlparser.NotationDeclHandler(notationName, base, systemId, publicId)",
+                    "connection.rollback()"
+                ],
+                [
+                    "token.ISNONTERMINAL(x)",
+                    "Match.group()"
+                ],
+                [
+                    "wave.openfp(file, mode)",
+                    "sunau.openfp(file, mode)"
+                ],
+                [
+                    "float.hex()",
+                    "list(d)"
+                ],
+                [
+                    "errno.EREMOTE",
+                    "config_parser.items(raw=False)"
+                ],
+                [
+                    "style.theme_names()",
+                    "warnings.filterwarnings(action, category=Warning)"
+                ],
+                [
+                    "WriteTransport.set_write_buffer_limits(low=None)",
+                    "WriteTransport.set_write_buffer_limits(high=None)"
+                ],
+                [
+                    "null_translations.add_fallback(fallback)",
+                    "os.wait4(pid, options)"
+                ],
+                [
+                    "__import__(name, globals=None)",
+                    "style.theme_names()"
+                ],
+                [
+                    "queue_listener.handle(record)",
+                    "html.entities.entitydefs"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "xml.sax.saxutils.XMLGenerator(out=None, encoding='iso-8859-1')"
+                ],
+                [
+                    "http.cookiejar.DefaultCookiePolicy(netscape=True)",
+                    "HMAC.digest()"
+                ],
+                [
+                    "multiprocessing.Condition()",
+                    "array.frombytes(s)"
+                ],
+                [
+                    "profile.Profile(subcalls=True)",
+                    "decimal.sqrt()"
+                ],
+                [
+                    "logging.handlers.TimedRotatingFileHandler(filename, when='h')",
+                    "logging.handlers.TimedRotatingFileHandler(filename, interval=1)"
+                ],
+                [
+                    "multiprocessing.get_context()",
+                    "gc.get_objects()"
+                ],
+                [
+                    "turtle.onclick(fun)",
+                    "turtle.onscreenclick(fun)"
+                ],
+                [
+                    "time.replace(hour=self.hour, minute=self.minute)",
+                    "HTTPConnection.connect()"
+                ],
+                [
+                    "SSLSocket.server_side",
+                    "str.isascii()"
+                ],
+                [
+                    "curses.flash()",
+                    "errno.ENOTSOCK"
+                ],
+                [
+                    "ZipFile.infolist()",
+                    "SMTP.login(user, password)"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "collections.namedtuple(typename, field_names, defaults=None)"
+                ],
+                [
+                    "email_message.replace_header(_name, _value)",
+                    "SMTP.send_message(msg, rcpt_options=())"
+                ],
+                [
+                    "copyreg.pickle(type, function)",
+                    "sqlite3.Connection"
+                ],
+                [
+                    "trace.size",
+                    "window.bkgdset(ch, attr)"
+                ],
+                [
+                    "curses.flash()",
+                    "abc.ABC"
+                ],
+                [
+                    "turtle.onclick(fun)",
+                    "future.add_done_callback(callback)"
+                ],
+                [
+                    "FTP.connect()",
+                    "unittest.mock.MagicMock(*args, **kw)"
+                ],
+                [
+                    "HTTPPasswordMgrWithPriorAuth.update_authenticated(self, uri, is_authenticated=False)",
+                    "dis.dis(depth=None)"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "dis.dis(x=None, depth=None)"
+                ],
+                [
+                    "stat.S_IWOTH",
+                    "_thread.interrupt_main()"
+                ],
+                [
+                    "doc_test_runner.run(test)",
+                    "mailcap.findmatch(caps, MIMEtype, plist=)"
+                ],
+                [
+                    "heapq.nlargest(n, iterable)",
+                    "tkinter.tix.Balloon"
+                ],
+                [
+                    "async_exit_stack.push_async_exit(exit)",
+                    "gc.get_referrers(*objs)"
+                ],
+                [
+                    "style.theme_names()",
+                    "window.instr(y, x)"
+                ],
+                [
+                    "ZipFile.infolist()",
+                    "auto.object"
+                ],
+                [
+                    "struct.size",
+                    "tracemalloc.get_tracemalloc_memory()"
+                ],
+                [
+                    "importlib.resources.read_binary(package, resource)",
+                    "base64.a85decode(b, adobe=False)"
+                ],
+                [
+                    "bdb.dispatch_return(frame, arg)",
+                    "email_message.get_content_maintype()"
+                ],
+                [
+                    "future.set_exception(exception)",
+                    "copyreg.pickle(type, function)"
+                ],
+                [
+                    "traceback.print_stack()",
+                    "modulefinder.ModuleFinder(excludes=)"
+                ],
+                [
+                    "shlex.split(s, comments=False)",
+                    "socket.gethostbyname(hostname)"
+                ],
+                [
+                    "FileCookieJar.revert(filename=None)",
+                    "textbox.stripspaces"
+                ],
+                [
+                    "dispatcher.create_socket(family=socket.AF_INET)",
+                    "cmath.phase(x)"
+                ],
+                [
+                    "html_diff.__init__(linejunk=None)",
+                    "controller.open(url, autoraise=True)"
+                ],
+                [
+                    "modulefinder.ModuleFinder(excludes=)",
+                    "bytecode.from_traceback(tb)"
+                ],
+                [
+                    "types.DynamicClassAttribute(fset=None)",
+                    "errno.ENOSYS"
+                ],
+                [
+                    "print(*objects)",
+                    "print(*objects, sep=' ', end='\\n')"
+                ],
+                [
+                    "print(*objects, end='\\n', file=sys.stdout)",
+                    "print(*objects, end='\\n')"
+                ],
+                [
+                    "PurePath.parent",
+                    "tempfile.gettempprefix()"
+                ],
+                [
+                    "http.cookiejar.DefaultCookiePolicy(netscape=True)",
+                    "locale.currency(val, international=False)"
+                ],
+                [
+                    "__import__(name, globals=None)",
+                    "ExpatError.lineno"
+                ],
+                [
+                    "test_case.setUp()",
+                    "gettext.find(domain, localedir=None)"
+                ],
+                [
+                    "ZipFile.comment",
+                    "shutil.copymode(src, dst)"
+                ],
+                [
+                    "def latest_commit(self) -> git.Commit:         \"\"\"         :return: latest commit         :rtype: git.Commit object         \"\"\"         latest_commit: git.Commit = self.repo.head.commit         LOGGER.debug('latest commit: %s', latest_commit)         return latest_commit",
+                    "def get_last_commit_line(git_path=None):     \"\"\"     Get one-line description of HEAD commit for repository in current dir.     \"\"\"     if git_path is None: git_path = GIT_PATH     output = check_output([git_path, \"log\", \"--pretty=format:'%ad %h %s'\",                            \"--date=short\", \"-n1\"])     return output.strip()[1:-1]"
+                ],
+                [
+                    "def strip_accents(s):     \"\"\"     Strip accents to prepare for slugification.     \"\"\"     nfkd = unicodedata.normalize('NFKD', unicode(s))     return u''.join(ch for ch in nfkd if not unicodedata.combining(ch))",
+                    "def casefold_with_i_dots(text):     \"\"\"     Convert capital I's and capital dotted \u0130's to lowercase in the way     that's appropriate for Turkish and related languages, then case-fold     the rest of the letters.     \"\"\"     text = unicodedata.normalize('NFC', text).replace('\u0130', 'i').replace('I', '\u0131')     return text.casefold()"
+                ],
+                [
+                    "def check_bucket_exists(self, bucket: str) -> bool:         \"\"\"         Checks if bucket with specified name exists.         :param bucket: the bucket to be checked.         :return: true if specified bucket exists.         \"\"\"         exists = True         try:             self.s3_client.head_bucket(Bucket=bucket)         except botocore.exceptions.ClientError as e:             # If a client error is thrown, then check that it was a 404 error.             # If it was a 404 error, then the bucket does not exist.             error_code = int(e.response['Error']['Code'])             if error_code == 404:                 exists = False         return exists",
+                    "def check_for_key(self, key, bucket_name=None):         \"\"\"         Checks if a key exists in a bucket          :param key: S3 key that will point to the file         :type key: str         :param bucket_name: Name of the bucket in which the file is stored         :type bucket_name: str         \"\"\"         if not bucket_name:             (bucket_name, key) = self.parse_s3_url(key)          try:             self.get_conn().head_object(Bucket=bucket_name, Key=key)             return True         except ClientError as e:             self.log.info(e.response[\"Error\"][\"Message\"])             return False"
+                ],
+                [
+                    "def is_list_of_states(self, arg):         \"\"\"         A list of states example -         [('x1', 'easy'), ('x2', 'hard')]          Returns         -------         True, if arg is a list of states else False.          \"\"\"         return isinstance(arg, list) and all(isinstance(i, tuple) for i in arg)",
+                    "def iget_list_column_slice(list_, start=None, stop=None, stride=None):     \"\"\" iterator version of get_list_column \"\"\"     if isinstance(start, slice):         slice_ = start     else:         slice_ = slice(start, stop, stride)     return (row[slice_] for row in list_)"
+                ],
+                [
+                    "def list_move_to_front(l,value='other'):     \"\"\"if the value is in the list, move it to the front and return it.\"\"\"     l=list(l)     if value in l:         l.remove(value)         l.insert(0,value)     return l",
+                    "def extendleft(self, iterable):         \"\"\"Extend the left side of this GeventDeque by appending         elements from the iterable argument.  Note, the series of left         appends results in reversing the order of elements in the         iterable argument.         \"\"\"         self._deque.extendleft(iterable)         if len(self._deque) > 0:             self.notEmpty.set()"
+                ],
+                [
+                    "sqlite3.PARSE_COLNAMES",
+                    "cgihttp_request_handler.cgi_directories"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "style.theme_names()"
+                ],
+                [
+                    "def truncate(string, index):     \"\"\"Truncate a string at index and add ...\"\"\"     if len(string) > index and index > 0:         string = string[:index - 1] + u('\u2026')     return string",
+                    "def strip_spaces(x):     \"\"\"     Strips spaces     :param x:     :return:     \"\"\"     x = x.replace(b' ', b'')     x = x.replace(b'\\t', b'')     return x"
+                ],
+                [
+                    "time.monotonic()",
+                    "def _str_to_list(s):     \"\"\"Converts a comma separated string to a list\"\"\"     _list = s.split(\",\")     return list(map(lambda i: i.lstrip(), _list))"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "__import__(name, globals=None)"
+                ],
+                [
+                    "def address(self):         \"\"\"         Returns the name of the port that this motor is connected to.         \"\"\"         self._address, value = self.get_attr_string(self._address, 'address')         return value",
+                    "def result(self):         \"\"\" Return the result of the AMP (as a string)\"\"\"         ret = self.get('result')         if ret is not None:             ret = u(ret)         return ret"
+                ],
+                [
+                    "def QA_util_datetime_to_strdate(dt):     \"\"\"     :param dt:  pythone datetime.datetime     :return:  1999-02-01 string type     \"\"\"     strdate = \"%04d-%02d-%02d\" % (dt.year, dt.month, dt.day)     return strdate",
+                    "def str_to_date(date: str) -> datetime.datetime:     \"\"\" Convert cbr.ru API date ste to python datetime      :param date: date from API response      :return: date like datetime     :rtype: datetime     \"\"\"     date = date.split('.')     date.reverse()     y, m, d = date     return datetime.datetime(int(y), int(m), int(d))"
+                ],
+                [
+                    "def index(self, item):         \"\"\" Not recommended for use on large lists due to time             complexity, but it works              -> #int list index of @item         \"\"\"         for i, x in enumerate(self.iter()):             if x == item:                 return i         return None",
+                    "def find(self, name):         \"\"\"Return the index of the toc entry with name NAME.             Return -1 for failure.\"\"\"         for i, nm in enumerate(self.data):             if nm[-1] == name:                 return i         return -1"
+                ],
+                [
+                    "def Ry_matrix(theta):     \"\"\"Rotation matrix around the Y axis\"\"\"     return np.array([         [np.cos(theta), 0, np.sin(theta)],         [0, 1, 0],         [-np.sin(theta), 0, np.cos(theta)]     ])",
+                    "def firmware_download_input_rbridge_id(self, **kwargs):         \"\"\"Auto Generated Code         \"\"\"         config = ET.Element(\"config\")         firmware_download = ET.Element(\"firmware_download\")         config = firmware_download         input = ET.SubElement(firmware_download, \"input\")         rbridge_id = ET.SubElement(input, \"rbridge-id\")         rbridge_id.text = kwargs.pop('rbridge_id')          callback = kwargs.pop('callback', self._callback)         return callback(config)"
+                ],
+                [
+                    "def to_pascal_case(s):     \"\"\"Transform underscore separated string to pascal case      \"\"\"     return re.sub(r'(?!^)_([a-zA-Z])', lambda m: m.group(1).upper(), s.capitalize())",
+                    "def csvpretty(csvfile: csvfile=sys.stdin):     \"\"\" Pretty print a CSV file. \"\"\"     shellish.tabulate(csv.reader(csvfile))"
+                ],
+                [
+                    "def hex_to_rgb(h):     \"\"\" Returns 0 to 1 rgb from a hex list or tuple \"\"\"     h = h.lstrip('#')     return tuple(int(h[i:i+2], 16)/255. for i in (0, 2 ,4))",
+                    "def hex2rgb(value):     \"\"\"Converts a hexadeximal color string to an RGB 3-tuple      EXAMPLE     -------     >>> hex2rgb('#0000FF')     (0, 0, 255)     \"\"\"     value = value.lstrip('#')     lv = len(value)     return tuple(int(value[i:i+lv//3], 16) for i in range(0, lv, lv//3))"
+                ],
+                [
+                    "def spline_interpolate(x1, y1, x2):     \"\"\"     Given a function at a set of points (x1, y1), interpolate to     evaluate it at points x2.     \"\"\"     sp = Spline(x1, y1)     return sp(x2)",
+                    "def ReadTif(tifFile):         \"\"\"Reads a tif file to a 2D NumPy array\"\"\"         img = Image.open(tifFile)         img = np.array(img)         return img"
+                ],
+                [
+                    "ZipFile.infolist()",
+                    "def __split_every_n(self, n, data):         \"\"\"         \"\"\"         return [data[i:i+n] for i in range(0, len(data), n)]"
+                ],
+                [
+                    "style.theme_names()",
+                    "def str2int(string_with_int):     \"\"\" Collect digits from a string \"\"\"     return int(\"\".join([char for char in string_with_int if char in string.digits]) or 0)"
+                ],
+                [
+                    "def try_convert(value):         \"\"\"Convert value to a numeric value or raise a ValueError         if that isn't possible.          \"\"\"         convertible = ForceNumeric.is_convertible(value)         if not convertible or isinstance(value, bool):             raise ValueError         if isinstance(str(value), str):             return ForceNumeric.str_to_num(value)         return float(value)",
+                    "def is_string(obj):     \"\"\"Is this a string.      :param object obj:     :rtype: bool     \"\"\"     if PYTHON3:         str_type = (bytes, str)     else:         str_type = (bytes, str, unicode)     return isinstance(obj, str_type)"
+                ],
+                [
+                    "def int2str(num, radix=10, alphabet=BASE85):     \"\"\"helper function for quick base conversions from integers to strings\"\"\"     return NumConv(radix, alphabet).int2str(num)",
+                    "def try_cast_int(s):     \"\"\"(str) -> int     All the digits in a given string are concatenated and converted into a single number.     \"\"\"     try:         temp = re.findall('\\d', str(s))         temp = ''.join(temp)         return int(temp)     except:         return s"
+                ],
+                [
+                    "def read_string(buff, byteorder='big'):     \"\"\"Read a string from a file-like object.\"\"\"     length = read_numeric(USHORT, buff, byteorder)     return buff.read(length).decode('utf-8')",
+                    "def MultiArgMax(x):   \"\"\"   Get tuple (actually a generator) of indices where the max value of   array x occurs. Requires that x have a max() method, as x.max()   (in the case of NumPy) is much faster than max(x).   For a simpler, faster argmax when there is only a single maximum entry,   or when knowing only the first index where the maximum occurs,   call argmax() on a NumPy array.    :param x: Any sequence that has a max() method.   :returns: Generator with the indices where the max value occurs.   \"\"\"   m = x.max()   return (i for i, v in enumerate(x) if v == m)"
+                ],
+                [
+                    "def list_of_lists_to_dict(l):     \"\"\" Convert list of key,value lists to dict      [['id', 1], ['id', 2], ['id', 3], ['foo': 4]]     {'id': [1, 2, 3], 'foo': [4]}     \"\"\"     d = {}     for key, val in l:         d.setdefault(key, []).append(val)     return d",
+                    "def size(self):         \"\"\"Total number of grid points.\"\"\"         # Since np.prod(()) == 1.0 we need to handle that by ourselves         return (0 if self.shape == () else                 int(np.prod(self.shape, dtype='int64')))"
+                ],
+                [
+                    "def shape(self):         \"\"\"Compute the shape of the dataset as (rows, cols).\"\"\"         if not self.data:             return (0, 0)         return (len(self.data), len(self.dimensions))",
+                    "def is_installable(self, model_index):         \"\"\" \"\"\"         row = model_index.row()         status = self._rows[row][C.COL_STATUS]         return status == C.NOT_INSTALLED"
+                ],
+                [
+                    "def _station(self) -> str:         \"\"\"Extract station name.\"\"\"         return str(self.obj.SBRes.SBReq.Start.Station.HafasName.Text.pyval)",
+                    "def log_no_newline(self, msg):       \"\"\" print the message to the predefined log file without newline \"\"\"       self.print2file(self.logfile, False, False, msg)"
+                ],
+                [
+                    "style.theme_names()",
+                    "def pstd(self, *args, **kwargs):         \"\"\" Console to STDOUT \"\"\"         kwargs['file'] = self.out         self.print(*args, **kwargs)         sys.stdout.flush()"
+                ],
+                [
+                    "def read_img(path):     \"\"\" Reads image specified by path into numpy.ndarray\"\"\"     img = cv2.resize(cv2.imread(path, 0), (80, 30)).astype(np.float32) / 255     img = np.expand_dims(img.transpose(1, 0), 0)     return img",
+                    "def resize(src, size, interpolation=cv2.INTER_LINEAR):     \"\"\"Decode image from str buffer.     Wrapper for cv2.imresize that uses mx.nd.NDArray      Parameters     ----------     src : NDArray         image in (width, height, channels)     size : tuple         target size in (width, height)     interpolation : int         same as interpolation for cv2.imresize      Returns     -------     img : NDArray         resized image     \"\"\"     hdl = NDArrayHandle()     check_call(_LIB.MXCVResize(src.handle, mx_uint(size[0]), mx_uint(size[1]),                                interpolation, ctypes.byref(hdl)))     return mx.nd.NDArray(hdl)"
+                ],
+                [
+                    "def ziptake(items_list, indexes_list):     \"\"\"     SeeAlso:         vt.ziptake     \"\"\"     return [take(list_, index_list)             for list_, index_list in zip(items_list, indexes_list)]",
+                    "def is_iterable(value):     \"\"\"must be an iterable (list, array, tuple)\"\"\"     return isinstance(value, np.ndarray) or isinstance(value, list) or isinstance(value, tuple), value"
+                ],
+                [
+                    "def S(self):         \"\"\":obj:`numpy.ndarray` : The 3x3 scaling matrix for this projection         \"\"\"         S = np.array([[self._plane_width / self._vol_width, 0, 0],                       [0, self._plane_height / self._vol_height, 0],                       [0, 0, self._depth_scale / self._vol_depth]])         return S",
+                    "def load_data(filename):     \"\"\"     :rtype : numpy matrix     \"\"\"     data = pandas.read_csv(filename, header=None, delimiter='\\t', skiprows=9)     return data.as_matrix()"
+                ],
+                [
+                    "def skip_connection_distance(a, b):     \"\"\"The distance between two skip-connections.\"\"\"     if a[2] != b[2]:         return 1.0     len_a = abs(a[1] - a[0])     len_b = abs(b[1] - b[0])     return (abs(a[0] - b[0]) + abs(len_a - len_b)) / (max(a[0], b[0]) + max(len_a, len_b))",
+                    "def to_dataframe(products):         \"\"\"Return the products from a query response as a Pandas DataFrame         with the values in their appropriate Python types.         \"\"\"         try:             import pandas as pd         except ImportError:             raise ImportError(\"to_dataframe requires the optional dependency Pandas.\")          return pd.DataFrame.from_dict(products, orient='index')"
+                ],
+                [
+                    "os._exit(n)",
+                    "def str2int(string_with_int):     \"\"\" Collect digits from a string \"\"\"     return int(\"\".join([char for char in string_with_int if char in string.digits]) or 0)"
+                ],
+                [
+                    "def flatten(l, types=(list, float)):     \"\"\"     Flat nested list of lists into a single list.     \"\"\"     l = [item if isinstance(item, types) else [item] for item in l]     return [item for sublist in l for item in sublist]",
+                    "def should_skip_logging(func):     \"\"\"     Should we skip logging for this handler?      \"\"\"     disabled = strtobool(request.headers.get(\"x-request-nolog\", \"false\"))     return disabled or getattr(func, SKIP_LOGGING, False)"
+                ],
+                [
+                    "def return_letters_from_string(text):     \"\"\"Get letters from string only.\"\"\"     out = \"\"     for letter in text:         if letter.isalpha():             out += letter     return out",
+                    "def drop_bad_characters(text):     \"\"\"Takes a text and drops all non-printable and non-ascii characters and     also any whitespace characters that aren't space.      :arg str text: the text to fix      :returns: text with all bad characters dropped      \"\"\"     # Strip all non-ascii and non-printable characters     text = ''.join([c for c in text if c in ALLOWED_CHARS])     return text"
+                ],
+                [
+                    "def as_tuple(self, value):         \"\"\"Utility function which converts lists to tuples.\"\"\"         if isinstance(value, list):             value = tuple(value)         return value",
+                    "def compose_all(tups):   \"\"\"Compose all given tuples together.\"\"\"   from . import ast  # I weep for humanity   return functools.reduce(lambda x, y: x.compose(y), map(ast.make_tuple, tups), ast.make_tuple({}))"
+                ],
+                [
+                    "def bitsToString(arr):   \"\"\"Returns a string representing a numpy array of 0's and 1's\"\"\"   s = array('c','.'*len(arr))   for i in xrange(len(arr)):     if arr[i] == 1:       s[i]='*'   return s",
+                    "def _saferound(value, decimal_places):     \"\"\"     Rounds a float value off to the desired precision     \"\"\"     try:         f = float(value)     except ValueError:         return ''     format = '%%.%df' % decimal_places     return format % f"
+                ],
+                [
+                    "def column(self, i):          \"\"\"from right\"\"\"         return ''.join([str(digitat2(r,i)) for r in self])",
+                    "def file_exists(original_file):     \"\"\"     Check to make sure the original file exists     \"\"\"     if original_file.startswith(\"s3://\"):         from filesystem import s3         return s3.file_exists(original_file)     else:         if not os.path.exists(original_file):             return False         if not os.path.isfile(original_file):             return False     return True"
+                ],
+                [
+                    "def _exists(self, path):         \"\"\"S3 directory is not S3Ojbect.         \"\"\"         if path.endswith('/'):             return True         return self.storage.exists(path)",
+                    "def write_tsv_line_from_list(linelist, outfp):     \"\"\"Utility method to convert list to tsv line with carriage return\"\"\"     line = '\\t'.join(linelist)     outfp.write(line)     outfp.write('\\n')"
+                ],
+                [
+                    "def authenticate(self, username=\"\", password=\"\", **kwargs):         \"\"\"Allow users to log in with their email address.\"\"\"         try:             user = get_user_model().objects.filter(email__iexact=username)[0]             if check_password(password, user.password):                 return user             else:                 return None         except IndexError:             # No user was found, return None - triggers default login failed             return None",
+                    "def round_to_int(number, precision):     \"\"\"Round a number to a precision\"\"\"     precision = int(precision)     rounded = (int(number) + precision / 2) // precision * precision     return rounded"
+                ],
+                [
+                    "def QA_util_datetime_to_strdate(dt):     \"\"\"     :param dt:  pythone datetime.datetime     :return:  1999-02-01 string type     \"\"\"     strdate = \"%04d-%02d-%02d\" % (dt.year, dt.month, dt.day)     return strdate",
+                    "def _station(self) -> str:         \"\"\"Extract station name.\"\"\"         return str(self.obj.SBRes.SBReq.Start.Station.HafasName.Text.pyval)"
+                ],
+                [
+                    "html_diff.__init__(linejunk=None)",
+                    "dispatcher.create_socket(family=socket.AF_INET)"
+                ],
+                [
+                    "def unique(input_list):     \"\"\"     Return a list of unique items (similar to set functionality).      Parameters     ----------     input_list : list         A list containg some items that can occur more than once.      Returns     -------     list         A list with only unique occurances of an item.      \"\"\"     output = []     for item in input_list:         if item not in output:             output.append(item)     return output",
+                    "def normalize_unitnumber(unit_number):     \"\"\"Returns a normalized unit number, i.e. integers     Raises exception X10InvalidUnitNumber if unit number appears to be invalid     \"\"\"     try:         try:             unit_number = int(unit_number)         except ValueError:             raise X10InvalidUnitNumber('%r not a valid unit number' % unit_number)     except TypeError:         raise X10InvalidUnitNumber('%r not a valid unit number' % unit_number)     if not (1 <= unit_number <= 16):         raise X10InvalidUnitNumber('%r not a valid unit number' % unit_number)     return unit_number"
+                ],
+                [
+                    "dispatcher.create_socket(family=socket.AF_INET)",
+                    "def find_geom(geom, geoms):     \"\"\"     Returns the index of a geometry in a list of geometries avoiding     expensive equality checks of `in` operator.     \"\"\"     for i, g in enumerate(geoms):         if g is geom:             return i"
+                ],
+                [
+                    "def scroll_down(lines=1, file=sys.stdout):     \"\"\" Scroll the whole page down a number of lines, new lines are added to         the top.          Esc[<lines>T     \"\"\"     scroll.down(lines).write(file=file)",
+                    "def normalize_multiline(line):     \"\"\"Normalize multiline-related code that will cause syntax error.      This is for purposes of checking syntax.      \"\"\"     if line.startswith('def ') and line.rstrip().endswith(':'):         return line + ' pass'     elif line.startswith('return '):         return 'def _(): ' + line     elif line.startswith('@'):         return line + 'def _(): pass'     elif line.startswith('class '):         return line + ' pass'     elif line.startswith(('if ', 'elif ', 'for ', 'while ')):         return line + ' pass'     else:         return line"
+                ],
+                [
+                    "__import__(name, globals=None, locals=None)",
+                    "xml.sax.saxutils.XMLGenerator(out=None, encoding='iso-8859-1')"
+                ],
+                [
+                    "difflib.SequenceMatcher(b='')",
+                    "def sliced(seq, n):     \"\"\"Yield slices of length *n* from the sequence *seq*.          >>> list(sliced((1, 2, 3, 4, 5, 6), 3))         [(1, 2, 3), (4, 5, 6)]      If the length of the sequence is not divisible by the requested slice     length, the last slice will be shorter.          >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))         [(1, 2, 3), (4, 5, 6), (7, 8)]      This function will only work for iterables that support slicing.     For non-sliceable iterables, see :func:`chunked`.      \"\"\"     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))"
+                ],
+                [
+                    "def add_colons(s):     \"\"\"Add colons after every second digit.      This function is used in functions to prettify serials.      >>> add_colons('teststring')     'te:st:st:ri:ng'     \"\"\"     return ':'.join([s[i:i + 2] for i in range(0, len(s), 2)])",
+                    "def draw_header(self, stream, header):         \"\"\"Draw header with underline\"\"\"         stream.writeln('=' * (len(header) + 4))         stream.writeln('| ' + header + ' |')         stream.writeln('=' * (len(header) + 4))         stream.writeln()"
+                ],
+                [
+                    "style.theme_names()",
+                    "time.replace(hour=self.hour, minute=self.minute)"
+                ],
+                [
+                    "def rvalues(self):         \"\"\"          in reversed order         \"\"\"         tmp = self         while tmp is not None:             yield tmp.data             tmp = tmp.prev",
+                    "def get_order(self, codes):         \"\"\"Return evidence codes in order shown in code2name.\"\"\"         return sorted(codes, key=lambda e: [self.ev2idx.get(e)])"
+                ],
+                [
+                    "window.instr(y, x)",
+                    "def pause(msg=\"Press Enter to Continue...\"):     \"\"\"press to continue\"\"\"     print('\\n' + Fore.YELLOW + msg + Fore.RESET, end='')     input()"
+                ],
+                [
+                    "def do_exit(self, arg):         \"\"\"Exit the shell session.\"\"\"          if self.current:             self.current.close()         self.resource_manager.close()         del self.resource_manager         return True",
+                    "def stop_process(self, process, timeout=None):         \"\"\" Initiates a graceful stop of one process \"\"\"          process[\"terminate\"] = True         if timeout is not None:             process[\"terminate_at\"] = time.time() + timeout         process[\"subprocess\"].send_signal(signal.SIGINT)"
+                ],
+                [
+                    "def as_csv(self):         \"\"\"Return a CSV representation as a string\"\"\"          from io import StringIO          s = StringIO()         w = csv.writer(s)         for row in self.rows:             w.writerow(row)          return s.getvalue()",
+                    "def fopenat(base_fd, path):     \"\"\"     Does openat read-only, then does fdopen to get a file object     \"\"\"      return os.fdopen(openat(base_fd, path, os.O_RDONLY), 'rb')"
+                ],
+                [
+                    "def build_output(self, fout):         \"\"\"Squash self.out into string.          Join every line in self.out with a new line and write the         result to the output file.         \"\"\"         fout.write('\\n'.join([s for s in self.out]))",
+                    "def series_table_row_offset(self, series):         \"\"\"         Return the number of rows preceding the data table for *series* in         the Excel worksheet.         \"\"\"         title_and_spacer_rows = series.index * 2         data_point_rows = series.data_point_offset         return title_and_spacer_rows + data_point_rows"
+                ],
+                [
+                    "style.theme_names()",
+                    "warnings.filterwarnings(action, category=Warning)"
+                ],
+                [
+                    "def imdecode(image_path):     \"\"\"Return BGR image read by opencv\"\"\"     import os     assert os.path.exists(image_path), image_path + ' not found'     im = cv2.imread(image_path)     return im",
+                    "def out(self, output, newline=True):         \"\"\"Outputs a string to the console (stdout).\"\"\"         click.echo(output, nl=newline)"
+                ],
+                [
+                    "http.cookiejar.DefaultCookiePolicy(netscape=True)",
+                    "def upcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to upper case.\"\"\"     return [ tt.upper() for tt in map(_ustr,t) ]"
+                ],
+                [
+                    "ZipFile.comment",
+                    "def predictive_probability_multistate(M_c, X_L_list, X_D_list, Y, Q):     \"\"\"     Returns the predictive probability, averaged over each sample.     \"\"\"     logprobs = [float(predictive_probability(M_c, X_L, X_D, Y, Q))         for X_L, X_D in zip(X_L_list, X_D_list)]     return logmeanexp(logprobs)"
+                ],
+                [
+                    "def check_new_version_available(this_version):     \"\"\"     Checks if a newer version of Zappa is available.      Returns True is updateable, else False.      \"\"\"     import requests      pypi_url = 'https://pypi.python.org/pypi/Zappa/json'     resp = requests.get(pypi_url, timeout=1.5)     top_version = resp.json()['info']['version']      return this_version != top_version",
+                    "def compare(a, b):     \"\"\"      Compare items in 2 arrays. Returns sum(abs(a(i)-b(i)))     \"\"\"     s=0     for i in range(len(a)):         s=s+abs(a[i]-b[i])     return s"
+                ],
+                [
+                    "def full_like(array, value, dtype=None):     \"\"\" Create a shared memory array with the same shape and type as a given array, filled with `value`.     \"\"\"     shared = empty_like(array, dtype)     shared[:] = value     return shared",
+                    "def background_thread():     \"\"\"Example of how to send server generated events to clients.\"\"\"     count = 0     while True:         socketio.sleep(10)         count += 1         socketio.emit('my_response',                       {'data': 'Server generated event', 'count': count},                       namespace='/test')"
+                ],
+                [
+                    "def files_have_same_point_format_id(las_files):     \"\"\" Returns true if all the files have the same points format id     \"\"\"     point_format_found = {las.header.point_format_id for las in las_files}     return len(point_format_found) == 1",
+                    "def get_number(s, cast=int):     \"\"\"     Try to get a number out of a string, and cast it.     \"\"\"     import string     d = \"\".join(x for x in str(s) if x in string.digits)     return cast(d)"
+                ],
+                [
+                    "def round_to_float(number, precision):     \"\"\"Round a float to a precision\"\"\"     rounded = Decimal(str(floor((number + precision / 2) // precision))                       ) * Decimal(str(precision))     return float(rounded)",
+                    "source_loader.set_data(path, data)"
+                ],
+                [
+                    "datetime.fold",
+                    "def _str_to_list(s):     \"\"\"Converts a comma separated string to a list\"\"\"     _list = s.split(\",\")     return list(map(lambda i: i.lstrip(), _list))"
+                ]
+            ]
+        ],
+        "does_better": [
+            0.0954395321485106,
+            {
+                "ngram_match_score": 0.007705796781641871,
+                "weighted_ngram_match_score": 0.005345871496431589,
+                "syntax_match_score": 0.19704433497536947,
+                "dataflow_match_score": 0.17166212534059946
+            }
+        ],
+        "does_worse": [
+            0.7564424492280415,
+            {
+                "ngram_match_score": 0.9968283774375727,
+                "weighted_ngram_match_score": 0.6028956996302351,
+                "syntax_match_score": 0.632295719844358,
+                "dataflow_match_score": 0.79375
+            }
+        ]
+    }
+}

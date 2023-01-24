@@ -1,0 +1,533 @@
+{
+    "UX+AST": {
+        "total": [
+            0.7164815862599766,
+            {
+                "ngram_match_score": 0.815866042284455,
+                "weighted_ngram_match_score": 0.6738412276410575,
+                "syntax_match_score": 0.7075998282524689,
+                "dataflow_match_score": 0.6686192468619246
+            }
+        ],
+        "missed_preds": [
+            0.18362616478876437,
+            [
+                [
+                    "print('%*s : %*s' % (20, 'Python', 20, 'Very Good'))"
+                ],
+                [
+                    "\"\"\"\"\"\".join(['a', 'b', 'c'])"
+                ],
+                [
+                    "then = datetime.datetime.strptime(when, '%Y-%m-%d').date()"
+                ],
+                [
+                    "\"\"\":\"\"\".join(str(x) for x in b)"
+                ],
+                [
+                    "print(' '.join(map(str, l)))"
+                ],
+                [
+                    "re.split('(\\\\W+)', 'Words, words, words.')"
+                ],
+                [
+                    "s.split(' ', 4)"
+                ],
+                [
+                    "numpy.zeros((3, 3, 3))"
+                ],
+                [
+                    "my_dict.update((x, y * 2) for x, y in list(my_dict.items()))"
+                ],
+                [
+                    "subprocess.call('sleep.sh', shell=True)"
+                ],
+                [
+                    "print('lamp, bag, mirror'.replace('bag,', ''))"
+                ],
+                [
+                    "\"\"\".\"\"\".join(s.split('.')[::-1])"
+                ],
+                [
+                    "dict((k, [d[k] for d in dicts]) for k in dicts[0])",
+                    "{k: [d[k] for d in dicts] for k in dicts[0]}"
+                ],
+                [
+                    "[image for menuitem in list_of_menuitems for image in menuitem]"
+                ],
+                [
+                    "df.b.str.contains('^f')"
+                ],
+                [
+                    "text = re.sub('\\\\b(\\\\w+)( \\\\1\\\\b)+', '\\\\1', text)"
+                ],
+                [
+                    "\"\"\"QH QD JC KD JS\"\"\".split()"
+                ],
+                [
+                    "print(re.search('>.*<', line).group(0))"
+                ],
+                [
+                    "[x for x in mylist if len(x) == 3]"
+                ],
+                [
+                    "'first string is: %s, second one is: %s' % (str1, 'geo.tif')"
+                ],
+                [
+                    "[x.strip() for x in '2.MATCHES $$TEXT$$ STRING'.split('$$TEXT$$')]"
+                ],
+                [
+                    "['it'] + ['was'] + ['annoying']"
+                ],
+                [
+                    "level1 = map(list, level1)"
+                ],
+                [
+                    "[m.group(0) for m in re.finditer('(\\\\d)\\\\1*', s)]"
+                ],
+                [
+                    "dict(x[i:i + 2] for i in range(0, len(x), 2))"
+                ],
+                [
+                    "values = sum([['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']], [])"
+                ],
+                [
+                    "[(x + y) for x, y in zip(word, word[1:])]",
+                    "list(map(lambda x, y: x + y, word[:-1], word[1:]))"
+                ],
+                [
+                    "\"\"\" \"\"\".join(my_string.split())"
+                ],
+                [
+                    "[sum(l[:i]) for i, _ in enumerate(l)]"
+                ],
+                [
+                    "\"\"\"Docs/src/Scripts/temp\"\"\".replace('/', '/\\x00/').split('\\x00')"
+                ],
+                [
+                    "ut.sort(key=cmpfun, reverse=True)",
+                    "ut.sort(key=lambda x: x.count, reverse=True)",
+                    "ut.sort(key=lambda x: x.count, reverse=True)"
+                ],
+                [
+                    "'ME' + str(i)"
+                ],
+                [
+                    "re.findall('\\\\b(\\\\w+)d\\\\b', s)"
+                ],
+                [
+                    "[i for i in teststr if re.search('\\\\d+[xX]', i)]"
+                ],
+                [
+                    "int('1')",
+                    "int()",
+                    "T2 = [map(int, x) for x in T1]"
+                ],
+                [
+                    "time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(1347517370))"
+                ],
+                [
+                    "result[0]['from_user']"
+                ],
+                [
+                    "re.findall('n(?<=[^n]n)n+(?=[^n])(?i)', s)"
+                ],
+                [
+                    "list(dict((x[0], x) for x in L).values())"
+                ],
+                [
+                    "\"\"\", \"\"\".join('(' + ', '.join(i) + ')' for i in L)"
+                ],
+                [
+                    "sorted(list5, lambda x: (degree(x), x))",
+                    "sorted(list5, key=lambda vertex: (degree(vertex), vertex))"
+                ],
+                [
+                    "(n for n in [1, 2, 3, 5])"
+                ],
+                [
+                    "from functools import reduce\nreduce(lambda a, b: a + b, (('aa',), ('bb',), ('cc',)))",
+                    "map(lambda a: a[0], (('aa',), ('bb',), ('cc',)))"
+                ],
+                [
+                    "ip = re.findall('[0-9]+(?:\\\\.[0-9]+){3}', s)"
+                ],
+                [
+                    "[x for x in myfile.splitlines() if x != '']",
+                    "lst = map(int, open('filename.txt').readlines())"
+                ],
+                [
+                    "re.findall('(.+?):(.+?)\\\\b ?', text)"
+                ],
+                [
+                    "elements = ['%{0}%'.format(element) for element in elements]"
+                ],
+                [
+                    "dict([('Name', 'Joe'), ('Age', 22)])"
+                ],
+                [
+                    "{i[1]: i[0] for i in list(myDictionary.items())}"
+                ],
+                [
+                    "[i for i, j in enumerate(myList) if 'how' in j.lower() or 'what' in j.lower()]"
+                ],
+                [
+                    "b.append((a[0][0], a[0][2]))"
+                ],
+                [
+                    "[x for x in range(len(stocks_list)) if stocks_list[x] == 'MSFT']"
+                ],
+                [
+                    "re.split('[ ](?=[A-Z]+\\\\b)', input)",
+                    "re.split('[ ](?=[A-Z])', input)"
+                ],
+                [
+                    "[dct[k] for k in lst]"
+                ],
+                [
+                    "subprocess.Popen(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat'])"
+                ],
+                [
+                    "np.vstack((a, b))"
+                ],
+                [
+                    "df.xs('sat', level='day', drop_level=False)"
+                ],
+                [
+                    "c2.sort(key=lambda row: row[2])",
+                    "c2.sort(key=lambda row: (row[2], row[1], row[0]))",
+                    "c2.sort(key=lambda row: (row[2], row[1]))"
+                ],
+                [
+                    "element.get_attribute('innerHTML')"
+                ],
+                [
+                    "np.column_stack(([1, 2, 3], [4, 5, 6]))"
+                ],
+                [
+                    "y = [[] for n in range(2)]"
+                ],
+                [
+                    "sys.stdout.write('.')"
+                ],
+                [
+                    "sum(1 << i for i, b in enumerate(x) if b)"
+                ],
+                [
+                    "[y for x in data for y in (x if isinstance(x, list) else [x])]"
+                ],
+                [
+                    "(x[1:] + x[:-1]) / 2",
+                    "x[:-1] + (x[1:] - x[:-1]) / 2"
+                ],
+                [
+                    "[re.sub('(?<!\\\\d)\\\\.(?!\\\\d)', ' ', i) for i in s]"
+                ],
+                [
+                    "subprocess.check_call('vasp | tee tee_output', shell=True)"
+                ],
+                [
+                    "\"\"\",\"\"\".join(trans['category'])"
+                ],
+                [
+                    "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]"
+                ],
+                [
+                    "re.sub('(\\\\_a)?\\\\.([^\\\\.]*)$', '_suff.\\\\2', 'long.file.name.jpg')"
+                ],
+                [
+                    "numlist = [float(x) for x in numlist]"
+                ],
+                [
+                    "df.to_csv(filename, index=False)"
+                ],
+                [
+                    "b.sort(key=lambda x: x[1][2])"
+                ],
+                [
+                    "datetime.datetime.now()"
+                ],
+                [
+                    "next(i for i, x in enumerate(lst) if not isinstance(x, bool) and x == 1)"
+                ],
+                [
+                    "mystring.replace(' ', '! !').split('!')"
+                ],
+                [
+                    "a[:, (np.newaxis)]"
+                ]
+            ]
+        ],
+        "does_better": [
+            0.8911879414937374,
+            {
+                "ngram_match_score": 1.0,
+                "weighted_ngram_match_score": 0.8572266150695175,
+                "syntax_match_score": 0.8342857142857143,
+                "dataflow_match_score": 0.8732394366197183
+            }
+        ],
+        "does_worse": [
+            0.21880546217513436,
+            {
+                "ngram_match_score": 0.13325275935063088,
+                "weighted_ngram_match_score": 0.13379838168185992,
+                "syntax_match_score": 0.2149122807017544,
+                "dataflow_match_score": 0.39325842696629215
+            }
+        ]
+    },
+    "UX+CR": {
+        "total": [
+            0.7355983997814214,
+            {
+                "ngram_match_score": 0.8417255971653501,
+                "weighted_ngram_match_score": 0.6937186944298531,
+                "syntax_match_score": 0.7148990983254616,
+                "dataflow_match_score": 0.6920502092050209
+            }
+        ],
+        "missed_preds": [
+            0.1661874387683147,
+            [
+                [
+                    "print('%*s : %*s' % (20, 'Python', 20, 'Very Good'))"
+                ],
+                [
+                    "\"\"\"\"\"\".join(['a', 'b', 'c'])"
+                ],
+                [
+                    "then = datetime.datetime.strptime(when, '%Y-%m-%d').date()"
+                ],
+                [
+                    "re.split('(\\\\W+)', 'Words, words, words.')"
+                ],
+                [
+                    "s.split(' ', 4)"
+                ],
+                [
+                    "numpy.zeros((3, 3, 3))"
+                ],
+                [
+                    "x = np.asarray(x).reshape(1, -1)[(0), :]"
+                ],
+                [
+                    "subprocess.call('sleep.sh', shell=True)"
+                ],
+                [
+                    "print('lamp, bag, mirror'.replace('bag,', ''))"
+                ],
+                [
+                    "[image for menuitem in list_of_menuitems for image in menuitem]"
+                ],
+                [
+                    "print(l[3:] + l[:3])"
+                ],
+                [
+                    "[x for x in ['AAT', 'XAC', 'ANT', 'TTA'] if 'X' not in x and 'N' not in x]"
+                ],
+                [
+                    "text = re.sub('\\\\b(\\\\w+)( \\\\1\\\\b)+', '\\\\1', text)"
+                ],
+                [
+                    "\"\"\"QH QD JC KD JS\"\"\".split()"
+                ],
+                [
+                    "[index for index, item in enumerate(thelist) if item[0] == '332']"
+                ],
+                [
+                    "[x for x in mylist if len(x) == 3]"
+                ],
+                [
+                    "[x.strip() for x in '2.MATCHES $$TEXT$$ STRING'.split('$$TEXT$$')]"
+                ],
+                [
+                    "['it'] + ['was'] + ['annoying']"
+                ],
+                [
+                    "level1 = map(list, level1)"
+                ],
+                [
+                    "values = sum([['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']], [])"
+                ],
+                [
+                    "[(x + y) for x, y in zip(word, word[1:])]",
+                    "list(map(lambda x, y: x + y, word[:-1], word[1:]))"
+                ],
+                [
+                    "\"\"\" \"\"\".join(my_string.split())"
+                ],
+                [
+                    "\"\"\"Docs/src/Scripts/temp\"\"\".replace('/', '/\\x00/').split('\\x00')"
+                ],
+                [
+                    "ut.sort(key=cmpfun, reverse=True)",
+                    "ut.sort(key=lambda x: x.count, reverse=True)",
+                    "ut.sort(key=lambda x: x.count, reverse=True)"
+                ],
+                [
+                    "re.findall('\\\\b(\\\\w+)d\\\\b', s)"
+                ],
+                [
+                    "[i for i in teststr if re.search('\\\\d+[xX]', i)]"
+                ],
+                [
+                    "int('1')",
+                    "int()",
+                    "T2 = [map(int, x) for x in T1]"
+                ],
+                [
+                    "lol = list(csv.reader(open('text.txt', 'rb'), delimiter='\\t'))"
+                ],
+                [
+                    "time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(1347517370))"
+                ],
+                [
+                    "result[0]['from_user']"
+                ],
+                [
+                    "res = dict((v, k) for k, v in a.items())"
+                ],
+                [
+                    "re.findall('n(?<=[^n]n)n+(?=[^n])(?i)', s)"
+                ],
+                [
+                    "sorted(list5, lambda x: (degree(x), x))",
+                    "sorted(list5, key=lambda vertex: (degree(vertex), vertex))"
+                ],
+                [
+                    "(n for n in [1, 2, 3, 5])"
+                ],
+                [
+                    "from functools import reduce\nreduce(lambda a, b: a + b, (('aa',), ('bb',), ('cc',)))",
+                    "map(lambda a: a[0], (('aa',), ('bb',), ('cc',)))"
+                ],
+                [
+                    "[x for x in myfile.splitlines() if x != '']",
+                    "lst = map(int, open('filename.txt').readlines())"
+                ],
+                [
+                    "re.findall('(.+?):(.+?)\\\\b ?', text)"
+                ],
+                [
+                    "elements = ['%{0}%'.format(element) for element in elements]"
+                ],
+                [
+                    "dict([('Name', 'Joe'), ('Age', 22)])"
+                ],
+                [
+                    "{i[1]: i[0] for i in list(myDictionary.items())}"
+                ],
+                [
+                    "[i for i, j in enumerate(myList) if 'how' in j.lower() or 'what' in j.lower()]"
+                ],
+                [
+                    "pd.DataFrame(out.tolist(), columns=['out-1', 'out-2'], index=out.index)"
+                ],
+                [
+                    "[x for x in range(len(stocks_list)) if stocks_list[x] == 'MSFT']"
+                ],
+                [
+                    "re.split('[ ](?=[A-Z]+\\\\b)', input)",
+                    "re.split('[ ](?=[A-Z])', input)"
+                ],
+                [
+                    "subprocess.Popen(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat'])"
+                ],
+                [
+                    "q.put((-n, n))"
+                ],
+                [
+                    "print(concatenate((a, b), axis=0))",
+                    "print(concatenate((a, b), axis=1))",
+                    "c = np.r_[(a[None, :], b[None, :])]",
+                    "np.array((a, b))"
+                ],
+                [
+                    "df.xs('sat', level='day', drop_level=False)"
+                ],
+                [
+                    "c2.sort(key=lambda row: row[2])",
+                    "c2.sort(key=lambda row: (row[2], row[1], row[0]))",
+                    "c2.sort(key=lambda row: (row[2], row[1]))"
+                ],
+                [
+                    "myList.insert(0, 'wuggah')"
+                ],
+                [
+                    "np.column_stack(([1, 2, 3], [4, 5, 6]))"
+                ],
+                [
+                    "y = [[] for n in range(2)]"
+                ],
+                [
+                    "sys.stdout.write('.')"
+                ],
+                [
+                    "(x[1:] + x[:-1]) / 2",
+                    "x[:-1] + (x[1:] - x[:-1]) / 2"
+                ],
+                [
+                    "l = sorted(l, key=itemgetter('time'), reverse=True)",
+                    "l = sorted(l, key=lambda a: a['time'], reverse=True)"
+                ],
+                [
+                    "text.split()",
+                    "text.split(',')",
+                    "line.split()"
+                ],
+                [
+                    "[re.sub('(?<!\\\\d)\\\\.(?!\\\\d)', ' ', i) for i in s]"
+                ],
+                [
+                    "subprocess.check_call('vasp | tee tee_output', shell=True)"
+                ],
+                [
+                    "\"\"\",\"\"\".join(trans['category'])"
+                ],
+                [
+                    "[x for x in sents if not x.startswith('@$\\t') and not x.startswith('#')]"
+                ],
+                [
+                    "numlist = [float(x) for x in numlist]"
+                ],
+                [
+                    "df.to_csv(filename, index=False)"
+                ],
+                [
+                    "s.encode('iso-8859-15')"
+                ],
+                [
+                    "b.sort(key=lambda x: x[1][2])"
+                ],
+                [
+                    "datetime.datetime.now()"
+                ],
+                [
+                    "mystring.replace(' ', '! !').split('!')"
+                ],
+                [
+                    "a[:, (np.newaxis)]"
+                ]
+            ]
+        ],
+        "does_better": [
+            0.24093976802845485,
+            {
+                "ngram_match_score": 0.16661228004244988,
+                "weighted_ngram_match_score": 0.20543653050195304,
+                "syntax_match_score": 0.21142857142857144,
+                "dataflow_match_score": 0.38028169014084506
+            }
+        ],
+        "does_worse": [
+            0.9919478545563789,
+            {
+                "ngram_match_score": 1.0,
+                "weighted_ngram_match_score": 0.9853352778746384,
+                "syntax_match_score": 0.9824561403508771,
+                "dataflow_match_score": 1.0
+            }
+        ]
+    }
+}

@@ -1,0 +1,660 @@
+[
+    [
+        [
+            "shutil.get_terminal_size(lines))",
+            "curses.is_term_resized(nlines, ncols)",
+            "trace.size",
+            "window.instr(y, x)",
+            "textbox.stripspaces"
+        ],
+        [
+            "turtle.pensize()",
+            "turtle.width()",
+            "turtle.pensize(width=None)"
+        ],
+        "PyDocs"
+    ],
+    [
+        [
+            "base_server.server_close()",
+            "Protocol.eof_received()",
+            "SSLSocket.server_side",
+            "smtpd.SMTPChannel(server, conn, addr, decode_data=False)",
+            "smtplib.LMTP(host='', port=LMTP_PORT)"
+        ],
+        [
+            "HTTPConnection.connect()"
+        ],
+        "PyDocs"
+    ],
+    [
+        [
+            "loop.getaddrinfo(host, port, family=0)",
+            "logging.handlers.SocketHandler(host, port)",
+            "asyncio.open_connection(port=None)",
+            "http.client.HTTPSConnection(host, blocksize=8192)",
+            "test.support.SOCK_MAX_SIZE"
+        ],
+        [
+            "FTP.connect(port=0)",
+            "FTP.connect(host='', port=0)",
+            "FTP.connect(host='')",
+            "FTP.connect()"
+        ],
+        "PyDocs"
+    ],
+    [
+        [
+            "window.syncup()",
+            "controller.open(url, autoraise=True)",
+            "window.instr(y, x)",
+            "window.bkgdset(ch, attr)",
+            "widget.identify_row(y)"
+        ],
+        [
+            "subprocess.SW_HIDE"
+        ],
+        "PyDocs"
+    ],
+    [
+        [
+            "codeop.compile_command(source, filename=\"<input>\", symbol=\"single\")",
+            "py_compile.compile(file, dfile=None)",
+            "compileall.compile_path(skip_curdir=True, maxlevels=0)",
+            "compileall.compile_dir(dir, ddir=None)",
+            "loader.exec_module(module)"
+        ],
+        [
+            "profile.run(command, filename=None)"
+        ],
+        "PyDocs"
+    ],
+    [
+        [
+            "def clean_strings(iterable):     \"\"\"     Take a list of strings and clear whitespace      on each one. If a value in the list is not a      string pass it through untouched.      Args:         iterable: mixed list      Returns:          mixed list     \"\"\"     retval = []     for val in iterable:         try:             retval.append(val.strip())         except(AttributeError):             retval.append(val)     return retval",
+            "def string_to_list(string, sep=\",\", filter_empty=False):     \"\"\"Transforma una string con elementos separados por `sep` en una lista.\"\"\"     return [value.strip() for value in string.split(sep)             if (not filter_empty or value)]",
+            "def remove(self, item):         \"\"\"Remove the first occurence of an item, the caseless way.\"\"\"         for entry in self:             if item.lower() == entry.lower():                 list.remove(self, entry)                 return         raise ValueError(': list.remove(x): x not in list')",
+            "def unpunctuate(s, *, char_blacklist=string.punctuation):     \"\"\" Remove punctuation from string s. \"\"\"     # remove punctuation     s = \"\".join(c for c in s if c not in char_blacklist)     # remove consecutive spaces     return \" \".join(filter(None, s.split(\" \")))",
+            "def remove_bad(string):     \"\"\"     remove problem characters from string     \"\"\"     remove = [':', ',', '(', ')', ' ', '|', ';', '\\'']     for c in remove:         string = string.replace(c, '_')     return string"
+        ],
+        [
+            "def clean(self, text):         \"\"\"Remove all unwanted characters from text.\"\"\"         return ''.join([c for c in text if c in self.alphabet])",
+            "def is_break_tag(self, el):         \"\"\"Check if tag is an element we should break on.\"\"\"          name = el.name         return name in self.break_tags or name in self.user_break_tags"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]",
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def string_to_list(string, sep=\",\", filter_empty=False):     \"\"\"Transforma una string con elementos separados por `sep` en una lista.\"\"\"     return [value.strip() for value in string.split(sep)             if (not filter_empty or value)]",
+            "def split_strings_in_list_retain_spaces(orig_list):     \"\"\"     Function to split every line in a list, and retain spaces for a rejoin     :param orig_list: Original list     :return:         A List with split lines      \"\"\"     temp_list = list()     for line in orig_list:         line_split = __re.split(r'(\\s+)', line)         temp_list.append(line_split)      return temp_list",
+            "def split_into_sentences(s):   \"\"\"Split text into list of sentences.\"\"\"   s = re.sub(r\"\\s+\", \" \", s)   s = re.sub(r\"[\\\\.\\\\?\\\\!]\", \"\\n\", s)   return s.split(\"\\n\")"
+        ],
+        [
+            "def normalize_value(text):     \"\"\"     This removes newlines and multiple spaces from a string.     \"\"\"     result = text.replace('\\n', ' ')     result = re.subn('[ ]{2,}', ' ', result)[0]     return result",
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def _check_elements_equal(lst):     \"\"\"     Returns true if all of the elements in the list are equal.     \"\"\"     assert isinstance(lst, list), \"Input value must be a list.\"     return not lst or lst.count(lst[0]) == len(lst)",
+            "def isin(value, values):     \"\"\" Check that value is in values \"\"\"     for i, v in enumerate(value):         if v not in np.array(values)[:, i]:             return False     return True",
+            "def obj_in_list_always(target_list, obj):     \"\"\"     >>> l = [1,1,1]     >>> obj_in_list_always(l, 1)     True     >>> l.append(2)     >>> obj_in_list_always(l, 1)     False     \"\"\"     for item in set(target_list):         if item is not obj:             return False     return True",
+            "def equal(list1, list2):     \"\"\" takes flags returns indexes of True values \"\"\"     return [item1 == item2 for item1, item2 in broadcast_zip(list1, list2)]",
+            "def isin(elems, line):     \"\"\"Check if an element from a list is in a string.      :type elems: list     :type line: str      \"\"\"     found = False     for e in elems:         if e in line.lower():             found = True             break     return found"
+        ],
+        [
+            "def valid (names):     \"\"\" Returns true iff all elements of names are valid features.     \"\"\"     if isinstance(names, str):         names = [names]         assert is_iterable_typed(names, basestring)      return all(name in __all_features for name in names)",
+            "def is_list_of_states(self, arg):         \"\"\"         A list of states example -         [('x1', 'easy'), ('x2', 'hard')]          Returns         -------         True, if arg is a list of states else False.          \"\"\"         return isinstance(arg, list) and all(isinstance(i, tuple) for i in arg)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def array_dim(arr):     \"\"\"Return the size of a multidimansional array.     \"\"\"     dim = []     while True:         try:             dim.append(len(arr))             arr = arr[0]         except TypeError:             return dim",
+            "def size(self):         \"\"\"Total number of grid points.\"\"\"         # Since np.prod(()) == 1.0 we need to handle that by ourselves         return (0 if self.shape == () else                 int(np.prod(self.shape, dtype='int64')))",
+            "def is_square_matrix(mat):     \"\"\"Test if an array is a square matrix.\"\"\"     mat = np.array(mat)     if mat.ndim != 2:         return False     shape = mat.shape     return shape[0] == shape[1]",
+            "def _column(arr, indexes):     \"\"\" Returns a column with given indexes from a deep array      For example, if the array is a matrix and indexes is a single int, will     return arr[:,indexes]. If the array is an order 3 tensor and indexes is a     pair of ints, will return arr[:,indexes[0],indexes[1]], etc.      \"\"\"     if arr.ndim == 2 and types.is_int(indexes):         return arr[:, indexes]     elif arr.ndim == 3 and len(indexes) == 2:         return arr[:, indexes[0], indexes[1]]     else:         raise NotImplementedError('Only supporting arrays of dimension 2 and 3 as yet.')",
+            "def lengths( self ):         \"\"\"         The cell lengths.          Args:             None          Returns:             (np.array(a,b,c)): The cell lengths.         \"\"\"         return( np.array( [ math.sqrt( sum( row**2 ) ) for row in self.matrix ] ) )"
+        ],
+        [
+            "def A(*a):     \"\"\"convert iterable object into numpy array\"\"\"     return np.array(a[0]) if len(a)==1 else [np.array(o) for o in a]",
+            "def length(self):         \"\"\"Array of vector lengths\"\"\"         return np.sqrt(np.sum(self**2, axis=1)).view(np.ndarray)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def remove(self, item):         \"\"\"Remove the first occurence of an item, the caseless way.\"\"\"         for entry in self:             if item.lower() == entry.lower():                 list.remove(self, entry)                 return         raise ValueError(': list.remove(x): x not in list')",
+            "def remove_list_duplicates(lista, unique=False):     \"\"\"     Remove duplicated elements in a list.     Args:         lista: List with elements to clean duplicates.     \"\"\"     result = []     allready = []      for elem in lista:         if elem not in result:             result.append(elem)         else:             allready.append(elem)      if unique:         for elem in allready:             result = list(filter((elem).__ne__, result))      return result",
+            "def clean_strings(iterable):     \"\"\"     Take a list of strings and clear whitespace      on each one. If a value in the list is not a      string pass it through untouched.      Args:         iterable: mixed list      Returns:          mixed list     \"\"\"     retval = []     for val in iterable:         try:             retval.append(val.strip())         except(AttributeError):             retval.append(val)     return retval",
+            "def remove_duplicates(lst):     \"\"\"     Emulate what a Python ``set()`` does, but keeping the element's order.     \"\"\"     dset = set()     return [l for l in lst if l not in dset and not dset.add(l)]",
+            "def _not_none(items):     \"\"\"Whether the item is a placeholder or contains a placeholder.\"\"\"     if not isinstance(items, (tuple, list)):         items = (items,)     return all(item is not _none for item in items)"
+        ],
+        [
+            "def unique(list):     \"\"\" Returns a copy of the list without duplicates.     \"\"\"     unique = []; [unique.append(x) for x in list if x not in unique]     return unique",
+            "def dedup_list(l):     \"\"\"Given a list (l) will removing duplicates from the list,        preserving the original order of the list. Assumes that        the list entrie are hashable.\"\"\"     dedup = set()     return [ x for x in l if not (x in dedup or dedup.add(x))]"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def remove_bad(string):     \"\"\"     remove problem characters from string     \"\"\"     remove = [':', ',', '(', ')', ' ', '|', ';', '\\'']     for c in remove:         string = string.replace(c, '_')     return string",
+            "def strip_spaces(s):     \"\"\" Strip excess spaces from a string \"\"\"     return u\" \".join([c for c in s.split(u' ') if c])",
+            "def unpunctuate(s, *, char_blacklist=string.punctuation):     \"\"\" Remove punctuation from string s. \"\"\"     # remove punctuation     s = \"\".join(c for c in s if c not in char_blacklist)     # remove consecutive spaces     return \" \".join(filter(None, s.split(\" \")))",
+            "def add_colons(s):     \"\"\"Add colons after every second digit.      This function is used in functions to prettify serials.      >>> add_colons('teststring')     'te:st:st:ri:ng'     \"\"\"     return ':'.join([s[i:i + 2] for i in range(0, len(s), 2)])",
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)"
+        ],
+        [
+            "def truncate(string, index):     \"\"\"Truncate a string at index and add ...\"\"\"     if len(string) > index and index > 0:         string = string[:index - 1] + u('\u2026')     return string",
+            "def strip_spaces(x):     \"\"\"     Strips spaces     :param x:     :return:     \"\"\"     x = x.replace(b' ', b'')     x = x.replace(b'\\t', b'')     return x"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def list_to_str(list, separator=','):     \"\"\"     >>> list = [0, 0, 7]     >>> list_to_str(list)     '0,0,7'     \"\"\"     list = [str(x) for x in list]     return separator.join(list)",
+            "def list2string (inlist,delimit=' '):     \"\"\" Converts a 1D list to a single long string for file output, using the string.join function.  Usage:   list2string (inlist,delimit=' ') Returns: the string created from inlist \"\"\"     stringlist = [makestr(_) for _ in inlist]     return string.join(stringlist,delimit)",
+            "def _tuple_repr(data):     \"\"\"Return a repr() for a list/tuple\"\"\"     if len(data) == 1:         return \"(%s,)\" % rpr(data[0])     else:         return \"(%s)\" % \", \".join([rpr(x) for x in data])",
+            "def bitsToString(arr):   \"\"\"Returns a string representing a numpy array of 0's and 1's\"\"\"   s = array('c','.'*len(arr))   for i in xrange(len(arr)):     if arr[i] == 1:       s[i]='*'   return s",
+            "def commajoin_as_strings(iterable):     \"\"\" Join the given iterable with ',' \"\"\"     return _(u',').join((six.text_type(i) for i in iterable))"
+        ],
+        [
+            "def string_format_func(s): \t\"\"\" \tFunction used internally to format string data for output to XML. \tEscapes back-slashes and quotes, and wraps the resulting string in \tquotes. \t\"\"\" \treturn u\"\\\"%s\\\"\" % unicode(s).replace(u\"\\\\\", u\"\\\\\\\\\").replace(u\"\\\"\", u\"\\\\\\\"\")",
+            "def safe_format(s, **kwargs):   \"\"\"   :type s str   \"\"\"   return string.Formatter().vformat(s, (), defaultdict(str, **kwargs))"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def string_repr(s):     \"\"\"Return a string as hex dump.\"\"\"     if compat.is_bytes(s):         res = \"{!r}: \".format(s)         for b in s:             if type(b) is str:  # Py2                 b = ord(b)             res += \"%02x \" % b         return res     return \"{}\".format(s)",
+            "def intToBin(i):     \"\"\" Integer to two bytes \"\"\"     # divide in two parts (bytes)     i1 = i % 256     i2 = int(i / 256)     # make string (little endian)     return i.to_bytes(2, byteorder='little')",
+            "def hex_escape(bin_str):   \"\"\"   Hex encode a binary string   \"\"\"   printable = string.ascii_letters + string.digits + string.punctuation + ' '   return ''.join(ch if ch in printable else r'0x{0:02x}'.format(ord(ch)) for ch in bin_str)",
+            "def tob32(val):     \"\"\"Return provided 32 bit value as a string of four bytes.\"\"\"     ret = bytearray(4)     ret[0] = (val>>24)&M8     ret[1] = (val>>16)&M8     ret[2] = (val>>8)&M8     ret[3] = val&M8     return ret",
+            "def write_double(self, number):         \"\"\" Writes a double to the underlying output file as a 8-byte value. \"\"\"         buf = pack(self.byte_order + \"d\", number)         self.write(buf)"
+        ],
+        [
+            "def hex_to_rgb(h):     \"\"\" Returns 0 to 1 rgb from a hex list or tuple \"\"\"     h = h.lstrip('#')     return tuple(int(h[i:i+2], 16)/255. for i in (0, 2 ,4))",
+            "def hex2rgb(value):     \"\"\"Converts a hexadeximal color string to an RGB 3-tuple      EXAMPLE     -------     >>> hex2rgb('#0000FF')     (0, 0, 255)     \"\"\"     value = value.lstrip('#')     lv = len(value)     return tuple(int(value[i:i+lv//3], 16) for i in range(0, lv, lv//3))"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def file_lines(bblfile:str) -> iter:     \"\"\"Yield lines found in given file\"\"\"     with open(bblfile) as fd:         yield from (line.rstrip() for line in fd if line.rstrip())",
+            "def write_file(writer, filename):   \"\"\"Write all of lines from file using the writer.\"\"\"   for line in txt_line_iterator(filename):     writer.write(line)     writer.write(\"\\n\")",
+            "def iter_lines(file_like: Iterable[str]) -> Generator[str, None, None]:     \"\"\" Helper for iterating only nonempty lines without line breaks\"\"\"     for line in file_like:         line = line.rstrip('\\r\\n')         if line:             yield line",
+            "def file_read(filename):     \"\"\"Read a file and close it.  Returns the file source.\"\"\"     fobj = open(filename,'r');     source = fobj.read();     fobj.close()     return source",
+            "def write_text(filename: str, text: str) -> None:     \"\"\"     Writes text to a file.     \"\"\"     with open(filename, 'w') as f:  # type: TextIO         print(text, file=f)"
+        ],
+        [
+            "def lint_file(in_file, out_file=None):     \"\"\"Helps remove extraneous whitespace from the lines of a file      :param file in_file: A readable file or file-like     :param file out_file: A writable file or file-like     \"\"\"     for line in in_file:         print(line.strip(), file=out_file)",
+            "def stdout_display():     \"\"\" Print results straight to stdout \"\"\"     if sys.version_info[0] == 2:         yield SmartBuffer(sys.stdout)     else:         yield SmartBuffer(sys.stdout.buffer)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def commajoin_as_strings(iterable):     \"\"\" Join the given iterable with ',' \"\"\"     return _(u',').join((six.text_type(i) for i in iterable))",
+            "def clean_strings(iterable):     \"\"\"     Take a list of strings and clear whitespace      on each one. If a value in the list is not a      string pass it through untouched.      Args:         iterable: mixed list      Returns:          mixed list     \"\"\"     retval = []     for val in iterable:         try:             retval.append(val.strip())         except(AttributeError):             retval.append(val)     return retval",
+            "def downcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to lower case.\"\"\"     return [ tt.lower() for tt in map(_ustr,t) ]",
+            "def upcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to upper case.\"\"\"     return [ tt.upper() for tt in map(_ustr,t) ]",
+            "def string_to_list(string, sep=\",\", filter_empty=False):     \"\"\"Transforma una string con elementos separados por `sep` en una lista.\"\"\"     return [value.strip() for value in string.split(sep)             if (not filter_empty or value)]"
+        ],
+        [
+            "def flatten_list(l):     \"\"\" Nested lists to single-level list, does not split strings\"\"\"     return list(chain.from_iterable(repeat(x,1) if isinstance(x,str) else x for x in l))",
+            "def _str_to_list(s):     \"\"\"Converts a comma separated string to a list\"\"\"     _list = s.split(\",\")     return list(map(lambda i: i.lstrip(), _list))"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def iget_list_column_slice(list_, start=None, stop=None, stride=None):     \"\"\" iterator version of get_list_column \"\"\"     if isinstance(start, slice):         slice_ = start     else:         slice_ = slice(start, stop, stride)     return (row[slice_] for row in list_)",
+            "def _column(arr, indexes):     \"\"\" Returns a column with given indexes from a deep array      For example, if the array is a matrix and indexes is a single int, will     return arr[:,indexes]. If the array is an order 3 tensor and indexes is a     pair of ints, will return arr[:,indexes[0],indexes[1]], etc.      \"\"\"     if arr.ndim == 2 and types.is_int(indexes):         return arr[:, indexes]     elif arr.ndim == 3 and len(indexes) == 2:         return arr[:, indexes[0], indexes[1]]     else:         raise NotImplementedError('Only supporting arrays of dimension 2 and 3 as yet.')",
+            "def A(*a):     \"\"\"convert iterable object into numpy array\"\"\"     return np.array(a[0]) if len(a)==1 else [np.array(o) for o in a]",
+            "def get_column(self, X, column):         \"\"\"Return a column of the given matrix.          Args:             X: `numpy.ndarray` or `pandas.DataFrame`.             column: `int` or `str`.          Returns:             np.ndarray: Selected column.         \"\"\"         if isinstance(X, pd.DataFrame):             return X[column].values          return X[:, column]",
+            "def get_list_index(lst, index_or_name):     \"\"\"     Return the index of an element in the list.      Args:         lst (list): The list.         index_or_name (int or str): The value of the reference element, or directly its numeric index.      Returns:         (int) The index of the element in the list.     \"\"\"     if isinstance(index_or_name, six.integer_types):         return index_or_name      return lst.index(index_or_name)"
+        ],
+        [
+            "def load_data(filename):     \"\"\"     :rtype : numpy matrix     \"\"\"     data = pandas.read_csv(filename, header=None, delimiter='\\t', skiprows=9)     return data.as_matrix()",
+            "def csv_to_matrix(csv_file_path):     \"\"\"Load a CSV file into a Python matrix of strings.      Args:         csv_file_path: Full path to a valid CSV file (e.g. c:/ladybug/test.csv)     \"\"\"     mtx = []     with open(csv_file_path) as csv_data_file:         for row in csv_data_file:             mtx.append(row.split(','))     return mtx"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def split(s):   \"\"\"Uses dynamic programming to infer the location of spaces in a string without spaces.\"\"\"   l = [_split(x) for x in _SPLIT_RE.split(s)]   return [item for sublist in l for item in sublist]",
+            "def trimmed_split(s, seps=(\";\", \",\")):     \"\"\"Given a string s, split is by one of one of the seps.\"\"\"     for sep in seps:         if sep not in s:             continue         data = [item.strip() for item in s.strip().split(sep)]         return data     return [s]",
+            "def string_to_list(string, sep=\",\", filter_empty=False):     \"\"\"Transforma una string con elementos separados por `sep` en una lista.\"\"\"     return [value.strip() for value in string.split(sep)             if (not filter_empty or value)]",
+            "def split_into_sentences(s):   \"\"\"Split text into list of sentences.\"\"\"   s = re.sub(r\"\\s+\", \" \", s)   s = re.sub(r\"[\\\\.\\\\?\\\\!]\", \"\\n\", s)   return s.split(\"\\n\")",
+            "def split_strings_in_list_retain_spaces(orig_list):     \"\"\"     Function to split every line in a list, and retain spaces for a rejoin     :param orig_list: Original list     :return:         A List with split lines      \"\"\"     temp_list = list()     for line in orig_list:         line_split = __re.split(r'(\\s+)', line)         temp_list.append(line_split)      return temp_list"
+        ],
+        [
+            "def clean(s):   \"\"\"Removes trailing whitespace on each line.\"\"\"   lines = [l.rstrip() for l in s.split('\\n')]   return '\\n'.join(lines)",
+            "def normalize_value(text):     \"\"\"     This removes newlines and multiple spaces from a string.     \"\"\"     result = text.replace('\\n', ' ')     result = re.subn('[ ]{2,}', ' ', result)[0]     return result"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def isreal(obj):     \"\"\"     Test if the argument is a real number (float or integer).      :param obj: Object     :type  obj: any      :rtype: boolean     \"\"\"     return (         (obj is not None)         and (not isinstance(obj, bool))         and isinstance(obj, (int, float))     )",
+            "def _not_none(items):     \"\"\"Whether the item is a placeholder or contains a placeholder.\"\"\"     if not isinstance(items, (tuple, list)):         items = (items,)     return all(item is not _none for item in items)",
+            "def is_valid_row(cls, row):         \"\"\"Indicates whether or not the given row contains valid data.\"\"\"         for k in row.keys():             if row[k] is None:                 return False         return True",
+            "def IntGreaterThanZero(n):     \"\"\"If *n* is an integer > 0, returns it, otherwise an error.\"\"\"     try:         n = int(n)     except:         raise ValueError(\"%s is not an integer\" % n)     if n <= 0:         raise ValueError(\"%d is not > 0\" % n)     else:         return n",
+            "def is_natural(x):     \"\"\"A non-negative integer.\"\"\"     try:         is_integer = int(x) == x     except (TypeError, ValueError):         return False     return is_integer and x >= 0"
+        ],
+        [
+            "def get(self):         \"\"\"         \"\"\"          if self.saved_list is None and self.null is False:             self.saved_list = []          return self.saved_list",
+            "def is_all_field_none(self):         \"\"\"         :rtype: bool         \"\"\"          if self._type_ is not None:             return False          if self._value is not None:             return False          if self._name is not None:             return False          return True"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def eof(fd):     \"\"\"Determine if end-of-file is reached for file fd.\"\"\"     b = fd.read(1)     end = len(b) == 0     if not end:         curpos = fd.tell()         fd.seek(curpos - 1)     return end",
+            "def file_read(filename):     \"\"\"Read a file and close it.  Returns the file source.\"\"\"     fobj = open(filename,'r');     source = fobj.read();     fobj.close()     return source",
+            "def file_lines(bblfile:str) -> iter:     \"\"\"Yield lines found in given file\"\"\"     with open(bblfile) as fd:         yield from (line.rstrip() for line in fd if line.rstrip())",
+            "def iter_lines(file_like: Iterable[str]) -> Generator[str, None, None]:     \"\"\" Helper for iterating only nonempty lines without line breaks\"\"\"     for line in file_like:         line = line.rstrip('\\r\\n')         if line:             yield line",
+            "def write_file(writer, filename):   \"\"\"Write all of lines from file using the writer.\"\"\"   for line in txt_line_iterator(filename):     writer.write(line)     writer.write(\"\\n\")"
+        ],
+        [
+            "def check_max_filesize(chosen_file, max_size):     \"\"\"     Checks file sizes for host     \"\"\"     if os.path.getsize(chosen_file) > max_size:         return False     else:         return True",
+            "def _increase_file_handle_limit():     \"\"\"Raise the open file handles permitted by the Dusty daemon process     and its child processes. The number we choose here needs to be within     the OS X default kernel hard limit, which is 10240.\"\"\"     logging.info('Increasing file handle limit to {}'.format(constants.FILE_HANDLE_LIMIT))     resource.setrlimit(resource.RLIMIT_NOFILE,                        (constants.FILE_HANDLE_LIMIT, resource.RLIM_INFINITY))"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def isAlphanum(c):     \"\"\"return true if the character is a letter, digit, underscore,            dollar sign, or non-ASCII character.     \"\"\"     return ((c >= 'a' and c <= 'z') or (c >= '0' and c <= '9') or             (c >= 'A' and c <= 'Z') or c == '_' or c == '$' or c == '\\\\' or (c is not None and ord(c) > 126));",
+            "def __contains__(self, char):  # noqa: D105         \"\"\"Implement the `in` keyword, searches the sequence.         \"\"\"         return len(char) <= len(self) and char in str(self.seq) * 2",
+            "def isthaichar(ch: str) -> bool:     \"\"\"     Check if a character is Thai     \u0e40\u0e1b\u0e47\u0e19\u0e2d\u0e31\u0e01\u0e29\u0e23\u0e44\u0e17\u0e22\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48      :param str ch: input character     :return: True or False     \"\"\"     ch_val = ord(ch)     if ch_val >= 3584 and ch_val <= 3711:         return True     return False",
+            "def isString(s):     \"\"\"Convenience method that works with all 2.x versions of Python     to determine whether or not something is stringlike.\"\"\"     try:         return isinstance(s, unicode) or isinstance(s, basestring)     except NameError:         return isinstance(s, str)",
+            "def __is__(cls, s):         \"\"\"Test if string matches this argument's format.\"\"\"         return s.startswith(cls.delims()[0]) and s.endswith(cls.delims()[1])"
+        ],
+        [
+            "def backward_char(self, e): # (C-b)         u\"\"\"Move back a character. \"\"\"         self.l_buffer.backward_char(self.argument_reset)         self.finalize()",
+            "def backward_char_extend_selection(self, e): #         u\"\"\"Move back a character. \"\"\"         self.l_buffer.backward_char_extend_selection(self.argument_reset)         self.finalize()"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def replace_all(filepath, searchExp, replaceExp):     \"\"\"     Replace all the ocurrences (in a file) of a string with another value.     \"\"\"     for line in fileinput.input(filepath, inplace=1):         if searchExp in line:             line = line.replace(searchExp, replaceExp)         sys.stdout.write(line)",
+            "def standard_input():     \"\"\"Generator that yields lines from standard input.\"\"\"     with click.get_text_stream(\"stdin\") as stdin:         while stdin.readable():             line = stdin.readline()             if line:                 yield line.strip().encode(\"utf-8\")",
+            "def file_read(filename):     \"\"\"Read a file and close it.  Returns the file source.\"\"\"     fobj = open(filename,'r');     source = fobj.read();     fobj.close()     return source",
+            "def file_lines(bblfile:str) -> iter:     \"\"\"Yield lines found in given file\"\"\"     with open(bblfile) as fd:         yield from (line.rstrip() for line in fd if line.rstrip())",
+            "def fix_header_comment(filename, timestamp):     \"\"\"Fixes the header-comment of the given file.\"\"\"     # Fix input file.     name = os.path.basename( filename )     for line in fileinput.input( filename, inplace=1, mode=\"rU\" ):         # If header-comment already contains anything for '$Id$', remove it.         line = re.sub(r'\\$Id:[^$]+\\$', r'$Id$', line.rstrip())         # Replace '$Id$' by a string containing the file's name (and a timestamp)!         line = re.sub(re.escape(r'$Id$'), r'$Id: ' + name + r' ' + timestamp.isoformat() + r' $', line.rstrip())         print(line)"
+        ],
+        [
+            "def _stdin_(p):     \"\"\"Takes input from user. Works for Python 2 and 3.\"\"\"     _v = sys.version[0]     return input(p) if _v is '3' else raw_input(p)",
+            "def get_input(input_func, input_str):     \"\"\"     Get input from the user given an input function and an input string     \"\"\"     val = input_func(\"Please enter your {0}: \".format(input_str))     while not val or not len(val.strip()):         val = input_func(\"You didn't enter a valid {0}, please try again: \".format(input_str))     return val"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def format_screen(strng):     \"\"\"Format a string for screen printing.      This removes some latex-type format codes.\"\"\"     # Paragraph continue     par_re = re.compile(r'\\\\$',re.MULTILINE)     strng = par_re.sub('',strng)     return strng",
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def indented_show(text, howmany=1):         \"\"\"Print a formatted indented text.         \"\"\"         print(StrTemplate.pad_indent(text=text, howmany=howmany))",
+            "def print_with_header(header, message, color, indent=0):     \"\"\"     Use one of the functions below for printing, not this one.     \"\"\"     print()     padding = ' ' * indent     print(padding + color + BOLD + header + ENDC + color + message + ENDC)",
+            "def format_single_space_only(text):     \"\"\"Revise consecutive empty space to single space.      Example::          \" I   feel    so  GOOD!\" => \"This is so GOOD!\"      **\u4e2d\u6587\u6587\u6863**      \u786e\u4fdd\u6587\u672c\u4e2d\u4e0d\u4f1a\u51fa\u73b0\u591a\u4f59\u8fde\u7eed1\u6b21\u7684\u7a7a\u683c\u3002     \"\"\"     return \" \".join([word for word in text.strip().split(\" \") if len(word) >= 1])"
+        ],
+        [
+            "def _display(self, layout):         \"\"\"launch layouts display\"\"\"         print(file=self.out)         TextWriter().format(layout, self.out)",
+            "def sing(a, b, c=False, name='yetone'):     \"\"\"sing a song     hehe      :param a: I'm a     :param b: I'm b     :param c: I'm c     :param name: I'm name     \"\"\"     print('test0.sing: <a: {}, b: {}, c: {}> by {}'.format(a, b, c, name))"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def remove_list_duplicates(lista, unique=False):     \"\"\"     Remove duplicated elements in a list.     Args:         lista: List with elements to clean duplicates.     \"\"\"     result = []     allready = []      for elem in lista:         if elem not in result:             result.append(elem)         else:             allready.append(elem)      if unique:         for elem in allready:             result = list(filter((elem).__ne__, result))      return result",
+            "def copy(self):         \"\"\"Return a copy of this list with each element copied to new memory         \"\"\"         out = type(self)()         for series in self:             out.append(series.copy())         return out",
+            "def contains_empty(features):     \"\"\"Check features data are not empty      :param features: The features data to check.     :type features: list of numpy arrays.      :return: True if one of the array is empty, False else.      \"\"\"     if not features:         return True     for feature in features:         if feature.shape[0] == 0:             return True     return False",
+            "def _not_none(items):     \"\"\"Whether the item is a placeholder or contains a placeholder.\"\"\"     if not isinstance(items, (tuple, list)):         items = (items,)     return all(item is not _none for item in items)",
+            "def chunks(items, size):     \"\"\" Split list into chunks of the given size.     Original order is preserved.      Example:         > chunks([1,2,3,4,5,6,7,8], 3)         [[1, 2, 3], [4, 5, 6], [7, 8]]     \"\"\"     return [items[i:i+size] for i in range(0, len(items), size)]"
+        ],
+        [
+            "def unique(list):     \"\"\" Returns a copy of the list without duplicates.     \"\"\"     unique = []; [unique.append(x) for x in list if x not in unique]     return unique",
+            "def dedupe_list(l):     \"\"\"Remove duplicates from a list preserving the order.      We might be tempted to use the list(set(l)) idiom, but it doesn't preserve     the order, which hinders testability and does not work for lists with     unhashable elements.     \"\"\"     result = []      for el in l:         if el not in result:             result.append(el)      return result"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def str2int(string_with_int):     \"\"\" Collect digits from a string \"\"\"     return int(\"\".join([char for char in string_with_int if char in string.digits]) or 0)",
+            "def get_number(s, cast=int):     \"\"\"     Try to get a number out of a string, and cast it.     \"\"\"     import string     d = \"\".join(x for x in str(s) if x in string.digits)     return cast(d)",
+            "def is_valid(number):     \"\"\"determines whether the card number is valid.\"\"\"     n = str(number)     if not n.isdigit():         return False     return int(n[-1]) == get_check_digit(n[:-1])",
+            "def try_cast_int(s):     \"\"\"(str) -> int     All the digits in a given string are concatenated and converted into a single number.     \"\"\"     try:         temp = re.findall('\\d', str(s))         temp = ''.join(temp)         return int(temp)     except:         return s",
+            "def _isint(string):     \"\"\"     >>> _isint(\"123\")     True     >>> _isint(\"123.45\")     False     \"\"\"     return type(string) is int or \\            (isinstance(string, _binary_type) or isinstance(string, _text_type)) and \\            _isconvertible(int, string)"
+        ],
+        [
+            "def ishex(obj):     \"\"\"     Test if the argument is a string representing a valid hexadecimal digit.      :param obj: Object     :type  obj: any      :rtype: boolean     \"\"\"     return isinstance(obj, str) and (len(obj) == 1) and (obj in string.hexdigits)",
+            "def is_dec(ip):     \"\"\"Return true if the IP address is in decimal notation.\"\"\"     try:         dec = int(str(ip))     except ValueError:         return False     if dec > 4294967295 or dec < 0:         return False     return True"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def rstjinja(app, docname, source):     \"\"\"     Render our pages as a jinja template for fancy templating goodness.     \"\"\"     # Make sure we're outputting HTML     if app.builder.format != 'html':         return     src = source[0]     rendered = app.builder.templates.render_string(         src, app.config.html_context     )     source[0] = rendered",
+            "def render_template(template_name, **context):     \"\"\"Render a template into a response.\"\"\"     tmpl = jinja_env.get_template(template_name)     context[\"url_for\"] = url_for     return Response(tmpl.render(context), mimetype=\"text/html\")",
+            "def url_to_image(url):     \"\"\"     Fetch an image from url and convert it into a Pillow Image object     \"\"\"     r = requests.get(url)     image = StringIO(r.content)     return image",
+            "def example_view():     text = request.args.get('text', 'http://www.youtube.com/watch?v=nda_OSWeyn8')     html = request.args.get('html', \"\"\" <p>This is a test</p> <p>http://www.youtube.com/watch?v=nda_OSWeyn8</p> <p>This will get rendered as a link: http://www.youtube.com/watch?v=nda_OSWeyn8</p> <p>This will not be modified: <a href=\"http://www.google.com/\">http://www.youtube.com/watch?v=nda_OSWeyn8</a></p>     \"\"\")     return render_template('example.html', text=text, html=html)",
+            "def file_exists(original_file):     \"\"\"     Check to make sure the original file exists     \"\"\"     if original_file.startswith(\"s3://\"):         from filesystem import s3         return s3.file_exists(original_file)     else:         if not os.path.exists(original_file):             return False         if not os.path.isfile(original_file):             return False     return True"
+        ],
+        [
+            "def is_empty(self):         \"\"\"Checks for an empty image.         \"\"\"         if(((self.channels == []) and (not self.shape == (0, 0))) or            ((not self.channels == []) and (self.shape == (0, 0)))):             raise RuntimeError(\"Channels-shape mismatch.\")         return self.channels == [] and self.shape == (0, 0)",
+            "def set_empty_text(self):         \"\"\"Display the empty text         \"\"\"         self.buffer.insert_with_tags_by_name(             self.buffer.get_start_iter(),             self.empty_text, 'empty-text')"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def sort_data(data, cols):     \"\"\"Sort `data` rows and order columns\"\"\"     return data.sort_values(cols)[cols + ['value']].reset_index(drop=True)",
+            "def get_last(self, table=None):         \"\"\"Just the last entry.\"\"\"         if table is None: table = self.main_table         query = 'SELECT * FROM \"%s\" ORDER BY ROWID DESC LIMIT 1;' % table         return self.own_cursor.execute(query).fetchone()",
+            "def median_high(data):     \"\"\"Return the high median of data.      When the number of data points is odd, the middle value is returned.     When it is even, the larger of the two middle values is returned.      \"\"\"     data = sorted(data)     n = len(data)     if n == 0:         raise StatisticsError(\"no median for empty data\")     return data[n // 2]",
+            "def iget_list_column_slice(list_, start=None, stop=None, stride=None):     \"\"\" iterator version of get_list_column \"\"\"     if isinstance(start, slice):         slice_ = start     else:         slice_ = slice(start, stop, stride)     return (row[slice_] for row in list_)",
+            "def getIndex(predicateFn: Callable[[T], bool], items: List[T]) -> int:     \"\"\"     Finds the index of an item in list, which satisfies predicate     :param predicateFn: predicate function to run on items of list     :param items: list of tuples     :return: first index for which predicate function returns True     \"\"\"     try:         return next(i for i, v in enumerate(items) if predicateFn(v))     except StopIteration:         return -1"
+        ],
+        [
+            "def qth_pw(self, q):         \"\"\"         returns the qth most probable element in the dawg.         \"\"\"         return heapq.nlargest(q + 2, self._T.iteritems(),                               key=operator.itemgetter(1))[-1]",
+            "def nameTuple(s: Influence) -> Tuple[str, str]:     \"\"\" Returns a 2-tuple consisting of the top groundings of the subj and obj     of an Influence statement. \"\"\"     return top_grounding(s.subj), top_grounding(s.obj)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def y_values_ref(self, series):         \"\"\"         The Excel worksheet reference to the Y values for this chart (not         including the column label).         \"\"\"         top_row = self.series_table_row_offset(series) + 2         bottom_row = top_row + len(series) - 1         return \"Sheet1!$B$%d:$B$%d\" % (top_row, bottom_row)",
+            "def wr_row_mergeall(self, worksheet, txtstr, fmt, row_idx):         \"\"\"Merge all columns and place text string in widened cell.\"\"\"         hdridxval = len(self.hdrs) - 1         worksheet.merge_range(row_idx, 0, row_idx, hdridxval, txtstr, fmt)         return row_idx + 1",
+            "def series_table_row_offset(self, series):         \"\"\"         Return the number of rows preceding the data table for *series* in         the Excel worksheet.         \"\"\"         title_and_spacer_rows = series.index * 2         data_point_rows = series.data_point_offset         return title_and_spacer_rows + data_point_rows",
+            "def as_csv(self):         \"\"\"Return a CSV representation as a string\"\"\"          from io import StringIO          s = StringIO()         w = csv.writer(s)         for row in self.rows:             w.writerow(row)          return s.getvalue()",
+            "def list_to_csv(my_list, csv_file):     \"\"\"     Save a matrix (list of lists) to a file as a CSV      .. code:: python          my_list = [[\"Name\", \"Location\"],                    [\"Chris\", \"South Pole\"],                    [\"Harry\", \"Depth of Winter\"],                    [\"Bob\", \"Skull\"]]          reusables.list_to_csv(my_list, \"example.csv\")      example.csv      .. code:: csv          \"Name\",\"Location\"         \"Chris\",\"South Pole\"         \"Harry\",\"Depth of Winter\"         \"Bob\",\"Skull\"      :param my_list: list of lists to save to CSV     :param csv_file: File to save data to     \"\"\"     if PY3:         csv_handler = open(csv_file, 'w', newline='')     else:         csv_handler = open(csv_file, 'wb')      try:         writer = csv.writer(csv_handler, delimiter=',', quoting=csv.QUOTE_ALL)         writer.writerows(my_list)     finally:         csv_handler.close()"
+        ],
+        [
+            "def addValue(self, _, value):     \"\"\"Adds a value from the given source.\"\"\"     self.total += self._dataFormat.getValue(value)",
+            "def unique(self, values):         \"\"\"Place each entry in a table, while asserting that each entry occurs once\"\"\"         _, count = self.count()         if not np.array_equiv(count, 1):             raise ValueError(\"Not every entry in the table is assigned a unique value\")         return self.sum(values)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def color_text_boxes(ax, labels, colors, color_arrow=True):     \"\"\"Color text boxes.      Instead of this function, one can pass annotate_kwargs and plot_kwargs to     plot_line_ids function.     \"\"\"     assert len(labels) == len(colors), \\         \"Equal no. of colors and lables must be given\"     boxes = ax.findobj(mpl.text.Annotation)     box_labels = lineid_plot.unique_labels(labels)     for box in boxes:         l = box.get_label()         try:             loc = box_labels.index(l)         except ValueError:             continue  # No changes for this box         box.set_color(colors[loc])         if color_arrow:             box.arrow_patch.set_color(colors[loc])      ax.figure.canvas.draw()",
+            "def set_scalebar_for_all(self, row_column_list=None,                              location='lower right'):         \"\"\"Show marker area scale for subplots.          :param row_column_list: a list containing (row, column) tuples to             specify the subplots, or None to indicate *all* subplots.         :param location: the location of the label inside the plot.  May             be one of 'center', 'upper right', 'lower right', 'upper             left', 'lower left'.          \"\"\"         if row_column_list is None:             for subplot in self.subplots:                 subplot.set_scalebar(location)         else:             for row, column in row_column_list:                 subplot = self.get_subplot_at(row, column)                 subplot.set_scalebar(location)",
+            "def horizontal_line(ax, scale, i, **kwargs):     \"\"\"     Draws the i-th horizontal line parallel to the lower axis.      Parameters     ----------     ax: Matplotlib AxesSubplot         The subplot to draw on.     scale: float, 1.0         Simplex scale size.     i: float         The index of the line to draw     kwargs: Dictionary         Any kwargs to pass through to Matplotlib.     \"\"\"      p1 = (0, i, scale - i)     p2 = (scale - i, i, 0)     line(ax, p1, p2, **kwargs)",
+            "def plot_target(target, ax):     \"\"\"Ajoute la target au plot\"\"\"     ax.scatter(target[0], target[1], target[2], c=\"red\", s=80)",
+            "def basic():     \"\"\"Set up a basic stereonet and plot the same data each time.\"\"\"     fig, ax = mplstereonet.subplots()      strike, dip = 315, 30     ax.plane(strike, dip, color='lightblue')     ax.pole(strike, dip, color='green', markersize=15)     ax.rake(strike, dip, 40, marker='*', markersize=20, color='green')      # Make a bit of room for the title...     fig.subplots_adjust(top=0.8)      return ax"
+        ],
+        [
+            "def finish_plot():     \"\"\"Helper for plotting.\"\"\"     plt.legend()     plt.grid(color='0.7')     plt.xlabel('x')     plt.ylabel('y')     plt.show()",
+            "def show(self, title=''):         \"\"\"         Display Bloch sphere and corresponding data sets.         \"\"\"         self.render(title=title)         if self.fig:             plt.show(self.fig)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def _not_none(items):     \"\"\"Whether the item is a placeholder or contains a placeholder.\"\"\"     if not isinstance(items, (tuple, list)):         items = (items,)     return all(item is not _none for item in items)",
+            "def chk_enum_arg(s):     \"\"\"Checks if the string `s` is a valid enum string.      Return True or False.\"\"\"      if len(s) == 0 or s[0].isspace() or s[-1].isspace():         return False     else:         return True",
+            "def isreal(obj):     \"\"\"     Test if the argument is a real number (float or integer).      :param obj: Object     :type  obj: any      :rtype: boolean     \"\"\"     return (         (obj is not None)         and (not isinstance(obj, bool))         and isinstance(obj, (int, float))     )",
+            "def is_int(value):     \"\"\"Return `True` if ``value`` is an integer.\"\"\"     if isinstance(value, bool):         return False     try:         int(value)         return True     except (ValueError, TypeError):         return False",
+            "def strToBool(val):     \"\"\"     Helper function to turn a string representation of \"true\" into     boolean True.     \"\"\"     if isinstance(val, str):         val = val.lower()      return val in ['true', 'on', 'yes', True]"
+        ],
+        [
+            "def get_text_or_url(args):     \"\"\"Determine if we need text or url output\"\"\"     redirect_mode = args.bang or args.search or args.lucky     if redirect_mode or args.url:         return 'url'     else:         return 'text'",
+            "def none_of(value, *args):     \"\"\" None of the items in value should match \"\"\"      if len(args):         value = (value,) + args      return ExpectationNone(value)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def main():     \"\"\"Ideally we shouldn't lose the first second of events\"\"\"     time.sleep(1)     with Input() as input_generator:         for e in input_generator:             print(repr(e))",
+            "def seconds(num):     \"\"\"     Pause for this many seconds     \"\"\"     now = pytime.time()     end = now + num     until(end)",
+            "def main(idle):     \"\"\"Any normal python logic which runs a loop. Can take arguments.\"\"\"     while True:          LOG.debug(\"Sleeping for {0} seconds.\".format(idle))         time.sleep(idle)",
+            "def run(self, forever=True):         \"\"\"start the bot\"\"\"         loop = self.create_connection()         self.add_signal_handlers()         if forever:             loop.run_forever()",
+            "def __call__(self, _):         \"\"\"Print the current iteration.\"\"\"         if self.iter % self.step == 0:             print(self.fmt.format(self.iter), **self.kwargs)          self.iter += 1"
+        ],
+        [
+            "def stop(self) -> None:         \"\"\"Stops the analysis as soon as possible.\"\"\"         if self._stop and not self._posted_kork:             self._stop()             self._stop = None",
+            "def wait_until_exit(self):         \"\"\" Wait until thread exit              Used for testing purpose only         \"\"\"          if self._timeout is None:             raise Exception(\"Thread will never exit. Use stop or specify timeout when starting it!\")          self._thread.join()         self.stop()"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def timeit(output):     \"\"\"     If output is string, then print the string and also time used     \"\"\"     b = time.time()     yield     print output, 'time used: %.3fs' % (time.time()-b)",
+            "def stdout_display():     \"\"\" Print results straight to stdout \"\"\"     if sys.version_info[0] == 2:         yield SmartBuffer(sys.stdout)     else:         yield SmartBuffer(sys.stdout.buffer)",
+            "def __call__(self, _):         \"\"\"Print the current iteration.\"\"\"         if self.iter % self.step == 0:             print(self.fmt.format(self.iter), **self.kwargs)          self.iter += 1",
+            "def out(self, output, newline=True):         \"\"\"Outputs a string to the console (stdout).\"\"\"         click.echo(output, nl=newline)"
+        ],
+        [
+            "def indented_show(text, howmany=1):         \"\"\"Print a formatted indented text.         \"\"\"         print(StrTemplate.pad_indent(text=text, howmany=howmany))",
+            "def print_with_header(header, message, color, indent=0):     \"\"\"     Use one of the functions below for printing, not this one.     \"\"\"     print()     padding = ' ' * indent     print(padding + color + BOLD + header + ENDC + color + message + ENDC)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def partition(list_, columns=2):     \"\"\"     Break a list into ``columns`` number of columns.     \"\"\"      iter_ = iter(list_)     columns = int(columns)     rows = []      while True:         row = []         for column_number in range(1, columns + 1):             try:                 value = six.next(iter_)             except StopIteration:                 pass             else:                 row.append(value)          if not row:             return rows         rows.append(row)",
+            "def iget_list_column_slice(list_, start=None, stop=None, stride=None):     \"\"\" iterator version of get_list_column \"\"\"     if isinstance(start, slice):         slice_ = start     else:         slice_ = slice(start, stop, stride)     return (row[slice_] for row in list_)",
+            "def column_stack_2d(data):     \"\"\"Perform column-stacking on a list of 2d data blocks.\"\"\"     return list(list(itt.chain.from_iterable(_)) for _ in zip(*data))",
+            "def csv_to_matrix(csv_file_path):     \"\"\"Load a CSV file into a Python matrix of strings.      Args:         csv_file_path: Full path to a valid CSV file (e.g. c:/ladybug/test.csv)     \"\"\"     mtx = []     with open(csv_file_path) as csv_data_file:         for row in csv_data_file:             mtx.append(row.split(','))     return mtx",
+            "def transpose(table):     \"\"\"     transpose matrix     \"\"\"     t = []     for i in range(0, len(table[0])):         t.append([row[i] for row in table])     return t"
+        ],
+        [
+            "def A(*a):     \"\"\"convert iterable object into numpy array\"\"\"     return np.array(a[0]) if len(a)==1 else [np.array(o) for o in a]",
+            "def to_list(self):         \"\"\"Convert this confusion matrix into a 2x2 plain list of values.\"\"\"         return [[int(self.table.cell_values[0][1]), int(self.table.cell_values[0][2])],                 [int(self.table.cell_values[1][1]), int(self.table.cell_values[1][2])]]"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def readTuple(self, line, n=3):         \"\"\" Reads a tuple of numbers. e.g. vertices, normals or teture coords.         \"\"\"         numbers = [num for num in line.split(' ') if num]         return [float(num) for num in numbers[1:n + 1]]",
+            "def get_number(s, cast=int):     \"\"\"     Try to get a number out of a string, and cast it.     \"\"\"     import string     d = \"\".join(x for x in str(s) if x in string.digits)     return cast(d)",
+            "def imt2tup(string):     \"\"\"     >>> imt2tup('PGA')     ('PGA',)     >>> imt2tup('SA(1.0)')     ('SA', 1.0)     >>> imt2tup('SA(1)')     ('SA', 1.0)     \"\"\"     s = string.strip()     if not s.endswith(')'):         # no parenthesis, PGA is considered the same as PGA()         return (s,)     name, rest = s.split('(', 1)     return (name,) + tuple(float(x) for x in ast.literal_eval(rest[:-1] + ','))",
+            "def _parse_tuple_string(argument):         \"\"\" Return a tuple from parsing 'a,b,c,d' -> (a,b,c,d) \"\"\"         if isinstance(argument, str):             return tuple(int(p.strip()) for p in argument.split(','))         return argument",
+            "def as_tuple(self, value):         \"\"\"Utility function which converts lists to tuples.\"\"\"         if isinstance(value, list):             value = tuple(value)         return value"
+        ],
+        [
+            "def rgba_bytes_tuple(self, x):         \"\"\"Provides the color corresponding to value `x` in the         form of a tuple (R,G,B,A) with int values between 0 and 255.         \"\"\"         return tuple(int(u*255.9999) for u in self.rgba_floats_tuple(x))",
+            "def get_value_tuple(self):         \"\"\"         Returns a tuple of the color's values (in order). For example,         an LabColor object will return (lab_l, lab_a, lab_b), where each         member of the tuple is the float value for said variable.         \"\"\"         retval = tuple()         for val in self.VALUES:             retval += (getattr(self, val),)         return retval"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def last_midnight():     \"\"\"     return a datetime of last mid-night     \"\"\"     now = datetime.now()     return datetime(now.year, now.month, now.day)",
+            "def biweekly(date=datetime.date.today()):     \"\"\"     Every two weeks.     \"\"\"     return datetime.date(date.year, date.month, 1 if date.day < 15 else 15)",
+            "def isworkday(self, date):         \"\"\"         Check if a given date is a work date, ignoring holidays.          Args:             date (date, datetime or str): Date to be checked.          Returns:             bool: True if the date is a work date, False otherwise.         \"\"\"         date = parsefun(date)         return self.weekdaymap[date.weekday()].isworkday",
+            "def get_month_start(day=None):     \"\"\"Returns the first day of the given month.\"\"\"     day = add_timezone(day or datetime.date.today())     return day.replace(day=1)",
+            "def is_third_friday(day=None):     \"\"\" check if day is month's 3rd friday \"\"\"     day = day if day is not None else datetime.datetime.now()     defacto_friday = (day.weekday() == 4) or (         day.weekday() == 3 and day.hour() >= 17)     return defacto_friday and 14 < day.day < 22"
+        ],
+        [
+            "def created_today(self):         \"\"\"Return True if created today.\"\"\"         if self.datetime.date() == datetime.today().date():             return True         return False",
+            "def now_time(str=False):     \"\"\"Get the current time.\"\"\"     if str:         return datetime.datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")     return datetime.datetime.now()"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def isin(elems, line):     \"\"\"Check if an element from a list is in a string.      :type elems: list     :type line: str      \"\"\"     found = False     for e in elems:         if e in line.lower():             found = True             break     return found",
+            "def _check_elements_equal(lst):     \"\"\"     Returns true if all of the elements in the list are equal.     \"\"\"     assert isinstance(lst, list), \"Input value must be a list.\"     return not lst or lst.count(lst[0]) == len(lst)",
+            "def isin(value, values):     \"\"\" Check that value is in values \"\"\"     for i, v in enumerate(value):         if v not in np.array(values)[:, i]:             return False     return True",
+            "def get_list_index(lst, index_or_name):     \"\"\"     Return the index of an element in the list.      Args:         lst (list): The list.         index_or_name (int or str): The value of the reference element, or directly its numeric index.      Returns:         (int) The index of the element in the list.     \"\"\"     if isinstance(index_or_name, six.integer_types):         return index_or_name      return lst.index(index_or_name)",
+            "def _not_none(items):     \"\"\"Whether the item is a placeholder or contains a placeholder.\"\"\"     if not isinstance(items, (tuple, list)):         items = (items,)     return all(item is not _none for item in items)"
+        ],
+        [
+            "def elXpath(self, xpath, dom=None):         \"\"\"check if element is present by css\"\"\"         if dom is None:             dom = self.browser         return expect(dom.is_element_present_by_xpath, args=[xpath])",
+            "def is_present(self, selector):         \"\"\"Check if an element is present in the dom or not          This method won't check if the element is displayed or not         This method won't wait until the element is visible or present         This method won't raise any exception if the element is not present          Returns:             bool: True if the element is present; False otherwise         \"\"\"         self.debug_log(\"Is present (%s)\" % selector)          element = self.find(             selector,             raise_exception=False,             wait_until_present=False,             wait_until_visible=False         )         if element:             self.debug_log(\"is present: True\")             return True         else:             self.debug_log(\"is present: False\")             return False"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def screen_cv2(self):         \"\"\"cv2 Image of current window screen\"\"\"         pil_image = self.screen.convert('RGB')         cv2_image = np.array(pil_image)         pil_image.close()         # Convert RGB to BGR          cv2_image = cv2_image[:, :, ::-1]         return cv2_image",
+            "def scroll_down(lines=1, file=sys.stdout):     \"\"\" Scroll the whole page down a number of lines, new lines are added to         the top.          Esc[<lines>T     \"\"\"     scroll.down(lines).write(file=file)",
+            "def disown(cmd):     \"\"\"Call a system command in the background,        disown it and hide it's output.\"\"\"     subprocess.Popen(cmd,                      stdout=subprocess.DEVNULL,                      stderr=subprocess.DEVNULL)",
+            "def ResetConsoleColor() -> bool:     \"\"\"     Reset to the default text color on console window.     Return bool, True if succeed otherwise False.     \"\"\"     if sys.stdout:         sys.stdout.flush()     bool(ctypes.windll.kernel32.SetConsoleTextAttribute(_ConsoleOutputHandle, _DefaultConsoleColor))",
+            "def title(msg):     \"\"\"Sets the title of the console window.\"\"\"     if sys.platform.startswith(\"win\"):         ctypes.windll.kernel32.SetConsoleTitleW(tounicode(msg))"
+        ],
+        [
+            "def getBitmap(self):         \"\"\" Captures screen area of this region, at least the part that is on the screen          Returns image as numpy array         \"\"\"         return PlatformManager.getBitmapFromRect(self.x, self.y, self.w, self.h)",
+            "def transform_coords(self, width, height): \t\t\"\"\"Return the current absolute (x, y) coordinates of \t\tthe tablet tool event, transformed to screen coordinates and \t\twhether they have changed in this event.  \t\tNote: \t\t\tOn some devices, returned value may be negative or larger than \t\t\tthe width of the device. See `Out-of-bounds motion events`_ \t\t\tfor more details. \t\tArgs: \t\t\twidth (int): The current output screen width. \t\t\theight (int): The current output screen height. \t\tReturns: \t\t\t((float, float), bool): The current absolute (x, y) coordinates \t\t\ttransformed to screen coordinates and whether they have changed. \t\t\"\"\"  \t\tx = self._libinput.libinput_event_tablet_tool_get_x_transformed( \t\t\tself._handle, width) \t\ty = self._libinput.libinput_event_tablet_tool_get_y_transformed( \t\t\tself._handle, height) \t\tx_changed = self._libinput.libinput_event_tablet_tool_x_has_changed( \t\t\tself._handle) \t\ty_changed = self._libinput.libinput_event_tablet_tool_y_has_changed( \t\t\tself._handle) \t\treturn (x, y), x_changed or y_changed"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def list_to_str(list, separator=','):     \"\"\"     >>> list = [0, 0, 7]     >>> list_to_str(list)     '0,0,7'     \"\"\"     list = [str(x) for x in list]     return separator.join(list)",
+            "def natural_sort(list_to_sort: Iterable[str]) -> List[str]:     \"\"\"     Sorts a list of strings case insensitively as well as numerically.      For example: ['a1', 'A2', 'a3', 'A11', 'a22']      To sort a list in place, don't call this method, which makes a copy. Instead, do this:      my_list.sort(key=natural_keys)      :param list_to_sort: the list being sorted     :return: the list sorted naturally     \"\"\"     return sorted(list_to_sort, key=natural_keys)",
+            "def list2string (inlist,delimit=' '):     \"\"\" Converts a 1D list to a single long string for file output, using the string.join function.  Usage:   list2string (inlist,delimit=' ') Returns: the string created from inlist \"\"\"     stringlist = [makestr(_) for _ in inlist]     return string.join(stringlist,delimit)",
+            "def format(self):         \"\"\"         Return a well formatted list. Basicaly, it's sort a list and remove duplicate.          :return: A sorted, without duplicate, list.         :rtype: list         \"\"\"          try:             return sorted(list(set(self.main_list)), key=str.lower)          except TypeError:  # pragma: no cover             return self.main_list",
+            "def printdict(adict):     \"\"\"printdict\"\"\"     dlist = list(adict.keys())     dlist.sort()     for i in range(0, len(dlist)):         print(dlist[i], adict[dlist[i]])"
+        ],
+        [
+            "def __repr__(self):         \"\"\"         Basic string representation of the order.         \"\"\"         list_repr = \"<MarketOrderList: \\n\"          for order_list in [olist.orders for olist in self._orders.values()]:             for order in order_list:                 list_repr += repr(order)          return list_repr",
+            "def _tuple_repr(data):     \"\"\"Return a repr() for a list/tuple\"\"\"     if len(data) == 1:         return \"(%s,)\" % rpr(data[0])     else:         return \"(%s)\" % \", \".join([rpr(x) for x in data])"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def disown(cmd):     \"\"\"Call a system command in the background,        disown it and hide it's output.\"\"\"     subprocess.Popen(cmd,                      stdout=subprocess.DEVNULL,                      stderr=subprocess.DEVNULL)",
+            "def kill_mprocess(process):     \"\"\"kill process     Args:         process - Popen object for process     \"\"\"     if process and proc_alive(process):         process.terminate()         process.communicate()     return not proc_alive(process)",
+            "def __init__(self, pidfile, daemonize=True, root=False, root_chk_argv=True, stdin=\"/dev/null\", stdout=\"/dev/null\", stderr=\"/dev/null\"): \t\t\"\"\" \t\tMake our daemon instance. \t\tpidfile: the file we're going to store the process id in. ex: /tmp/matt-daemon.pid \t\troot:    does this script require root? True if it does, False if it doesn't. Will be enforced. \t\troot_chk_argv:  does the script require '--requires-root' in sys.argv to run as root? (usage is good) \t\tstdin:   where the script gets stdin from. \"/dev/null\", \"/dev/stdin\", etc. \t\tstdout:  where the script writes stdout. \"/dev/null\", \"/dev/stdout\", etc. \t\tstderr:  where the script writes stderr. \"/dev/null\", \"/dev/stderr\", etc. \t\t\"\"\" \t\t# Enforce root usage or non-usage. \t\tRootCheck.check(root, check_argv=root_chk_argv) \t\tself.pidfile = pidfile \t\tself.should_daemonize = daemonize \t\tself.stdin = stdin \t\tself.stdout = stdout \t\tself.stderr = stderr",
+            "def _quit(self, *args):         \"\"\" quit crash \"\"\"         self.logger.warn('Bye!')         sys.exit(self.exit())",
+            "def exit(exit_code=0):   r\"\"\"A function to support exiting from exit hooks.    Could also be used to exit from the calling scripts in a thread safe manner.   \"\"\"   core.processExitHooks()    if state.isExitHooked and not hasattr(sys, 'exitfunc'): # The function is called from the exit hook     sys.stderr.flush()     sys.stdout.flush()     os._exit(exit_code) #pylint: disable=W0212    sys.exit(exit_code)"
+        ],
+        [
+            "def timeout_thread_handler(timeout, stop_event):     \"\"\"A background thread to kill the process if it takes too long.      Args:         timeout (float): The number of seconds to wait before killing             the process.         stop_event (Event): An optional event to cleanly stop the background             thread if required during testing.     \"\"\"      stop_happened = stop_event.wait(timeout)     if stop_happened is False:         print(\"Killing program due to %f second timeout\" % timeout)      os._exit(2)",
+            "def stop_process(self):         \"\"\"         Stops the child process.         \"\"\"         self._process.terminate()         if not self._process.waitForFinished(100):             self._process.kill()"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def listfolder(p):     \"\"\"     generator of list folder in the path.     folders only     \"\"\"     for entry in scandir.scandir(p):         if entry.is_dir():             yield entry.name",
+            "def get_all_files(folder):     \"\"\"     Generator that loops through all absolute paths of the files within folder      Parameters     ----------     folder: str     Root folder start point for recursive search.      Yields     ------     fpath: str     Absolute path of one file in the folders     \"\"\"     for path, dirlist, filelist in os.walk(folder):         for fn in filelist:             yield op.join(path, fn)",
+            "def get_files(dir_name):     \"\"\"Simple directory walker\"\"\"     return [(os.path.join('.', d), [os.path.join(d, f) for f in files]) for d, _, files in os.walk(dir_name)]",
+            "def get_subdirs(parent_path):   \"\"\"Return a list of (name, path) tuples of direct subdirectories of      parent_path, where each tuple corresponds to one subdirectory. Files     in the parent_path are excluded from the output.     \"\"\"   entries = os.listdir(parent_path)   subdirs = [(entry, os.path.join(parent_path, entry))              for entry in entries              if os.path.isdir(entry)]   return subdirs",
+            "def walk_tree(root):     \"\"\"Pre-order depth-first\"\"\"     yield root      for child in root.children:         for el in walk_tree(child):             yield el"
+        ],
+        [
+            "def print_tree(self, indent=2):         \"\"\" print_tree: prints out structure of tree             Args: indent (int): What level of indentation at which to start printing             Returns: None         \"\"\"         config.LOGGER.info(\"{indent}{data}\".format(indent=\"   \" * indent, data=str(self)))         for child in self.children:             child.print_tree(indent + 1)",
+            "def print_item_with_children(ac, classes, level):     \"\"\" Print the given item and all children items \"\"\"     print_row(ac.id, ac.name, f\"{ac.allocation:,.2f}\", level)     print_children_recursively(classes, ac, level + 1)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def _replace_nan(a, val):     \"\"\"     replace nan in a by val, and returns the replaced array and the nan     position     \"\"\"     mask = isnull(a)     return where_method(val, mask, a), mask",
+            "def _fill_array_from_list(the_list, the_array):         \"\"\"Fill an `array` from a `list`\"\"\"         for i, val in enumerate(the_list):             the_array[i] = val         return the_array",
+            "def transpose(table):     \"\"\"     transpose matrix     \"\"\"     t = []     for i in range(0, len(table[0])):         t.append([row[i] for row in table])     return t",
+            "def pivot(self):         \"\"\"         transposes rows and columns         \"\"\"         self.op_data = [list(i) for i in zip(*self.ip_data)]",
+            "def A(*a):     \"\"\"convert iterable object into numpy array\"\"\"     return np.array(a[0]) if len(a)==1 else [np.array(o) for o in a]"
+        ],
+        [
+            "def Tmatrix(X):     \"\"\"     gets the orientation matrix (T) from data in X     \"\"\"     T = [[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]]     for row in X:         for k in range(3):             for l in range(3):                 T[k][l] += row[k] * row[l]     return T",
+            "def transform(foci, mat):     \"\"\" Convert coordinates from one space to another using provided     transformation matrix. \"\"\"     t = linalg.pinv(mat)     foci = np.hstack((foci, np.ones((foci.shape[0], 1))))     return np.dot(foci, t)[:, 0:3]"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def natural_sort(list_to_sort: Iterable[str]) -> List[str]:     \"\"\"     Sorts a list of strings case insensitively as well as numerically.      For example: ['a1', 'A2', 'a3', 'A11', 'a22']      To sort a list in place, don't call this method, which makes a copy. Instead, do this:      my_list.sort(key=natural_keys)      :param list_to_sort: the list being sorted     :return: the list sorted naturally     \"\"\"     return sorted(list_to_sort, key=natural_keys)",
+            "def format(self):         \"\"\"         Return a well formatted list. Basicaly, it's sort a list and remove duplicate.          :return: A sorted, without duplicate, list.         :rtype: list         \"\"\"          try:             return sorted(list(set(self.main_list)), key=str.lower)          except TypeError:  # pragma: no cover             return self.main_list",
+            "def transcript_sort_key(transcript):     \"\"\"     Key function used to sort transcripts. Taking the negative of     protein sequence length and nucleotide sequence length so that     the transcripts with longest sequences come first in the list. This couldn't     be accomplished with `reverse=True` since we're also sorting by     transcript name (which places TP53-001 before TP53-002).     \"\"\"     return (         -len(transcript.protein_sequence),         -len(transcript.sequence),         transcript.name     )",
+            "def upcaseTokens(s,l,t):     \"\"\"Helper parse action to convert tokens to upper case.\"\"\"     return [ tt.upper() for tt in map(_ustr,t) ]",
+            "def list_to_str(list, separator=','):     \"\"\"     >>> list = [0, 0, 7]     >>> list_to_str(list)     '0,0,7'     \"\"\"     list = [str(x) for x in list]     return separator.join(list)"
+        ],
+        [
+            "def toposort_flatten(data, sort=True):     \"\"\"Returns a single list of dependencies. For any set returned by toposort(), those items are sorted and appended to the result (just to make the results deterministic).\"\"\"      result = []     for d in toposort(data):         try:             result.extend((sorted if sort else list)(d))         except TypeError as e:             result.extend(list(d))     return result",
+            "def csort(objs, key):     \"\"\"Order-preserving sorting function.\"\"\"     idxs = dict((obj, i) for (i, obj) in enumerate(objs))     return sorted(objs, key=lambda obj: (key(obj), idxs[obj]))"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def extend(a: dict, b: dict) -> dict:     \"\"\"Merge two dicts and return a new dict. Much like subclassing works.\"\"\"     res = a.copy()     res.update(b)     return res",
+            "def union(self, other):         \"\"\"produce a 'union' of this dict and another (at the key level).          values in the second dict take precedence over that of the first\"\"\"         x = SetLikeDict(**self)         x.update(other)         return x",
+            "def list_of_lists_to_dict(l):     \"\"\" Convert list of key,value lists to dict      [['id', 1], ['id', 2], ['id', 3], ['foo': 4]]     {'id': [1, 2, 3], 'foo': [4]}     \"\"\"     d = {}     for key, val in l:         d.setdefault(key, []).append(val)     return d",
+            "def dict_merge(set1, set2):     \"\"\"Joins two dictionaries.\"\"\"     return dict(list(set1.items()) + list(set2.items()))",
+            "def list2dict(lst):     \"\"\"Takes a list of (key,value) pairs and turns it into a dict.\"\"\"      dic = {}     for k,v in lst: dic[k] = v     return dic"
+        ],
+        [
+            "def as_dictionary(self):         \"\"\"         Convert this object to a dictionary with formatting appropriate for a PIF.          :returns: Dictionary with the content of this object formatted for a PIF.         \"\"\"         return {to_camel_case(i): Serializable._convert_to_dictionary(self.__dict__[i])                 for i in self.__dict__ if self.__dict__[i] is not None}",
+            "def _zeep_to_dict(cls, obj):         \"\"\"Convert a zeep object to a dictionary.\"\"\"         res = serialize_object(obj)         res = cls._get_non_empty_dict(res)         return res"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def dashrepl(value):     \"\"\"     Replace any non-word characters with a dash.     \"\"\"     patt = re.compile(r'\\W', re.UNICODE)     return re.sub(patt, '-', value)",
+            "def replace(s, replace):     \"\"\"Replace multiple values in a string\"\"\"     for r in replace:         s = s.replace(*r)     return s",
+            "def remove_bad(string):     \"\"\"     remove problem characters from string     \"\"\"     remove = [':', ',', '(', ')', ' ', '|', ';', '\\'']     for c in remove:         string = string.replace(c, '_')     return string",
+            "def _sanitize(text):     \"\"\"Return sanitized Eidos text field for human readability.\"\"\"     d = {'-LRB-': '(', '-RRB-': ')'}     return re.sub('|'.join(d.keys()), lambda m: d[m.group(0)], text)",
+            "def lowstrip(term):     \"\"\"Convert to lowercase and strip spaces\"\"\"     term = re.sub('\\s+', ' ', term)     term = term.lower()     return term"
+        ],
+        [
+            "def slugify(value):     \"\"\"Simple Slugify.\"\"\"     s1 = first_cap_re.sub(r'\\1_\\2', value)     s2 = all_cap_re.sub(r'\\1_\\2', s1)     return s2.lower().replace(' _', '_').replace(' ', '_')",
+            "def slugify(s):     \"\"\"     Converts the given string to a URL slug.     \"\"\"     s = strip_accents(s.replace(\"'\", '').lower())     return re.sub('[^a-z0-9]+', ' ', s).strip().replace(' ', '-')"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def eof(fd):     \"\"\"Determine if end-of-file is reached for file fd.\"\"\"     b = fd.read(1)     end = len(b) == 0     if not end:         curpos = fd.tell()         fd.seek(curpos - 1)     return end",
+            "def get_line_ending(line):     \"\"\"Return line ending.\"\"\"     non_whitespace_index = len(line.rstrip()) - len(line)     if not non_whitespace_index:         return ''     else:         return line[non_whitespace_index:]",
+            "def seconds(num):     \"\"\"     Pause for this many seconds     \"\"\"     now = pytime.time()     end = now + num     until(end)",
+            "def find_first_in_list(txt: str, str_list: [str]) -> int:  # type: ignore     \"\"\"     Returns the index of the earliest occurence of an item from a list in a string      Ex: find_first_in_list('foobar', ['bar', 'fin']) -> 3     \"\"\"     start = len(txt) + 1     for item in str_list:         if start > txt.find(item) > -1:             start = txt.find(item)     return start if len(txt) + 1 > start > -1 else -1",
+            "def main(idle):     \"\"\"Any normal python logic which runs a loop. Can take arguments.\"\"\"     while True:          LOG.debug(\"Sleeping for {0} seconds.\".format(idle))         time.sleep(idle)"
+        ],
+        [
+            "def stop(self) -> None:         \"\"\"Stops the analysis as soon as possible.\"\"\"         if self._stop and not self._posted_kork:             self._stop()             self._stop = None",
+            "def timeout_thread_handler(timeout, stop_event):     \"\"\"A background thread to kill the process if it takes too long.      Args:         timeout (float): The number of seconds to wait before killing             the process.         stop_event (Event): An optional event to cleanly stop the background             thread if required during testing.     \"\"\"      stop_happened = stop_event.wait(timeout)     if stop_happened is False:         print(\"Killing program due to %f second timeout\" % timeout)      os._exit(2)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def stdoutwriteline(*args):     \"\"\"     @type args: tuple     @return: None     \"\"\"     s = \"\"      for i in args:         s += str(i) + \" \"      s = s.strip()     sys.stdout.write(str(s) + \"\\n\")     sys.stdout.flush()      return s",
+            "def print_with_header(header, message, color, indent=0):     \"\"\"     Use one of the functions below for printing, not this one.     \"\"\"     print()     padding = ' ' * indent     print(padding + color + BOLD + header + ENDC + color + message + ENDC)",
+            "def flushed_print(*args, **kwargs):     \"\"\"     Use to replace print(*args, flush=True) that doesn't exist for python<3.3     \"\"\"     print(*args, **kwargs)     file = kwargs.get('file', sys.stdout)     file.flush() if file is not None else sys.stdout.flush()",
+            "def pstd(self, *args, **kwargs):         \"\"\" Console to STDOUT \"\"\"         kwargs['file'] = self.out         self.print(*args, **kwargs)         sys.stdout.flush()",
+            "def execfile(fname, variables):     \"\"\" This is builtin in python2, but we have to roll our own on py3. \"\"\"     with open(fname) as f:         code = compile(f.read(), fname, 'exec')         exec(code, variables)"
+        ],
+        [
+            "def out(self, output, newline=True):         \"\"\"Outputs a string to the console (stdout).\"\"\"         click.echo(output, nl=newline)",
+            "def _display(self, layout):         \"\"\"launch layouts display\"\"\"         print(file=self.out)         TextWriter().format(layout, self.out)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def Slice(a, begin, size):     \"\"\"     Slicing op.     \"\"\"     return np.copy(a)[[slice(*tpl) for tpl in zip(begin, begin+size)]],",
+            "def _column(arr, indexes):     \"\"\" Returns a column with given indexes from a deep array      For example, if the array is a matrix and indexes is a single int, will     return arr[:,indexes]. If the array is an order 3 tensor and indexes is a     pair of ints, will return arr[:,indexes[0],indexes[1]], etc.      \"\"\"     if arr.ndim == 2 and types.is_int(indexes):         return arr[:, indexes]     elif arr.ndim == 3 and len(indexes) == 2:         return arr[:, indexes[0], indexes[1]]     else:         raise NotImplementedError('Only supporting arrays of dimension 2 and 3 as yet.')",
+            "def get_inputs_from_cm(index, cm):     \"\"\"Return indices of inputs to the node with the given index.\"\"\"     return tuple(i for i in range(cm.shape[0]) if cm[i][index])",
+            "def ziptake(items_list, indexes_list):     \"\"\"     SeeAlso:         vt.ziptake     \"\"\"     return [take(list_, index_list)             for list_, index_list in zip(items_list, indexes_list)]",
+            "def maskIndex(self):         \"\"\" Returns a boolean index with True if the value is masked.              Always has the same shape as the maksedArray.data, event if the mask is a single boolan.         \"\"\"         if isinstance(self.mask, bool):             return np.full(self.data.shape, self.mask, dtype=np.bool)         else:             return self.mask"
+        ],
+        [
+            "def A(*a):     \"\"\"convert iterable object into numpy array\"\"\"     return np.array(a[0]) if len(a)==1 else [np.array(o) for o in a]",
+            "def _transform_triple_numpy(x):     \"\"\"Transform triple index into a 1-D numpy array.\"\"\"     return np.array([x.head, x.relation, x.tail], dtype=np.int64)"
+        ],
+        "WebQuery"
+    ],
+    [
+        [
+            "def is_valid(number):     \"\"\"determines whether the card number is valid.\"\"\"     n = str(number)     if not n.isdigit():         return False     return int(n[-1]) == get_check_digit(n[:-1])",
+            "def IntGreaterThanZero(n):     \"\"\"If *n* is an integer > 0, returns it, otherwise an error.\"\"\"     try:         n = int(n)     except:         raise ValueError(\"%s is not an integer\" % n)     if n <= 0:         raise ValueError(\"%d is not > 0\" % n)     else:         return n",
+            "def get_number(s, cast=int):     \"\"\"     Try to get a number out of a string, and cast it.     \"\"\"     import string     d = \"\".join(x for x in str(s) if x in string.digits)     return cast(d)",
+            "def _isint(string):     \"\"\"     >>> _isint(\"123\")     True     >>> _isint(\"123.45\")     False     \"\"\"     return type(string) is int or \\            (isinstance(string, _binary_type) or isinstance(string, _text_type)) and \\            _isconvertible(int, string)",
+            "def is_number(obj):     \"\"\"     Helper function to determine numbers     across Python 2.x and 3.x     \"\"\"     try:         from numbers import Number     except ImportError:         from operator import isNumberType         return isNumberType(obj)     else:         return isinstance(obj, Number)"
+        ],
+        [
+            "def validate_non_negative_integer(option, value):     \"\"\"Validate that 'value' is a positive integer or 0.     \"\"\"     val = validate_integer(option, value)     if val < 0:         raise ValueError(\"The value of %s must be \"                          \"a non negative integer\" % (option,))     return val",
+            "def validate_positive_integer(option, value):     \"\"\"Validate that 'value' is a positive integer, which does not include 0.     \"\"\"     val = validate_integer(option, value)     if val <= 0:         raise ValueError(\"The value of %s must be \"                          \"a positive integer\" % (option,))     return val"
+        ],
+        "WebQuery"
+    ]
+]
