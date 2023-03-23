@@ -40,7 +40,8 @@ if __name__ == "__main__":
     train_data = pairs[val_size:]
     val_data = pairs[:val_size]
     
+    print(train_path)
     with open(train_path, "w") as f:
         json.dump(train_data, f, indent=4)
-    with open(val_path, "w") as f:
-        json.dump(val_data, f, indent=4)
+    # with open(val_path, "w") as f:
+    #     json.dump(val_data, f, indent=4)
