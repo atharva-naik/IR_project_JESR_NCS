@@ -12,5 +12,7 @@ if __name__ == "__main__":
         model_path = os.path.join(path, "model.pt")
         if os.path.exists(model_path):
             print(f"\x1b[32;1mcheckpoint exists for {path}\x1b[0m")
-        else: print(f"\x1b[32;1mcheckpoint missing for {path}\x1b[0m")
+        else: 
+            ctr += 1
+            print(f"\x1b[31;1mcheckpoint missing for {path}\x1b[0m")
     print(f"missing {ctr}/{tot} checkpoints!")
