@@ -1,14 +1,14 @@
-# IR_project_JESR_NCS
-Implementation of Joint Embedding Space Retrieval (JESR) for Neural Code Search (NCS) for IR term project.
+# SYNC
+Implementation of StructurallY Guided 
 Our model is composed of the following components (1) encoders (2) distance function
 
 ## Setup
 Download the required datasets and model checkpoints from this [google drive](https://drive.google.com/drive/folders/1khRWNvuM0K5fxXyS1pA6FQ7lTdhvspmY?usp=sharing) link. All the data should be contained in a folder called "triples" (check scripts/train_codebert.py) in case of confusion. Store the models
- in their respective fodlers (e.g. GraphCodeBERT/model.pt should be present inside GraphCodeBERT but as GraphCodeBERT/model.pt not GraphCodeBERT/GraphCodeBERT/model.pt). Again in case of confusion check the default argument of the argument parser for models/GraphCodeBERT.
+ in their respective folders (e.g. GraphCodeBERT/model.pt should be present inside GraphCodeBERT but as GraphCodeBERT/model.pt not GraphCodeBERT/GraphCodeBERT/model.pt). Again in case of confusion check the default argument of the argument parser for models/GraphCodeBERT.
 
 Each variant of the augmentations proposed in our work can be found as different train and val set pairs.
 
-### Environmet:
+### Environment:
 Use the requirements.txt: ```pip install -r requirements.txt```
 
 If you face issues with requirements.txt then please try using our conda environment (py3.7.yml) <br>
